@@ -1,5 +1,6 @@
 package com.radar;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 public class Handler {
@@ -8,7 +9,6 @@ public class Handler {
 	Cube tempCube;
 	boolean looping,changed;
 	int ci,pi,i = 0;
-	boolean first = true;
 	
 	public void addPlayer(Player player){
 		players[pi] = player;
@@ -22,19 +22,22 @@ public class Handler {
 	public void render(Graphics g){
 		looping = true;
 		i = 0;
-		while (looping && !first){
+		while (looping){
 			if (i >= objects.length){
 				i = 0;
 				if (!changed){
 					looping = false;
 				}
 			}
-			if (objects[i].getDist() < objects[i+1].getDist()){
-				tempCube = objects[i];
-				objects[i] = objects[i+1];
-				objects[i+1] = tempCube;
-				changed = true;
-				System.out.println("Hi");
+			if (objects[i] != null && objects[i+1] != null){
+				if (objects[i].getDist() > objects[i+1].getDist()){
+					tempCube = objects[i];
+					objects[i] = objects[i+1];
+					objects[i+1] = tempCube;
+					changed = true;
+					g.setColor(Color.RED);
+					g.drawRect(0, 0, 50, 50);
+				}
 			}
 			i++;
 		}
@@ -42,9 +45,6 @@ public class Handler {
 			if (object != null){
 				object.render(g);
 			}
-		}
-		if (!first){
-			first = true;
 		}
 		players[0].render(g);
 	}

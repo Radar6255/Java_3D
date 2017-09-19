@@ -224,20 +224,16 @@ public class Cube {
 			}
 			i++;
 		}
-	}@SuppressWarnings("null")
+	}
 	public double getDist(){
 		try{
-			tx = point[0];
-			ty = point[1];
-			tz = point[2];
+			tx = points3D[0][0];
+			ty = points3D[0][1];
+			tz = points3D[0][2];
 		}catch(Exception e){
-			return (Double) null;
+			return 0;
 		}
-		tx = (float) (tx+x);
-		ty = (float) (ty+y);
-		tz = (float) (tz+z);
-		
-		return (Math.sqrt(Math.pow(tx-px, 2)+Math.pow(ty-py, 2)+Math.pow(tz-pz, 2)));
+		return (Math.sqrt(Math.pow(tx, 2)+Math.pow(ty, 2)+Math.pow(tz, 2)));
 	}
 	public void tick(){
 		
