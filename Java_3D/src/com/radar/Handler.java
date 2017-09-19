@@ -1,6 +1,5 @@
 package com.radar;
 
-import java.awt.Color;
 import java.awt.Graphics;
 
 public class Handler {
@@ -29,16 +28,16 @@ public class Handler {
 					looping = false;
 				}
 			}
+			changed = false;
 			if (objects[i] != null && objects[i+1] != null){
-				if (objects[i].getDist() > objects[i+1].getDist()){
+				if (objects[i].getDist() <= objects[i+1].getDist()){
 					tempCube = objects[i];
 					objects[i] = objects[i+1];
 					objects[i+1] = tempCube;
 					changed = true;
-					g.setColor(Color.RED);
-					g.drawRect(0, 0, 50, 50);
 				}
 			}
+			//System.out.println(changed);
 			i++;
 		}
 		for (Cube object: objects){
