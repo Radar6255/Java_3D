@@ -73,6 +73,10 @@ public class Cube {
 			ty = (float) (ty+(y-py));
 			tz = (float) (tz+(z-pz));
 			
+			points3D[i][0] = tx;
+			points3D[i][1] = ty;
+			points3D[i][2] = tz;
+			
 			dist = Math.sqrt(Math.pow(tz, 2)+Math.pow(tx, 2)+Math.pow(ty, 2));
 			
 			point = rotate2D(tx,tz,(float) Math.toRadians(rotLat));
@@ -82,9 +86,9 @@ public class Cube {
 			ty = point[0];
 			tz = point[1];
 
-			points3D[i][0] = tx;
-			points3D[i][1] = ty;
-			points3D[i][2] = tz;
+//			points3D[i][0] = tx;
+//			points3D[i][1] = ty;
+//			points3D[i][2] = tz;
 			
 			if (tz != 0){
 				f = fov / tz;
@@ -92,9 +96,7 @@ public class Cube {
 				f = fov;
 			}
 			
-			//System.out.println(i+" "+tx+" "+ty+" "+f);
 			g.fillOval((int) ((tx*f)+(Main.WIDTH/2)-2), (int) ((ty*f)+(Main.HEIGHT)-2), 4, 4);
-			//g.drawString(Integer.toString(i), (int) ((tx*f)+(Main.WIDTH/2)-2), (int) ((ty*f)+(Main.HEIGHT)-2));
 			points[i][0] = (int) ((tx*f)+(Main.WIDTH/2));
 			points[i][1] = (int) (ty*f)+(Main.HEIGHT);
 			if (ldist < dist){
@@ -140,21 +142,16 @@ public class Cube {
 				yCoords[1] = points[face[1]][1];
 				yCoords[2] = points[face[2]][1];
 				yCoords[3] = points[face[3]][1];
+				
 				float dist=0;
-				for(int i=0;i<3;i++){
-					float sum=0;
-					for(int j:face)sum+=points3D[j][i];
-					dist+=sum*sum;
-				}
-//				sum += (points3D[face[0]][0]+points3D[face[0]][1]+points3D[face[0]][2]);
-//				sum += (points3D[face[1]][0]+points3D[face[1]][1]+points3D[face[1]][2]);
-//				sum += (points3D[face[2]][0]+points3D[face[2]][1]+points3D[face[2]][2]);
-//				sum += (points3D[face[3]][0]+points3D[face[3]][1]+points3D[face[3]][2]);
-//				
-//				sum += (points3D[face[0]][0]+points3D[face[1]][0]+points3D[face[2]][0]+points3D[face[3]][0])/4;
-//				sum += (points3D[face[0]][1]+points3D[face[1]][1]+points3D[face[2]][1]+points3D[face[3]][1])/4;
-//				sum += (points3D[face[0]][2]+points3D[face[1]][2]+points3D[face[2]][2]+points3D[face[3]][2])/4;
-//				dist = sum / 3;
+//				for(int i=0;i<3;i++){
+//					float sum=0;
+//					for(int j:face)sum+=points3D[j][i];
+//					dist+=sum*sum;
+//				}
+				for (int j:face){
+					dist += (float) Math.sqrt(Math.pow(points3D[j][0],2)+Math.pow(points3D[j][1],2)+Math.pow(points3D[j][2],2));
+				}dist = dist/4;
 				
 				if(face[4] == 0){
 					faceColor = Color.BLUE;
@@ -193,18 +190,12 @@ public class Cube {
 		looping = true;
 		while (looping){
 			
-			if (renderFaces[i+1].getDist() >= renderFaces[i].getDist()){
+			if (renderFaces[i+1].getDist() > renderFaces[i].getDist()){
 				tempFace = renderFaces[i];
 				renderFaces[i] = renderFaces[i+1];
 				renderFaces[i+1] = tempFace;
 				changed = true;
 			}
-//			if (renderFaces[i].getDist() < renderFaces[i+1].getDist()){
-//				tempFace = renderFaces[i+1];
-//				renderFaces[i+1] = renderFaces[i];
-//				renderFaces[i] = tempFace;
-//				changed = true;
-//			}
 			i++;
 			if (i == 2 && changed){
 				i = 0;
@@ -217,10 +208,15 @@ public class Cube {
 		}
 		i = 0;
 		for (BlockFace face:renderFaces){
+			if (i+1<3){
+				if (renderFaces[i+1].getDist() > renderFaces[i].getDist()){
+					System.out.println("Not fully sorted");
+				}
+			}
 			if (face.getVisible()){
 				g.setColor(face.getColor());
 				g.fillPolygon(face.getXCoords(), face.getYCoords(),4);
-				g.drawImage(img.getImage(), Main.WIDTH/2, Main.WIDTH/2, null);
+				//g.drawImage(img.getImage(), Main.WIDTH/2, Main.WIDTH/2, null);
 			}
 			i++;
 		}

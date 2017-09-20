@@ -37,7 +37,6 @@ public class Handler {
 					changed = true;
 				}
 			}
-			//System.out.println(changed);
 			i++;
 		}
 		for (Cube object: objects){
