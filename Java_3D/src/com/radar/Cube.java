@@ -149,9 +149,16 @@ public class Cube {
 //					for(int j:face)sum+=points3D[j][i];
 //					dist+=sum*sum;
 //				}
-				for (int j:face){
-					dist += (float) Math.sqrt(Math.pow(points3D[j][0],2)+Math.pow(points3D[j][1],2)+Math.pow(points3D[j][2],2));
-				}dist = dist/4;
+//				for (int j:face){
+//					dist += (float) Math.sqrt(Math.pow(points3D[j][0],2)+Math.pow(points3D[j][1],2)+Math.pow(points3D[j][2],2));
+//				}dist = dist/4;
+				
+				for (int i=0;i<3;i++){
+					float sum=0;
+					for(int j:face){
+						sum += points3D[j][i];
+					}dist+=Math.pow(sum,2);
+				}dist = (float) Math.sqrt(dist);
 				
 				if(face[4] == 0){
 					faceColor = Color.BLUE;
@@ -209,7 +216,7 @@ public class Cube {
 		i = 0;
 		for (BlockFace face:renderFaces){
 			if (i+1<3){
-				if (renderFaces[i+1].getDist() > renderFaces[i].getDist()){
+				if (renderFaces[i+1].getDist() >= renderFaces[i].getDist()){
 					System.out.println("Not fully sorted");
 				}
 			}
