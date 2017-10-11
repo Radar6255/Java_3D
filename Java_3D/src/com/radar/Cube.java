@@ -20,7 +20,7 @@ public class Cube {
 	
 	public float[][] verts = {{0.5f,0.5f,0.5f},{0.5f,-0.5f,0.5f},{-0.5f,-0.5f,0.5f},{-0.5f,0.5f,0.5f},{0.5f,0.5f,-0.5f},{0.5f,-0.5f,-0.5f},{-0.5f,-0.5f,-0.5f},{-0.5f,0.5f,-0.5f}};
 	public int[][] faces = {{0,1,2,3,0},{4,5,6,7,1},{0,4,5,1,2},{2,6,7,3,3},{1,5,6,2,4},{3,7,4,0,5}}; 
-	public float[][] points3D = new float[8][3];
+	public float[][] points3D = new float[9][3];
 	public int[][] points = new int[8][2];
 	public double[] distances = new double[8];
 	private int[] xCoords = new int[4];
@@ -73,9 +73,9 @@ public class Cube {
 			ty = (float) (ty+(y-py));
 			tz = (float) (tz+(z-pz));
 			
-			points3D[i][0] = tx;
-			points3D[i][1] = ty;
-			points3D[i][2] = tz;
+//			points3D[i][0] = tx;
+//			points3D[i][1] = ty;
+//			points3D[i][2] = tz;
 			
 			dist = Math.sqrt(Math.pow(tz, 2)+Math.pow(tx, 2)+Math.pow(ty, 2));
 			
@@ -86,9 +86,9 @@ public class Cube {
 			ty = point[0];
 			tz = point[1];
 
-//			points3D[i][0] = tx;
-//			points3D[i][1] = ty;
-//			points3D[i][2] = tz;
+			points3D[i][0] = tx;
+			points3D[i][1] = ty;
+			points3D[i][2] = tz;
 			
 			if (tz != 0){
 				f = fov / tz;
@@ -157,8 +157,17 @@ public class Cube {
 					float sum=0;
 					for(int j:face){
 						sum += points3D[j][i];
-					}dist+=Math.pow(sum,2);
+					}points3D[8][i] = sum/4;
+					dist+=sum/4;
 				}dist = (float) Math.sqrt(dist);
+				
+				if (tz != 0){
+					f = fov / points3D[8][2];
+				}else{
+					f = fov;
+				}
+				g.setColor(Color.BLACK);
+				g.fillOval((int) ((points3D[8][0]-2)*f)+(Main.WIDTH/2),(int) ((points3D[8][1]-2)*f)+(Main.HEIGHT/2), 2, 2);
 				
 				if(face[4] == 0){
 					faceColor = Color.BLUE;
