@@ -73,9 +73,9 @@ public class Cube {
 			ty = (float) (ty+(y-py));
 			tz = (float) (tz+(z-pz));
 			
-//			points3D[i][0] = tx;
-//			points3D[i][1] = ty;
-//			points3D[i][2] = tz;
+			points3D[i][0] = tx;
+			points3D[i][1] = ty;
+			points3D[i][2] = tz;
 			
 			dist = Math.sqrt(Math.pow(tz, 2)+Math.pow(tx, 2)+Math.pow(ty, 2));
 			
@@ -86,9 +86,9 @@ public class Cube {
 			ty = point[0];
 			tz = point[1];
 
-			points3D[i][0] = tx;
-			points3D[i][1] = ty;
-			points3D[i][2] = tz;
+//			points3D[i][0] = tx;
+//			points3D[i][1] = ty;
+//			points3D[i][2] = tz;
 			
 			if (tz != 0){
 				f = fov / tz;
@@ -144,29 +144,29 @@ public class Cube {
 				yCoords[3] = points[face[3]][1];
 				
 				float dist=0;
-//				for(int i=0;i<3;i++){
-//					float sum=0;
-//					for(int j:face)sum+=points3D[j][i];
-//					dist+=sum*sum;
-//				}
-//				for (int j:face){
-//					dist += (float) Math.sqrt(Math.pow(points3D[j][0],2)+Math.pow(points3D[j][1],2)+Math.pow(points3D[j][2],2));
-//				}dist = dist/4;
-				
-				for (int i=0;i<3;i++){
+				for(int i=0;i<3;i++){
 					float sum=0;
-					for(int j:face){
-						sum += points3D[j][i];
-					}points3D[8][i] = sum/4;
-					dist+=sum/4;
-				}dist = (float) Math.sqrt(dist);
+					for(int j:face)sum+=points3D[j][i];
+					dist+=sum*sum;
+				}
+				for (int j:face){
+					dist += (float) Math.sqrt(Math.pow(points3D[j][0],2)+Math.pow(points3D[j][1],2)+Math.pow(points3D[j][2],2));
+				}dist = dist/4;
 				
+//				for (int i=0;i<3;i++){
+//					float sum=0;
+//					for(int j:face){
+//						sum += points3D[j][i];
+//					}points3D[8][i] = sum/4;
+//					dist+=sum/4;
+//				}dist = (float) Math.sqrt(dist);
+//				
 				if (tz != 0){
 					f = fov / points3D[8][2];
 				}else{
 					f = fov;
 				}
-				g.setColor(Color.BLACK);
+				g.setColor(Color.RED);
 				g.fillOval((int) ((points3D[8][0]-2)*f)+(Main.WIDTH/2),(int) ((points3D[8][1]-2)*f)+(Main.HEIGHT/2), 2, 2);
 				
 				if(face[4] == 0){
@@ -231,7 +231,9 @@ public class Cube {
 			}
 			if (face.getVisible()){
 				g.setColor(face.getColor());
-				g.fillPolygon(face.getXCoords(), face.getYCoords(),4);
+				//Face polygon
+				//g.fillPolygon(face.getXCoords(), face.getYCoords(),4);
+				
 				//g.drawImage(img.getImage(), Main.WIDTH/2, Main.WIDTH/2, null);
 			}
 			i++;
