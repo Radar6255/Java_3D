@@ -28,11 +28,11 @@ public class Main extends Canvas implements Runnable{
 		handler = new Handler();
 		Player thePlayer = new Player(-1,0,-2,0,0);
 		handler.addPlayer(thePlayer);
-		while(i < 5){
+		//while(i < 5){
 			Cube tempCube = new Cube(i,0,0,1,1,1,handler);
 			handler.addCube(tempCube);
 			i++;
-		}
+		//}
 		this.addKeyListener(new KeyInput(handler));
 		new Window(WIDTH,HEIGHT,"3D Stuff",this);
 	}
