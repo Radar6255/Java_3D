@@ -27,12 +27,13 @@ public class Main extends Canvas implements Runnable{
 	public Main(){
 		handler = new Handler();
 		Player thePlayer = new Player(-1,0,-2,0,0);
+		handler.addGeneration(new WorldGen(handler));
 		handler.addPlayer(thePlayer);
-		//while(i < 5){
-			Cube tempCube = new Cube(i,0,0,1,1,1,handler);
-			handler.addCube(tempCube);
-			i++;
-		//}
+//		while(i < 29){
+//			Cube tempCube = new Cube(2*i,0,0,1,1,1,handler,i);
+//			handler.addCube(tempCube);
+//			i++;
+//		}
 		this.addKeyListener(new KeyInput(handler));
 		new Window(WIDTH,HEIGHT,"3D Stuff",this);
 	}
@@ -66,6 +67,7 @@ public class Main extends Canvas implements Runnable{
 		}
 		stop();
 	}
+
 	public synchronized void start(){
 		thread = new Thread(this);
 		thread.start();
@@ -84,8 +86,7 @@ public class Main extends Canvas implements Runnable{
 			changeMouse = false;
 		}else if(!pause && changeMouse){
 			BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-			Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-			    cursorImg, new Point(0, 0), "blank cursor");
+			Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
 			this.setCursor(blankCursor);
 			changeMouse = false;
 		}
@@ -94,7 +95,7 @@ public class Main extends Canvas implements Runnable{
 	public void render(){
 		BufferStrategy bs = this.getBufferStrategy();
 		if (bs == null){
-			this.createBufferStrategy(3);
+			this.createBufferStrategy(2);
 			return;
 		}
 		final Graphics g = bs.getDrawGraphics();
@@ -104,7 +105,6 @@ public class Main extends Canvas implements Runnable{
 		g.dispose();
 		bs.show();
 	}
-	
 	
 	public static void main(String[] args){
 		new Main();

@@ -1,13 +1,20 @@
 package com.radar;
 
 import java.awt.Graphics;
+import java.util.LinkedList;
 
 public class Handler {
-	Cube[] objects = new Cube[30];
+	Cube[] objects;
 	Player[] players = new Player[2];
+	WorldGen gen;
 	Cube tempCube;
-	boolean looping,changed;
+	boolean looping,changed,out;
+	LinkedList<LinkedList<Cube[]>> chunks = new LinkedList<LinkedList<Cube[]>>();
 	int ci,pi,i = 0;
+	
+	public void addGeneration(WorldGen gen){
+		this.gen = gen;
+	}
 	
 	public void addPlayer(Player player){
 		players[pi] = player;
@@ -19,6 +26,8 @@ public class Handler {
 		ci++;
 	}
 	public void render(Graphics g){
+		chunks = gen.getWorld();
+		objects = chunks.get(0).get(0);
 		looping = true;
 		i = 0;
 		while (looping){
@@ -39,6 +48,7 @@ public class Handler {
 			}
 			i++;
 		}
+		
 		for (Cube object: objects){
 			if (object != null){
 				object.render(g);
@@ -47,6 +57,7 @@ public class Handler {
 		players[0].render(g);
 	}
 	public void tick(){
+		gen.tick();
 		for (Cube object: objects){
 			if (object != null){
 				object.tick();
