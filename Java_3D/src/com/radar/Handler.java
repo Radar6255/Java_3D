@@ -1,6 +1,7 @@
 package com.radar;
 
 import java.awt.Graphics;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 public class Handler {
@@ -68,30 +69,7 @@ public class Handler {
 			chunkI++;
 		}
 		
-		
-		looping = true;
-		i = 0;
-		while (looping){
-			if (i >= objects.size()){
-				i = 0;
-				if (!changed){
-					looping = false;
-				}
-			}
-			changed = false;
-			try{
-				if (objects.get(i).getDist() <= objects.get(i+1).getDist()){
-					tempCube = objects.get(i);
-					objects.set(i, objects.get(i+1));
-					objects.set(i+1, tempCube);
-					changed = true;
-				}
-			}catch(Exception e){
-				
-			}
-			i++;
-			
-		}
+		objects.sort(new cubeCompare());
 		
 		for (Cube object: objects){
 			if (object != null){
@@ -112,5 +90,14 @@ public class Handler {
 	public Player getPlayer(){
 		return players[0];
 	}
-	
+}
+class cubeCompare implements Comparator<Cube>{
+	@Override
+	public int compare(Cube c1, Cube c2){
+		if (c1.getDist() < c2.getDist()){
+			return 1;
+		}else{
+			return -1;
+		}
+	}
 }
