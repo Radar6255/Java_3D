@@ -11,6 +11,7 @@ import java.awt.Toolkit;
 
 public class Player {
 	double x,y,z,mx,my;
+	int chunkX,chunkY,chunkZ;
 	double rotLat,rotVert,s,c;
 	public boolean up,down,left,right,space,shift;
 	
@@ -30,11 +31,15 @@ public class Player {
 		this.rotVert = rotVert;
 	}
 	public void render(Graphics g){
+		
 		g.setColor(Color.BLACK);
 		g.drawString(x+" "+y+" "+z, 20, 20);
+		g.drawString(chunkX+" "+chunkY+" "+chunkZ, 20, 40);
 	}
 	public void tick(){
-		
+		chunkX = (int) Math.floor(x/16);
+		chunkY = (int) y;
+		chunkZ = (int) Math.floor(z/16);
 		if (!Main.pause){
 			mouseLoc = MouseInfo.getPointerInfo();
 			tempPoint = mouseLoc.getLocation();
@@ -93,6 +98,14 @@ public class Player {
 		return rotLat;
 	}public double getRotVert(){
 		return rotVert;
+	}public int getChunkX(){
+		return chunkX;
+	}public int getChunkY(){
+		return chunkY;
+	}public int getChunkZ(){
+		return chunkZ;
 	}
+
+
 
 }

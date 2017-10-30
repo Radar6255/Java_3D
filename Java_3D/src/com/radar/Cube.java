@@ -3,8 +3,6 @@ package com.radar;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import javax.swing.ImageIcon;
-
 public class Cube {
 	public int x, y, z, w, h, d, i, fov, far, index, cubeIndex;
 	public float tx, ty, tz, sum;
@@ -13,7 +11,7 @@ public class Cube {
 	public boolean hasFar = false;
 	public Color faceColor;
 	public boolean visible, changed, looping, render;
-	ImageIcon img = new ImageIcon("./dirt.png");
+	//ImageIcon img = new ImageIcon("./dirt.png");
 
 	Player player;
 	private Handler handler;
@@ -43,7 +41,7 @@ public class Cube {
 		} else {
 			fov = Main.HEIGHT;
 		}
-
+		//System.out.println("Hi");
 	}
 
 	private float[] rotate2D(float x, float y, float rad) {
@@ -105,32 +103,32 @@ public class Cube {
 			}
 			i++;
 		}
-
-		 g.drawLine((int) points[0][0], (int) points[0][1], (int)
-		 points[1][0], (int) points[1][1]);
-		 g.drawLine((int) points[2][0], (int) points[2][1], (int)
-		 points[1][0], (int) points[1][1]);
-		 g.drawLine((int) points[2][0], (int) points[2][1], (int)
-		 points[3][0], (int) points[3][1]);
-		 g.drawLine((int) points[3][0], (int) points[3][1], (int)
-		 points[0][0], (int) points[0][1]);
-		 g.drawLine((int) points[0][0], (int) points[0][1], (int)
-		 points[4][0], (int) points[4][1]);
-		 g.drawLine((int) points[4][0], (int) points[4][1], (int)
-		 points[5][0], (int) points[5][1]);
-		 g.drawLine((int) points[5][0], (int) points[5][1], (int)
-		 points[6][0], (int) points[6][1]);
-		 g.drawLine((int) points[6][0], (int) points[6][1], (int)
-		 points[7][0], (int) points[7][1]);
-		 g.drawLine((int) points[1][0], (int) points[1][1], (int)
-		 points[5][0], (int) points[5][1]);
-		 g.drawLine((int) points[2][0], (int) points[2][1], (int)
-		 points[6][0], (int) points[6][1]);
-		 g.drawLine((int) points[3][0], (int) points[3][1], (int)
-		 points[7][0], (int) points[7][1]);
-		 g.drawLine((int) points[7][0], (int) points[7][1], (int)
-		 points[4][0], (int) points[4][1]);
-
+		
+//		g.drawLine((int) points[0][0], (int) points[0][1], (int)
+//				points[1][0], (int) points[1][1]);
+//		g.drawLine((int) points[2][0], (int) points[2][1], (int)
+//				points[1][0], (int) points[1][1]);
+//		g.drawLine((int) points[2][0], (int) points[2][1], (int)
+//				points[3][0], (int) points[3][1]);
+//		g.drawLine((int) points[3][0], (int) points[3][1], (int)
+//				points[0][0], (int) points[0][1]);
+//		g.drawLine((int) points[0][0], (int) points[0][1], (int)
+//				points[4][0], (int) points[4][1]);
+//		g.drawLine((int) points[4][0], (int) points[4][1], (int)
+//				points[5][0], (int) points[5][1]);
+//		g.drawLine((int) points[5][0], (int) points[5][1], (int)
+//				points[6][0], (int) points[6][1]);
+//		g.drawLine((int) points[6][0], (int) points[6][1], (int)
+//				points[7][0], (int) points[7][1]);
+//		g.drawLine((int) points[1][0], (int) points[1][1], (int)
+//				points[5][0], (int) points[5][1]);
+//		g.drawLine((int) points[2][0], (int) points[2][1], (int)
+//				points[6][0], (int) points[6][1]);
+//		g.drawLine((int) points[3][0], (int) points[3][1], (int)
+//				points[7][0], (int) points[7][1]);
+//		g.drawLine((int) points[7][0], (int) points[7][1], (int)
+//				points[4][0], (int) points[4][1]);
+		
 		index = 0;
 		for (int[] face : faces) {
 			hasFar = false;
@@ -246,9 +244,12 @@ public class Cube {
 				g.setColor(face.getColor());
 				// Face polygon
 				g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
-
-				// g.drawImage(img.getImage(), Main.WIDTH/2, Main.WIDTH/2,
-				// null);
+				//g.draw(at.createTransformedShape(g)); // Draw the transformed shape
+				
+				//PerspectiveTransform test = new PerspectiveTransform();
+				
+				
+				// g.drawImage(img.getImage(), Main.WIDTH/2, Main.WIDTH/2, null);
 			}
 			i++;
 		}
