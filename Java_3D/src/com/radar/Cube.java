@@ -2,17 +2,20 @@ package com.radar;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Comparator;
+import java.util.LinkedList;
 
 public class Cube {
-	public int x, y, z, w, h, d, i, fov, far, index, cubeIndex;
+	public int x, y, z, w, h, d, i, fov, far, index, cubeIndex,count,pcx,pcy,pcz,xOff,zOff;
 	public float tx, ty, tz, sum;
 	public double f, f2, px, py, pz, rotLat, rotVert, dist, ldist, dist2;
 	public float[] point = new float[2];
 	public boolean hasFar = false;
+	public boolean test = true;
 	public Color faceColor;
 	public boolean visible, changed, looping, render;
 	//ImageIcon img = new ImageIcon("./dirt.png");
-
+	LinkedList<LinkedList<LinkedList<Integer>>> world = new LinkedList<LinkedList<LinkedList<Integer>>>();
 	Player player;
 	private Handler handler;
 
@@ -34,6 +37,11 @@ public class Cube {
 		this.w = w;
 		this.h = h;
 		this.d = d;
+		pcx = (int) Math.floor(x/16);
+		pcy = (int) y;
+		pcz = (int) Math.floor(z/16);
+		
+		
 		this.cubeIndex = cubeIndex;
 		this.handler = handler;
 		if (Main.WIDTH < Main.HEIGHT) {
@@ -130,6 +138,7 @@ public class Cube {
 //				points[4][0], (int) points[4][1]);
 		
 		index = 0;
+		count = 0;
 		for (int[] face : faces) {
 			hasFar = false;
 			i = 0;
@@ -193,6 +202,9 @@ public class Cube {
 				tz = point[1];
 				dist = (float) Math.sqrt(Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2));
 				visible = false;
+				
+				//Determines if cube face is on screen
+				
 				for (int xc : xCoords) {
 					if (xc > 0 && xc < Main.WIDTH) {
 						visible = true;
@@ -206,17 +218,78 @@ public class Cube {
 						}
 					}
 				}
+				world = handler.getWorld();
+				xOff = handler.getXOff();
+				zOff = handler.getZOff();
+				if(world.get(pcx+xOff).get(pcz+zOff)==null){
+					System.out.println("Why null??");
+				}
+				if (visible && world.get(pcx+xOff).get(pcz+zOff)!=null){
+					try{
+						if (count == 0){
+							//+x face direction
+							if (world.get(pcx+xOff).get(pcz+zOff).size()-1 >= cubeIndex+1){
+								if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+1) != 0){
+									visible = false;
+								}
+							}
+						}else if (count == 1){
+							//-x face direction
+							if (world.get(pcx+xOff).get(pcz+zOff).size()-1 >= cubeIndex+1){
+								if (cubeIndex%16 != 0){
+									if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+1) != 0){
+										visible = false;
+									}
+								}
+							}
+						}else if (count == 2){
+							//-z face direction
+							if (world.get(pcx+xOff).get(pcz+zOff).size()-1 >= cubeIndex+16){
+								if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+16) != 0){
+									visible = false;
+								}
+							}
+						}else if (count == 3){
+							//+z face direction
+							if (cubeIndex - 16 >= 0 && world.get(pcx+xOff).get(pcz+zOff).size()-1 >= cubeIndex-16){
+								if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex-16) != 0){
+									visible = false;
+								}
+							}
+						}else if (count == 4){
+							//-y face direction
+							visible = false;
+							if (world.get(pcx+xOff).get(pcz+zOff).size()-1 >= cubeIndex+256){
+								if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+256) != 0){
+									visible = false;
+								}
+							}
+						}else if (count == 5){
+							//+y face direction
+							if (cubeIndex-256 >= 0){
+								if (world.get(pcx+xOff).get(pcz+xOff).get(cubeIndex-256) != 0){
+									visible = false;
+								}
+							}
+						}
+					}catch(Exception e){
+						e.printStackTrace();
+						System.out.println(e.getCause());
+					}
+					
+				}
 				renderFaces[index] = new BlockFace(xCoords, yCoords, face, dist, faceColor, visible);
 
 				index++;
 				sum = 0;
 			}
+			count++;
 		}
-
+		//Arrays.sort(renderFaces,new sortFaces());
 		i = 0;
 		looping = true;
 		while (looping) {
-
+			
 			if (renderFaces[i + 1].getDist() > renderFaces[i].getDist()) {
 				tempFace = renderFaces[i];
 				renderFaces[i] = renderFaces[i + 1];
@@ -244,6 +317,8 @@ public class Cube {
 				g.setColor(face.getColor());
 				// Face polygon
 				g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
+				//g.setColor(Color.BLACK);
+				//g.drawString(""+cubeIndex,face.getXCoords()[0],face.getYCoords()[0]);
 				//g.draw(at.createTransformedShape(g)); // Draw the transformed shape
 				
 				//PerspectiveTransform test = new PerspectiveTransform();
@@ -267,6 +342,14 @@ public class Cube {
 	}
 
 	public void tick() {
-
+//		world = handler.getWorld();
+//		zOff = handler.getZOff();
+//		xOff = handler.getXOff();
 	}
+}class sortFaces implements Comparator<BlockFace>{
+
+	public int compare(BlockFace o1, BlockFace o2) {
+		return Double.compare(o1.getDist(), o2.getDist());
+	}
+	
 }

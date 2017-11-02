@@ -8,9 +8,10 @@ public class Handler {
 	//Cube[] objects = new Cube[20];
 	LinkedList<Cube> objects = new LinkedList<Cube>();
 	LinkedList<Integer> currentChunk = new LinkedList<Integer>();
-	Integer [][] loadedChunks = new Integer[20][4];
+	//Holds indices ofchunks loaded into render and where they start in the objects linkedList
+	Integer [][] loadedChunks = new Integer[60][4];
 	//Integer [] tempInts = new Integer[4];
-	int x,y,z, osize;
+	int x,y,z, osize,xOff,zOff;
 	Player[] players = new Player[2];
 	WorldGen gen;
 	Cube tempCube;
@@ -20,9 +21,13 @@ public class Handler {
 	
 	public void addGeneration(WorldGen gen){
 		this.gen = gen;
-	}
-	
-	public void addPlayer(Player player){
+	}public LinkedList<LinkedList<LinkedList<Integer>>> getWorld(){
+		return gen.getWorld();
+	}public int getXOff(){
+		return gen.getXOff();
+	}public int getZOff(){
+		return gen.getZOff();
+	}public void addPlayer(Player player){
 		players[pi] = player;
 		pi++;
 	}
@@ -34,17 +39,23 @@ public class Handler {
 	public void render(Graphics g){
 		chunks = gen.getWorld();
 		i = 0;
+		xOff = gen.getXOff();
+		zOff = gen.getZOff();
 		try{
-			currentChunk = chunks.get(players[0].getChunkX()).get(players[0].getChunkZ());
+			currentChunk = chunks.get(players[0].getChunkX()+xOff).get(players[0].getChunkZ()+zOff);
 			if (objects == null){
-				currentChunk = chunks.get(0).get(0);
+				//currentChunk = chunks.get(xOff).get(zOff);
+				currentChunk = null;
 			}
 		}catch(Exception e){
-			currentChunk = chunks.get(0).get(0);
-			//System.out.println("Null");
+			//currentChunk = chunks.get(xOff).get(zOff);
+			System.out.println("Null world");
+			currentChunk = null;
 		}
 		i = 0;
 //		objects = new LinkedList<Cube>();
+		
+		//Checks if needs to load current chunk player is in or if it has already been put in rendering array
 		loadChunk = true;
 		for (Integer [] info:loadedChunks){
 			if (info != null && info.length >3){
@@ -56,6 +67,7 @@ public class Handler {
 				}
 			}
 		}
+		//Loads chunks from world making them into cube objects to be rendered
 		if (loadChunk){
 			osize = objects.size()-1;
 			while(i < currentChunk.size()-1){
@@ -89,8 +101,15 @@ public class Handler {
 	}
 	public Player getPlayer(){
 		return players[0];
+	}public WorldGen getGen(){
+		return gen;
+	}public void reloadChunks(){
+		objects = new LinkedList<Cube>();
+		loadedChunks = new Integer[60][4];
 	}
 }
+
+//Used for Cube sorting
 class cubeCompare implements Comparator<Cube>{
 	@Override
 	public int compare(Cube c1, Cube c2){

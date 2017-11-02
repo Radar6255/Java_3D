@@ -15,7 +15,11 @@ public class KeyInput implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
-		if (key == KeyEvent.VK_W){
+		if (key == KeyEvent.VK_R){
+			handler.reloadChunks();
+		}if (key == KeyEvent.VK_T){
+			handler.getGen().printWorld();
+		}if (key == KeyEvent.VK_W){
 			handler.getPlayer().setUp(true);
 		}if (key == KeyEvent.VK_S){
 			handler.getPlayer().setDown(true);
