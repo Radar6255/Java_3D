@@ -30,17 +30,26 @@ public class Cube {
 	public BlockFace[] renderFaces = new BlockFace[3];
 	public BlockFace tempFace;
 
-	public Cube(int x, int y, int z, int w, int h, int d, Handler handler, int cubeIndex) {
+	public Cube(int x, int y, int z, int w, int h, int d, Handler handler, int cubeIndex,int chunkX,int chunkZ) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.w = w;
 		this.h = h;
 		this.d = d;
-		pcx = (int) Math.floor(x/16);
+		pcx = chunkX;
+		pcz = chunkZ;
+//		if (x > 0){
+//			pcx = (int) Math.floor(x/16.1);
+//		}else{
+//			pcx = (int) Math.floor((x-1)/16.1);
+//		}
 		pcy = (int) y;
-		pcz = (int) Math.floor(z/16);
-		
+//		if (z > 0){
+//			pcz = (int) Math.floor(z/16.1);
+//		}else{
+//			pcz = (int) Math.floor((z-1)/16.1);
+//		}
 		
 		this.cubeIndex = cubeIndex;
 		this.handler = handler;
@@ -63,6 +72,7 @@ public class Cube {
 		px = player.getX();
 		py = player.getY();
 		pz = player.getZ();
+		
 		rotLat = player.getRotLat();
 		rotVert = player.getRotVert();
 
@@ -80,11 +90,11 @@ public class Cube {
 			points3D[i][0] = tx;
 			points3D[i][1] = ty;
 			points3D[i][2] = tz;
-
+			
 			tx = (float) (tx + (x - px));
 			ty = (float) (ty + (y - py));
 			tz = (float) (tz + (z - pz));
-
+			
 			dist = Math.sqrt(Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2));
 
 			point = rotate2D(tx, tz, (float) Math.toRadians(rotLat));
@@ -221,33 +231,61 @@ public class Cube {
 				world = handler.getWorld();
 				xOff = handler.getXOff();
 				zOff = handler.getZOff();
-				if(world.get(pcx+xOff).get(pcz+zOff)==null){
-					System.out.println("Why null??");
-				}
-				if (visible && world.get(pcx+xOff).get(pcz+zOff)!=null){
-					try{
+				//System.out.println("Cube offsets "+xOff+" "+zOff);
+//				if(world.get(pcx+xOff).get(pcz+zOff)==null){
+//					System.out.println("Why null??");
+//				}
+				try{
+					if (visible && world.get(pcx+xOff).get(pcz+zOff)!=null){
 						if (count == 0){
 							//+x face direction
-							if (world.get(pcx+xOff).get(pcz+zOff).size()-1 >= cubeIndex+1){
+							if (world.get(pcx+xOff).get(pcz+zOff).size()-1 > cubeIndex+1){
 								if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+1) != 0){
 									visible = false;
+								}
+							}if (!visible && (cubeIndex+1)%16 == 0){
+								if (world.get(pcx+xOff).get(pcz+zOff+1) != null && !world.get(pcx+xOff).get(pcz+zOff+1).isEmpty()){
+									if (0 <= cubeIndex-15){
+										if (world.get(pcx+xOff).get(pcz+zOff+1).get(cubeIndex-15) == 0){
+											visible = true;
+										}
+									}
+								}else{
+									visible = true;
 								}
 							}
 						}else if (count == 1){
 							//-x face direction
-							if (world.get(pcx+xOff).get(pcz+zOff).size()-1 >= cubeIndex+1){
-								if (cubeIndex%16 != 0){
-									if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+1) != 0){
+							if (cubeIndex-1 >= 0){
+								//if (cubeIndex%16 != 0){
+								if (world.get(pcx+xOff).get(pcz+zOff).size()-1>cubeIndex-1){
+									if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex-1) != 0){
 										visible = false;
 									}
 								}
+							}if (!visible && cubeIndex%16 == 0){
+								if (world.get(pcx+xOff).get(pcz+zOff-1) != null && !world.get(pcx+xOff).get(pcz+zOff-1).isEmpty()){
+									if (world.get(pcx+xOff).get(pcz+zOff-1).size()-1 > cubeIndex+15){
+										if (world.get(pcx+xOff).get(pcz+zOff-1).get(cubeIndex+15) == 0){
+											visible = true;
+										}
+									}
+								}else{
+									visible = true;
+								}
 							}
+//							visible = true;
 						}else if (count == 2){
-							//-z face direction
-							if (world.get(pcx+xOff).get(pcz+zOff).size()-1 >= cubeIndex+16){
+							//-z face direction Green
+							if (world.get(pcx+xOff).get(pcz+zOff).size()-1 > cubeIndex+16){
+								
 								if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+16) != 0){
 									visible = false;
+									//System.out.println("Didn't render green side");
 								}
+//									if (cubeIndex == 0){
+//										System.out.println("ChunkX:"+pcx+" ChunkZ:"+pcz+" Value:"+world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+16)+" Visble "+visible);
+//									}
 							}
 						}else if (count == 3){
 							//+z face direction
@@ -256,6 +294,7 @@ public class Cube {
 									visible = false;
 								}
 							}
+//								visible = true;
 						}else if (count == 4){
 							//-y face direction
 							visible = false;
@@ -271,12 +310,15 @@ public class Cube {
 									visible = false;
 								}
 							}
+//								visible = true;
 						}
-					}catch(Exception e){
-						e.printStackTrace();
-						System.out.println(e.getCause());
+					}else if (visible){
+						System.out.println(world.get(pcx+xOff).get(pcz+zOff));
+						//System.out.println("Off X:"+xOff+" Off Z:"+zOff+" Chunk X:"+pcx+" Chunk Z:"+pcz+" Real Chunk X:"+(pcx+xOff)+" Chunk Z:"+(pcz+zOff));
 					}
-					
+				}catch(Exception e){
+					e.printStackTrace();
+					System.out.println(e.getCause());
 				}
 				renderFaces[index] = new BlockFace(xCoords, yCoords, face, dist, faceColor, visible);
 
@@ -308,23 +350,20 @@ public class Cube {
 		}
 		i = 0;
 		for (BlockFace face : renderFaces) {
-			if (i + 1 < 3) {
-				if (renderFaces[i + 1].getDist() > renderFaces[i].getDist()) {
-					System.out.println("Not fully sorted");
-				}
-			}
+//			if (i + 1 < 3) {
+//				if (renderFaces[i + 1].getDist() > renderFaces[i].getDist()) {
+//					System.out.println("Not fully sorted");
+//				}
+//			}
 			if (face.getVisible()) {
 				g.setColor(face.getColor());
 				// Face polygon
 				g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
-				//g.setColor(Color.BLACK);
-				//g.drawString(""+cubeIndex,face.getXCoords()[0],face.getYCoords()[0]);
-				//g.draw(at.createTransformedShape(g)); // Draw the transformed shape
-				
-				//PerspectiveTransform test = new PerspectiveTransform();
-				
-				
-				// g.drawImage(img.getImage(), Main.WIDTH/2, Main.WIDTH/2, null);
+				g.setColor(Color.BLACK);
+//				g.drawString(""+cubeIndex,face.getXCoords()[0],face.getYCoords()[0]);
+//				g.draw(at.createTransformedShape(g)); // Draw the transformed shape
+//				PerspectiveTransform test = new PerspectiveTransform();
+//				g.drawImage(img.getImage(), Main.WIDTH/2, Main.WIDTH/2, null);
 			}
 			i++;
 		}

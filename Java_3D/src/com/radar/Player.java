@@ -21,7 +21,7 @@ public class Player {
 	public PointerInfo mouseLoc;
 	public Point tempPoint;
 	
-	public double rate = 0.15;
+	public double rate = 0.25;
 	
 	public Player(double x,double y,double z,double rotLat,double rotVert){
 		this.x = x;
@@ -105,7 +105,4 @@ public class Player {
 	}public int getChunkZ(){
 		return chunkZ;
 	}
-
-
-
 }
