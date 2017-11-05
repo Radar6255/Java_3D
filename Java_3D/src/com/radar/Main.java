@@ -103,6 +103,8 @@ public class Main extends Canvas implements Runnable{
 			this.createBufferStrategy(2);
 			return;
 		}
+		//Help my sorting of cubes in handler
+		//System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
 		final Graphics g = bs.getDrawGraphics();
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, WIDTH, HEIGHT);

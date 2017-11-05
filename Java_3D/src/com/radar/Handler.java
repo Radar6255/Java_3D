@@ -11,7 +11,7 @@ public class Handler {
 	//Holds indices ofchunks loaded into render and where they start in the objects linkedList
 	Integer [][] loadedChunks = new Integer[60][4];
 	//Integer [] tempInts = new Integer[4];
-	int x,y,z, osize,xOff,zOff,chunkX,chunkZ;
+	int x,y,z, osize,xOff,zOff,chunkX,chunkZ,width;
 	Player[] players = new Player[2];
 	WorldGen gen;
 	Cube tempCube;
@@ -77,8 +77,16 @@ public class Handler {
 			osize = objects.size()-1;
 			while(i < currentChunk.size()-1){
 				if (currentChunk.get(i) == 1){
-					objects.add(new Cube((int) ((i/16) + 16*chunkX+1),(int) Math.floor(i/256),(int) ((i%16)+16*chunkZ+1),1,1,1,this,i,chunkX,chunkZ));
-					//System.out.println("x "+(i/16)+1+" y "+(int) Math.floor(i/256)+" z "+ i%16);
+					width = 1;
+//					try{
+//						while (currentChunk.get(i) == 1 && currentChunk.get(i+1) == 1){
+//							width++;
+//							i++;
+//						}
+//					}catch(Exception e){System.out.println("Hi");}
+					
+					objects.add(new Cube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*chunkX+1),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*chunkZ+1),1,1,1,this,i,chunkX,chunkZ));
+					//System.out.println((((i-256*Math.floor(i/(double) 256))%16)+16*chunkZ+1)+" "+i);
 				}i++;
 			}
 			Integer[] tempArray = {chunkX,chunkZ,osize,objects.size()-1};
@@ -127,10 +135,10 @@ public class Handler {
 class cubeCompare implements Comparator<Cube>{
 	@Override
 	public int compare(Cube c1, Cube c2){
-		if (c1.getDist() <= c2.getDist()){
+		if (c1.getDist() < c2.getDist()){
 			return 1;
-		}else{
+		}if (c1.getDist() > c2.getDist()){
 			return -1;
-		}
+		}return 0;
 	}
 }
