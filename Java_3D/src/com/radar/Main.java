@@ -30,7 +30,7 @@ public class Main extends Canvas implements Runnable{
 	
 	public Main(){
 		handler = new Handler();
-		Player thePlayer = new Player(1,0,2,0,0);
+		Player thePlayer = new Player(1,3,2,0,0);
 		handler.addPlayer(thePlayer);
 		handler.addGeneration(new WorldGen(handler,thePlayer));
 //		while(i < 5){

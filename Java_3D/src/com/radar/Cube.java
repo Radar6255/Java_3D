@@ -5,14 +5,14 @@ import java.awt.Graphics;
 import java.util.LinkedList;
 
 public class Cube {
-	public int x, y, z, w, h, d, i, fov, far, index, cubeIndex,count,pcx,pcy,pcz,xOff,zOff;
+	public int x, y, z, w, h, d, i, fov, far, index, cubeIndex,count,pcx,pcy,pcz,xOff,zOff,ir;
 	public float tx, ty, tz, sum;
 	public double f, f2, px, py, pz, rotLat, rotVert, dist, ldist, dist2;
 	public float[] point = new float[2];
 	public boolean hasFar,debug = false;
 	public boolean test = true;
 	public Color faceColor;
-	public boolean visible, changed, looping, render,repeat;
+	public boolean visible, changed, looping, render,repeat,renderBlock;
 	//ImageIcon img = new ImageIcon("./dirt.png");
 	LinkedList<LinkedList<LinkedList<Integer>>> world = new LinkedList<LinkedList<LinkedList<Integer>>>();
 	Player player;
@@ -23,7 +23,8 @@ public class Cube {
 	public static float[][] centerVerts = { { 0.0f, 0.0f, 0.5f }, { 0.0f, 0.0f, -0.5f }, { 0.5f, 0.0f, 0.0f },{ -0.5f, 0.0f, 0.0f }, { 0.0f, -0.5f, 0.0f }, { 0.0f, 0.5f, 0.0f } };
 	private int[][] faces = { { 0, 1, 2, 3, 0, 1}, { 4, 5, 6, 7, 1, 1}, { 0, 4, 5, 1, 2, 1}, { 2, 6, 7, 3, 3, 1},{ 1, 5, 6, 2, 4, 1}, { 3, 7, 4, 0, 5, 1} };
 	public float[][] points3D = new float[9][3];
-	public int[][] points = new int[8][2];
+	public int[][] points = new int[8][3];
+	public int[] pointsRemoved = new int[8];
 	public double[] distances = new double[8];
 	private int[] xCoords = new int[4];
 	private int[] yCoords = new int[4];
@@ -59,8 +60,6 @@ public class Cube {
 		} else {
 			fov = Main.HEIGHT;
 		}
-//		repeat = true;
-//		repeat = renderUpdate();
 		repeat = false;
 		if (!renderUpdate()){
 			repeat = true;
@@ -89,6 +88,8 @@ public class Cube {
 		//g.setColor(Color.BLACK);
 		
 		//Loop through all vertices to find which is farthest from player
+		ir = 0;
+		pointsRemoved = new int[8];
 		for (float[] point : verts) {
 			//Pulls x,y,z of points taking into account width, height, and depth
 			tx = point[0];
@@ -114,10 +115,16 @@ public class Cube {
 			point = rotate2D(tx, tz, (float) Math.toRadians(rotLat));
 			tx = point[0];
 			tz = point[1];
+			//This is the main problem for the mirror world I believe
 			point = rotate2D(ty, tz, (float) Math.toRadians(rotVert));
 			ty = point[0];
 			tz = point[1];
-			
+			if (ty<(float) (point[1] + (y - py))){
+				pointsRemoved[ir] = i;
+				renderBlock = false;
+			}else{
+				renderBlock = true;
+			}
 			//Calculates field of view taking into account divide by zero errors
 			if (tz != 0) {
 				f = fov / tz;
@@ -141,132 +148,132 @@ public class Cube {
 			}
 			i++;
 		}
-		
-//		g.drawLine((int) points[0][0], (int) points[0][1], (int)
-//				points[1][0], (int) points[1][1]);
-//		g.drawLine((int) points[2][0], (int) points[2][1], (int)
-//				points[1][0], (int) points[1][1]);
-//		g.drawLine((int) points[2][0], (int) points[2][1], (int)
-//				points[3][0], (int) points[3][1]);
-//		g.drawLine((int) points[3][0], (int) points[3][1], (int)
-//				points[0][0], (int) points[0][1]);
-//		g.drawLine((int) points[0][0], (int) points[0][1], (int)
-//				points[4][0], (int) points[4][1]);
-//		g.drawLine((int) points[4][0], (int) points[4][1], (int)
-//				points[5][0], (int) points[5][1]);
-//		g.drawLine((int) points[5][0], (int) points[5][1], (int)
-//				points[6][0], (int) points[6][1]);
-//		g.drawLine((int) points[6][0], (int) points[6][1], (int)
-//				points[7][0], (int) points[7][1]);
-//		g.drawLine((int) points[1][0], (int) points[1][1], (int)
-//				points[5][0], (int) points[5][1]);
-//		g.drawLine((int) points[2][0], (int) points[2][1], (int)
-//				points[6][0], (int) points[6][1]);
-//		g.drawLine((int) points[3][0], (int) points[3][1], (int)
-//				points[7][0], (int) points[7][1]);
-//		g.drawLine((int) points[7][0], (int) points[7][1], (int)
-//				points[4][0], (int) points[4][1]);
-		
-		index = 0;
-		count = 0;
-//		renderUpdate();
-		renderFaces = new BlockFace[3];
-		for (int[] face : faces) {
-			if (face[5] == 0){}
-			else{
-				//Finds if the face has the point farthest from screen
-				hasFar = false;
-				i = 0;
-				for (int point : face) {
-					if (i < 4) {
-						if (point == far) {
-							hasFar = true;
-							break;
+		if (renderBlock){
+//			g.drawLine((int) points[0][0], (int) points[0][1], (int)
+//					points[1][0], (int) points[1][1]);
+//			g.drawLine((int) points[2][0], (int) points[2][1], (int)
+//					points[1][0], (int) points[1][1]);
+//			g.drawLine((int) points[2][0], (int) points[2][1], (int)
+//					points[3][0], (int) points[3][1]);
+//			g.drawLine((int) points[3][0], (int) points[3][1], (int)
+//					points[0][0], (int) points[0][1]);
+//			g.drawLine((int) points[0][0], (int) points[0][1], (int)
+//					points[4][0], (int) points[4][1]);
+//			g.drawLine((int) points[4][0], (int) points[4][1], (int)
+//					points[5][0], (int) points[5][1]);
+//			g.drawLine((int) points[5][0], (int) points[5][1], (int)
+//					points[6][0], (int) points[6][1]);
+//			g.drawLine((int) points[6][0], (int) points[6][1], (int)
+//					points[7][0], (int) points[7][1]);
+//			g.drawLine((int) points[1][0], (int) points[1][1], (int)
+//					points[5][0], (int) points[5][1]);
+//			g.drawLine((int) points[2][0], (int) points[2][1], (int)
+//					points[6][0], (int) points[6][1]);
+//			g.drawLine((int) points[3][0], (int) points[3][1], (int)
+//					points[7][0], (int) points[7][1]);
+//			g.drawLine((int) points[7][0], (int) points[7][1], (int)
+//					points[4][0], (int) points[4][1]);
+			
+			index = 0;
+			count = 0;
+//			renderUpdate();
+			renderFaces = new BlockFace[3];
+			for (int[] face : faces) {
+				if (face[5] == 0){}
+				else{
+					//Finds if the face has the point farthest from screen
+					hasFar = false;
+					i = 0;
+					for (int point : face) {
+						if (i < 4) {
+							if (point == far) {
+								hasFar = true;
+								break;
+							}
 						}
-					}
-					i++;
-				}//If face doesn't have the farthest point then try to render it
-				if (!hasFar) {
-					//Add points to array to send with BlockFace for rendering
-					xCoords[0] = points[face[0]][0];
-					xCoords[1] = points[face[1]][0];
-					xCoords[2] = points[face[2]][0];
-					xCoords[3] = points[face[3]][0];
-	
-					yCoords[0] = points[face[0]][1];
-					yCoords[1] = points[face[1]][1];
-					yCoords[2] = points[face[2]][1];
-					yCoords[3] = points[face[3]][1];
-	
-					dist = 0;
-					
-					//Finds which face it is and what color it should be by index
-					//Also finds center point from that index-
-					//in order to get accurate distance from player to center of face
-					if (face[4] == 0) {
-						point = centerVerts[0];
-						faceColor = Color.BLUE;
-					}
-					if (face[4] == 1) {
-						point = centerVerts[1];
-						faceColor = Color.RED;
-					}
-					if (face[4] == 2) {
-						point = centerVerts[2];
-						faceColor = Color.GREEN;
-					}
-					if (face[4] == 3) {
-						point = centerVerts[3];
-						faceColor = Color.ORANGE;
-					}
-					if (face[4] == 4) {
-						point = centerVerts[4];
-						faceColor = Color.YELLOW;
-					}
-					if (face[4] == 5) {
-						point = centerVerts[5];
-						faceColor = Color.CYAN;
-					}//Rotates center point to make sure of accuracy
-					tx = point[0];
-					ty = point[1];
-					tz = point[2];
-					tx = (float) (tx + (x - px));
-					ty = (float) (ty + (y - py));
-					tz = (float) (tz + (z - pz));
-					point = rotate2D(tx, tz, (float) Math.toRadians(rotLat));
-					tx = point[0];
-					tz = point[1];
-					point = rotate2D(ty, tz, (float) Math.toRadians(rotVert));
-					ty = point[0];
-					tz = point[1];
-					//Calculates distance to the center point of face
-					dist = (float) Math.sqrt(Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2));
-					visible = false;
-					
-					//Determines if cube face is on screen
-					for (int xc : xCoords) {
-						if (xc > 0 && xc < Main.WIDTH) {
-							visible = true;
+						i++;
+					}//If face doesn't have the farthest point then try to render it
+					if (!hasFar) {
+						//Add points to array to send with BlockFace for rendering
+						xCoords[0] = points[face[0]][0];
+						xCoords[1] = points[face[1]][0];
+						xCoords[2] = points[face[2]][0];
+						xCoords[3] = points[face[3]][0];
+		
+						yCoords[0] = points[face[0]][1];
+						yCoords[1] = points[face[1]][1];
+						yCoords[2] = points[face[2]][1];
+						yCoords[3] = points[face[3]][1];
+		
+						dist = 0;
+						
+						//Finds which face it is and what color it should be by index
+						//Also finds center point from that index-
+						//in order to get accurate distance from player to center of face
+						if (face[4] == 0) {
+							point = centerVerts[0];
+							faceColor = Color.BLUE;
 						}
-					}
-					if (visible) {
+						if (face[4] == 1) {
+							point = centerVerts[1];
+							faceColor = Color.RED;
+						}
+						if (face[4] == 2) {
+							point = centerVerts[2];
+							faceColor = Color.GREEN;
+						}
+						if (face[4] == 3) {
+							point = centerVerts[3];
+							faceColor = Color.ORANGE;
+						}
+						if (face[4] == 4) {
+							point = centerVerts[4];
+							faceColor = Color.YELLOW;
+						}
+						if (face[4] == 5) {
+							point = centerVerts[5];
+							faceColor = Color.CYAN;
+						}//Rotates center point to make sure of accuracy
+						tx = point[0];
+						ty = point[1];
+						tz = point[2];
+						tx = (float) (tx + (x - px));
+						ty = (float) (ty + (y - py));
+						tz = (float) (tz + (z - pz));
+						point = rotate2D(tx, tz, (float) Math.toRadians(rotLat));
+						tx = point[0];
+						tz = point[1];
+						point = rotate2D(ty, tz, (float) Math.toRadians(rotVert));
+						ty = point[0];
+						tz = point[1];
+						//Calculates distance to the center point of face
+						dist = (float) Math.sqrt(Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2));
 						visible = false;
-						for (int yc : yCoords) {
-							if (yc > 0 && yc < Main.WIDTH) {
+						
+						//Determines if cube face is on screen
+						for (int xc : xCoords) {
+							if (xc > 0 && xc < Main.WIDTH) {
 								visible = true;
 							}
 						}
+						if (visible) {
+							visible = false;
+							for (int yc : yCoords) {
+								if (yc > 0 && yc < Main.WIDTH) {
+									visible = true;
+								}
+							}
+						}if (visible){
+							chunk.addFace(new BlockFace(xCoords, yCoords, face, dist, faceColor, visible,cubeIndex));
+						}
+						//renderFaces[index] = new BlockFace(xCoords, yCoords, face, dist, faceColor, visible,cubeIndex);
+						index++;
+						sum = 0;
 					}
-					if (visible){
-						chunk.addFace(new BlockFace(xCoords, yCoords, face, dist, faceColor, visible,cubeIndex));
-					}
-					//renderFaces[index] = new BlockFace(xCoords, yCoords, face, dist, faceColor, visible,cubeIndex);
-					index++;
-					sum = 0;
 				}
+				count++;
+				
 			}
-			count++;
-			
 		}
 	}
 	

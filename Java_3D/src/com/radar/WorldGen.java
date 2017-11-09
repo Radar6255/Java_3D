@@ -13,7 +13,7 @@ public class WorldGen {
 	public LinkedList<LinkedList<LinkedList<Integer>>> world = new LinkedList<LinkedList<LinkedList<Integer>>>();
 	LinkedList<LinkedList<Integer>> chunk = new LinkedList<LinkedList<Integer>>();
 	
-	WorldGen(Handler handler, Player thePlayer){
+	public WorldGen(Handler handler, Player thePlayer){
 		this.handler = handler;
 		this.thePlayer = thePlayer;
 		world.add(new LinkedList<LinkedList<Integer>>());
