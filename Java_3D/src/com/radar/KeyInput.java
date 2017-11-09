@@ -18,12 +18,14 @@ public class KeyInput implements KeyListener {
 		int key = e.getKeyCode();
 		if (key == KeyEvent.VK_P){
 			i=0;
-//			while (i <255){
-//				handler.getGen().getWorld().get(0).get(0).add(0);
-//				i++;
-//			}
-			handler.getGen().getWorld().get(0).get(0).add(1);
+			while (i <255){
+				handler.getGen().addBlock(0, 0, 0);
+				i++;
+			}
+			handler.getGen().addBlock(1, 0, 0);
 			System.out.println("Added block");
+		}if (key == KeyEvent.VK_F12){
+			handler.debugMode();
 		}
 		if (key == KeyEvent.VK_R){
 			handler.reloadChunks();

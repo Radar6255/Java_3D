@@ -12,9 +12,9 @@ public class BlockFace {
 	private boolean visible, looping;
 	private boolean hasFar = false;
 	private double dist;
-	public int i,tempInt;
+	public int i,tempInt,cubeIndex;
 	
-	public BlockFace(int[] xCoords,int[] yCoords,int[] face,double dist, Color color, boolean visible){
+	public BlockFace(int[] xCoords,int[] yCoords,int[] face,double dist, Color color, boolean visible, int cubeIndex){
 		this.xCoords = xCoords.clone();
 		this.yCoords = yCoords.clone();
 		this.xCoordsC = xCoords.clone();
@@ -23,8 +23,10 @@ public class BlockFace {
 		this.color = color;
 		this.visible = visible;
 		this.dist = dist;
-	}
-	public int[] getFace(){
+		this.cubeIndex = cubeIndex;
+	}public int getCubeIndex(){
+		return cubeIndex;
+	}public int[] getFace(){
 		return face;
 	}public int[] getXCoords(){
 		return xCoords;

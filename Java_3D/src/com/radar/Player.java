@@ -51,7 +51,8 @@ public class Player {
 				rotVert = 90;
 			}if (rotVert < -90){
 				rotVert = -90;
-			}if (rotLat > 360){
+			}
+			if (rotLat > 360){
 				rotLat -= 360;
 			}if (rotLat < 0){
 				rotLat += 360;

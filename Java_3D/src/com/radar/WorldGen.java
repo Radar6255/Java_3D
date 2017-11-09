@@ -3,7 +3,7 @@ package com.radar;
 import java.util.LinkedList;
 
 public class WorldGen {
-	int i,index,all,chunkX,chunkY,chunkZ,xOff,zOff = 0;
+	int i,index,all,chunkX,chunkY,chunkZ,xOff,zOff,ix,iz = 0;
 	boolean test = true;
 	double x,y,z;
 	Handler handler;
@@ -36,56 +36,64 @@ public class WorldGen {
 		chunkX = thePlayer.getChunkX();
 		chunkY = thePlayer.getChunkY();
 		chunkZ = thePlayer.getChunkZ();
-		
-		try{
-			while((chunkX+xOff) < 5){
-				world.addFirst(new LinkedList<LinkedList<Integer>>());
-				while(world.get(0).size() < zOff){
-					world.get(0).add(new LinkedList<Integer>());
-				}
-				xOff++;
-			}
-			while((chunkZ+zOff) < 5){
-				for (LinkedList<LinkedList<Integer>> zChunks:world){
-					zChunks.addFirst(new LinkedList<Integer>());
-				}
-				zOff++;
-			}
-			
-			while (world.size() <= chunkX+5+xOff){
-				world.add(new LinkedList<LinkedList<Integer>>());
-				while(world.getLast().size() < zOff){
-					world.getLast().add(new LinkedList<Integer>());
-				}
-				//System.out.println("Adding to X... "+chunkX);
-			}
-			while (world.get(chunkX+xOff).size() <= chunkZ+zOff+5){
-				world.get(chunkX+xOff).add(new LinkedList<Integer>());
-				//System.out.println("Adding to Z... "+chunkZ);
-			}
-			//System.out.println((chunkX+xOff)+" "+(chunkZ+zOff));
-//			if (chunkX == 0 && chunkZ == 0 && test){
-//				System.out.println(world.get(chunkX+xOff).get(chunkZ+zOff));
-//				test = false;
-//			}
-			if (world.get(chunkX+xOff).get(chunkZ+zOff).isEmpty()){
-				//world.get(chunkX+xOff).set(chunkZ+zOff,new LinkedList<Integer>());
-				System.out.println("Generating new chunk at X:"+chunkX+" Z:"+chunkZ);
-				i = 0;
-				while (i < 257){
-					if (Math.round(Math.random()*(double) 2) == 1){
-						world.get(chunkX+xOff).get(chunkZ+zOff).add(1);
-					}else{
-						world.get(chunkX+xOff).get(chunkZ+zOff).add(0);
+		ix = -2;
+		iz = -2;
+		while(iz < 3){
+			try{
+				while((chunkX+xOff+ix) < 5){
+					world.addFirst(new LinkedList<LinkedList<Integer>>());
+					while(world.get(0).size() < zOff+ix){
+						world.get(0).add(new LinkedList<Integer>());
 					}
-					i++;
-//					System.out.println("Generating... "+i);
+					xOff++;
 				}
+				while((chunkZ+zOff+iz) < 5){
+					for (LinkedList<LinkedList<Integer>> zChunks:world){
+						zChunks.addFirst(new LinkedList<Integer>());
+					}
+					zOff++;
+				}
+				
+				while (world.size() <= chunkX+5+xOff+ix){
+					world.add(new LinkedList<LinkedList<Integer>>());
+					while(world.getLast().size() < zOff+iz){
+						world.getLast().add(new LinkedList<Integer>());
+					}
+					//System.out.println("Adding to X... "+chunkX);
+				}
+				while (world.get(chunkX+xOff+ix).size() <= chunkZ+zOff+5+iz){
+					world.get(chunkX+xOff+ix).add(new LinkedList<Integer>());
+					//System.out.println("Adding to Z... "+chunkZ);
+				}
+				//System.out.println((chunkX+xOff)+" "+(chunkZ+zOff));
+//				if (chunkX == 0 && chunkZ == 0 && test){
+//					System.out.println(world.get(chunkX+xOff).get(chunkZ+zOff));
+//					test = false;
+//				}
+				if (world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).isEmpty()){
+					//world.get(chunkX+xOff).set(chunkZ+zOff,new LinkedList<Integer>());
+					//System.out.println("Generating new chunk at X:"+chunkX+ix+" Z:"+chunkZ+iz);
+					i = 0;
+					while (i < 257){
+						if (Math.round(Math.random()*(double) 2) == 1){
+							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
+						}else{
+							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
+						}
+						i++;
+//						System.out.println("Generating... "+i);
+					}
+				}
+			}catch(Exception e){
+				System.out.println("World gen error : ");
+				e.printStackTrace();
+				System.out.println(e.getCause());
 			}
-		}catch(Exception e){
-			System.out.println("World gen error : ");
-			e.printStackTrace();
-			System.out.println(e.getCause());
+			ix++;
+			if (ix == 3){
+				iz++;
+				ix = -2;
+			}
 		}
 	}public LinkedList<LinkedList<LinkedList<Integer>>> getWorld(){
 		return world;
@@ -95,5 +103,8 @@ public class WorldGen {
 		return zOff;
 	}public void printWorld(){
 		System.out.println(world);
+	}public void addBlock(int blockNum, int chunkX, int chunkZ){
+		world.get(chunkX+xOff).get(chunkZ+zOff).add(blockNum);
+		
 	}
 }
