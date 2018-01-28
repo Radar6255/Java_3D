@@ -9,13 +9,13 @@ import java.util.LinkedList;
 //Uses created chunks sorted to render all BlockFaces
 public class Handler {
 	//Cube[] objects = new Cube[20];
-	LinkedList<Cube> objects = new LinkedList<Cube>();
+	LinkedList<CubeObject> objects = new LinkedList<CubeObject>();
 	LinkedList<Chunk> renderChunks = new LinkedList<Chunk>();
 	LinkedList<Chunk> objectsSorted = new LinkedList<Chunk>();
 	LinkedList<Integer> currentChunk = new LinkedList<Integer>();
 	//Holds indices of chunks loaded into render and where they start in the objects linkedList
 	LinkedList<Integer[]> renderedChunks = new LinkedList<Integer[]>();
-	int x,y,z, osize,xOff,zOff,chunkX,chunkZ,width,ix,iz;
+	int x,y,z, osize,xOff,zOff,chunkX,chunkZ,width,ix,iz,sCubeCount,chunkSize,cCubeCount;
 	Player[] players = new Player[2];
 	WorldGen gen;
 	Cube tempCube;
@@ -35,17 +35,28 @@ public class Handler {
 	}public void addPlayer(Player player){
 		players[pi] = player;
 		pi++;
-	}
-	
-	public void addCube(Cube object){
+	}public void addCube(Cube object){
 		objects.add(object);
 		ci++;
-	}public void debugMode(){
-		if (!debug){
-			debug = true;
-		}else{
-			debug = false;
-		}
+	}public void debugMode(boolean debug){
+		for (Chunk chunk:renderChunks){
+			chunk.setDebug(debug);
+		}players[0].setDebug(debug);
+		this.debug = debug;
+	}public Player getPlayer(){
+		return players[0];
+	}public WorldGen getGen(){
+		return gen;
+	}public void reloadChunks(){
+		objects = null;
+		objects = new LinkedList<CubeObject>();
+		renderedChunks = null;
+		renderedChunks = new LinkedList<Integer[]>();
+		chunkI = 0;
+		sCubeCount = 0;
+		cCubeCount = 0;
+	}public void addChunk(Chunk chunk){
+		renderChunks.add(chunk);
 	}
 	public void render(Graphics g){
 		chunks = gen.getWorld();
@@ -88,23 +99,38 @@ public class Handler {
 		i = 0;
 		if (loadChunk && currentChunk != null && !currentChunk.isEmpty()){
 			chunkCreating = new Chunk(chunkX+ix, chunkZ+iz, this, players[0]);
-			osize = objects.size()-1;
+//			osize = objects.size()-1;
+			osize = chunkSize;
 			while(i < currentChunk.size()-1){
 				if (currentChunk.get(i) == 1){
 					width = 1;
-//					try{
-//						while (currentChunk.get(i) == 1 && currentChunk.get(i+1) == 1){
-//							//System.out.println(width);
-//							width++;
-//							i++;
-//						}
-//					}catch(Exception e){System.out.println("Hi");}
-					objects.add(new Cube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)+1),width,1,1,this,i,chunkX+ix,chunkZ+iz,chunkCreating));
+					try{
+						while (currentChunk.get(i) == 1 && currentChunk.get(i+1) == 1){
+							//System.out.println(width);
+							if ((int) ((((i+1)-256*Math.floor((i+1)/(double) 256))/16) + 16*(chunkX+ix)+1) != (int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1)){
+								break;
+							}
+							width++;
+							i++;
+//							System.out.println("Width:"+width+" i:"+i);
+						}
+					}catch(Exception e){}
+					
+					//new Cube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)+1),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating);
+					if (width == 1){
+						sCubeCount++;
+						objects.add(new Cube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)+1),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating));
+					}else{
+						cCubeCount++;
+						objects.add(new CombinedCube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)+1),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating));
+					}
+					chunkSize++;
 					//System.out.println((((i-256*Math.floor(i/(double) 256))%16)+16*chunkZ+1)+" "+i);
 				}i++;
 			}
 			renderChunks.add(chunkCreating);
-			Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,objects.size()-1};
+			//Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,objects.size()-1};
+			Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,chunkSize};
 			renderedChunks.add(chunkI,tempArray);
 //			for (Integer[] data:loadedChunks){
 //				if (data[0] != null){
@@ -121,11 +147,11 @@ public class Handler {
 		}if (iz == 3){
 			iz = -2;
 		}
-		//if (loadChunk){
-		//	objectsSorted = (LinkedList<Chunk>) renderChunks.clone();
-		//}
+//		if (loadChunk){
+//			objectsSorted = (LinkedList<Chunk>) renderChunks.clone();
+//		}
 		renderChunks.sort(new chunkCompare());
-//		
+		
 //		for (Cube object: objectsSorted){
 //			if (object != null){
 //				object.setDebug(debug);
@@ -136,9 +162,13 @@ public class Handler {
 			chunk.render(g);
 		}
 		players[0].render(g);
+		if (debug){
+			g.drawString("Single Cubes:"+sCubeCount,10,70);
+			g.drawString("Combined Cubes:"+cCubeCount,10,80);
+		}
 	}
 	public void tick(){
-		gen.tick();
+//		gen.tick();
 //		for (Cube object: objects){
 //			if (object != null){
 //				object.tick();
@@ -149,17 +179,7 @@ public class Handler {
 		}
 		players[0].tick();
 	}
-	public Player getPlayer(){
-		return players[0];
-	}public WorldGen getGen(){
-		return gen;
-	}public void reloadChunks(){
-		objects = null;
-		objects = new LinkedList<Cube>();
-		renderedChunks = null;
-		renderedChunks = new LinkedList<Integer[]>();
-		chunkI = 0;
-	}
+	
 }
 
 //Used for Cube sorting

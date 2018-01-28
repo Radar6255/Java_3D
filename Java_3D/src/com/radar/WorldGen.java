@@ -20,6 +20,7 @@ public class WorldGen {
 		world.get(0).add(new LinkedList<Integer>());
 		i = 0;
 		while (i < 257){
+		//while (i < 2){
 			world.get(0).get(0).add(1);
 			i++;
 		}

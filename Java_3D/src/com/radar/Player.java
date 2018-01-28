@@ -12,8 +12,8 @@ import java.awt.Toolkit;
 public class Player {
 	double x,y,z,mx,my;
 	int chunkX,chunkY,chunkZ;
-	double rotLat,rotVert,s,c;
-	public boolean up,down,left,right,space,shift;
+	double rotLat,rotVert,s,c,sv,cv;
+	public boolean up,down,left,right,space,shift,debug;
 	
 	int centerX = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2;
 	int centerY = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2;
@@ -21,7 +21,7 @@ public class Player {
 	public PointerInfo mouseLoc;
 	public Point tempPoint;
 	
-	public double rate = 0.25;
+	public double rate = 0.2;
 	
 	public Player(double x,double y,double z,double rotLat,double rotVert){
 		this.x = x;
@@ -31,10 +31,11 @@ public class Player {
 		this.rotVert = rotVert;
 	}
 	public void render(Graphics g){
-		
-		g.setColor(Color.BLACK);
-		g.drawString(x+" "+y+" "+z, 20, 20);
-		g.drawString(chunkX+" "+chunkY+" "+chunkZ, 20, 40);
+		if (debug){
+			g.setColor(Color.BLACK);
+			g.drawString(x+" "+y+" "+z, 20, 20);
+			g.drawString(chunkX+" "+chunkY+" "+chunkZ, 20, 40);
+		}
 	}
 	public void tick(){
 		chunkX = (int) Math.floor(x/16);
@@ -66,7 +67,8 @@ public class Player {
 		
 		s = Math.sin(Math.toRadians(rotLat));
 		c = Math.cos(Math.toRadians(rotLat));
-		
+		sv = Math.sin(Math.toRadians(rotVert));
+		cv = Math.cos(Math.toRadians(rotVert));
 		 if (space){y+=rate/2;}
 		 if (shift){y-=rate/2;}
 		 if (up){z-=c*rate; x-=s*rate;}
@@ -76,6 +78,14 @@ public class Player {
 		 if (left){z-=s*rate;x+=c*rate;}
 		 if (right){z+=s*rate;x-=c*rate;}
 		 
+	}public double getSineLat(){
+		return s;
+	}public double getCosineLat(){
+		return c;
+	}public double getSineVert(){
+		return sv;
+	}public double getCosineVert(){
+		return cv;
 	}
 	public void setUp(boolean up){
 		this.up = up;
@@ -105,5 +115,7 @@ public class Player {
 		return chunkY;
 	}public int getChunkZ(){
 		return chunkZ;
+	}public void setDebug(boolean debug){
+		this.debug= debug;
 	}
 }

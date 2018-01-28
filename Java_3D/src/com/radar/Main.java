@@ -14,8 +14,9 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
-
+//Main class initializes all classes and runs the game loop
 public class Main extends Canvas implements Runnable{
+	public String version = "1.0.6";
 	public int frames,fps;
 	private static final long serialVersionUID = 1L;
 	private Thread thread;
@@ -33,11 +34,14 @@ public class Main extends Canvas implements Runnable{
 		Player thePlayer = new Player(1,3,2,0,0);
 		handler.addPlayer(thePlayer);
 		handler.addGeneration(new WorldGen(handler,thePlayer));
+//		Chunk test = new Chunk(0,0,handler,thePlayer);
 //		while(i < 5){
-//			Cube tempCube = new Cube(2*i,0,0,1,1,1,handler,i);
+//			Cube tempCube = new Cube(2*i,0,0,2,1,1,handler,i,0,0,test);
 //			handler.addCube(tempCube);
 //			i++;
 //		}
+//		handler.addChunk(test);
+
 		this.addKeyListener(new KeyInput(handler));
 		new Window(WIDTH,HEIGHT,"3D Stuff",this);
 	}
@@ -111,6 +115,7 @@ public class Main extends Canvas implements Runnable{
 		handler.render(g);
 		g.setColor(Color.BLACK);
 		g.drawString(Integer.toString(fps), WIDTH-40, 20);
+		g.drawString(version, 10, HEIGHT-40);
 //		Graphics2D g2d = (Graphics2D) g.create();
 //		AffineTransform backup = g2d.getTransform();
 //		AffineTransform at = AffineTransform.getTranslateInstance(16, 16); //Create the AffineTransform instance

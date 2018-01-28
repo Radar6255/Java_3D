@@ -5,6 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
+//Sets basis for all characteristics of the game window
 public class Window extends Canvas{
 	private static final long serialVersionUID = 7288512704324421631L;
 	

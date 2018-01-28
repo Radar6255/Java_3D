@@ -3,10 +3,14 @@ package com.radar;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+//Handles all key input from the user
+//Sends the data through setter methods
+
 public class KeyInput implements KeyListener {
 	
 	private Handler handler;
 	private boolean escape;
+	boolean debug = false;
 	int i = 0;
 	
 	public KeyInput(Handler handler){
@@ -24,8 +28,12 @@ public class KeyInput implements KeyListener {
 			}
 			handler.getGen().addBlock(1, 0, 0);
 			System.out.println("Added block");
-		}if (key == KeyEvent.VK_F12){
-			handler.debugMode();
+		}if (key == KeyEvent.VK_F3){
+			if (!debug){
+				debug = true;
+			}else{
+				debug = false;
+			}handler.debugMode(debug);
 		}
 		if (key == KeyEvent.VK_R){
 			handler.reloadChunks();

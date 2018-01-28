@@ -7,15 +7,15 @@ import java.util.LinkedList;
 //Cube class is created on chunk reading from the handler
 //Does all calculations for where BlockFaces should render and how far they are from the player
 
-public class Cube extends CubeObject{
+public class CombinedCube extends CubeObject{
 	public int x, y, z, w, h, d, i, fov, far, index, cubeIndex,count,pcx,pcy,pcz,xOff,zOff,ir;
 	BlockFace testFace;
 //	public float p1x, p1y, p1z,p2x, p2y, p2z,p3x, p3y, p3z,p4x, p4y, p4z;
-	public float distOff = 0.2f;
+	public float distOff = 0.0f;
 	public float tx, ty, tz, sum;
 	public double f, f2, px, py, pz, rotLat, rotVert, dist, ldist, dist2,sl,cl,sv,cv;
 	public float[] point = new float[2];
-	public boolean hasFar,debug = false;
+	public boolean hasFar,debug,test2 = false;
 	public int test = 0;
 	public Color faceColor;
 	public boolean visible, changed, looping, render,repeat,renderBlock,right,left,up,down,lside,rside,back,front;
@@ -42,7 +42,7 @@ public class Cube extends CubeObject{
 	public BlockFace[] renderFaces = new BlockFace[3];
 	public BlockFace tempFace;
 
-	public Cube(int x, int y, int z, int w, int h, int d, Handler handler, int cubeIndex,int chunkX,int chunkZ, Chunk chunk) {
+	public CombinedCube(int x, int y, int z, int w, int h, int d, Handler handler, int cubeIndex,int chunkX,int chunkZ, Chunk chunk) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -123,6 +123,7 @@ public class Cube extends CubeObject{
 //			points3D[i][0] = tx+x;
 //			points3D[i][1] = ty+y;
 //			points3D[i][2] = tz+z;
+			
 			tx = (float) (tx + (x - px));
 			ty = (float) (ty + (y - py));
 			tz = (float) (tz + (z - pz));
@@ -137,16 +138,16 @@ public class Cube extends CubeObject{
 			point = rotate2D(tx, tz, sl,cl);
 			tx = point[0];
 			tz = point[1];
+
 //			if (tx+(Main.WIDTH/2)<(float) (point[0] + (x - px))){
 //				renderBlock = false;
 //			}else{
 //				renderBlock = true;
 //			}
-			//This is the main problem for the mirror world I believe
+			
 			point = rotate2D(ty, tz, sv,cv);
 			ty = point[0];
 			tz = point[1];
-			
 			
 			renderBlock = true;
 			if (ty<(float) (point[1] + (y - py))){
@@ -262,19 +263,19 @@ public class Cube extends CubeObject{
 						tx = pointsX[0]-distOff;
 						ty = pointsY[0]-distOff;
 						tz = pointsZ[0]-distOff;
-						for(i=0;i < 4;i++){
+//						for(i=0;i < 4;i++){
 //							System.out.println(pointsX[i]+" "+pointsY[i]+" "+pointsZ[i]);
-						}
+//						}
 						//Right side of cube
 						//Gets weather the player is on the left or right side of the cube and then uses the x point that is closest to the point
-						if (pointsX[0] < px || pointsX[1] < px || pointsX[2] < px || pointsX[3] < px){
+						if (pointsX[0] < px || pointsX[1] < px || pointsX[2] < px || pointsX[3] < px){ //If any point is left of the player
 							for(i=0;i < 4;i++){
-								if (tx > pointsX[i]){
+								if (tx > pointsX[i]){ //Find right most point in cube
 									tx = pointsX[i]-distOff-(float)0;
 								}
 							}
 						}
-						if (pointsY[0] < py || pointsY[1] < py || pointsY[2] < py || pointsY[3] < py){
+						if (pointsY[0] < py || pointsY[1] < py || pointsY[2] < py || pointsY[3] < py){ //If any point is below the player
 							for(i=0;i < 4;i++){
 								if (ty > pointsY[i]){
 									ty = pointsY[i]+distOff-(float)0;
@@ -311,15 +312,27 @@ public class Cube extends CubeObject{
 									tz = pointsZ[i]-distOff-(float)0;
 								}
 							}
-						}
-						if (px > x && x+w > px  && !lside && !rside){
+						}test2 = false;
+						if (px > x && x+w > px && !front && !back){
 							tx = 0;
-//							System.out.println(tx+" "+ty+" "+tz);
+							//System.out.println(tx+" "+ty+" "+tz);
+							test2 = true;
 						}if (py > y && y+h > py && !up && !down){
 							ty = 0;
-						}if (pz > z && z+d > pz && !front && !back){
+							//System.out.println(tx+" "+ty+" "+tz);
+							//test2 = true;
+						}if (pz > z && z+d > pz && !lside && !rside){
 							tz = 0;
-//							System.out.println(tx+" "+ty+" "+tz);
+							//System.out.println(tx+" "+ty+" "+tz);
+							test2 = true;
+						}if (test2&&debug){
+							if (lside||rside){
+								System.out.println("Right/left side");
+							}if (up||down){
+								System.out.println("Top/Bottom");
+							}if (front||back){
+								System.out.println("front/back");
+							}
 						}
 						dist = (float) Math.sqrt(Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2));
 						visible = false;

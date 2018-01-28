@@ -13,10 +13,12 @@ import java.util.LinkedList;
 //These chunks are sorted in the handler using the getDist class
 
 public class Chunk {
-	LinkedList<Cube> chunk = new LinkedList<Cube>();
+	LinkedList<CubeObject> blocks = new LinkedList<CubeObject>();
+	LinkedList<CombinedCube> combinedBlocks = new LinkedList<CombinedCube>();
 	LinkedList<BlockFace> facesToRender = new LinkedList<BlockFace>();
 	public int chunkX, chunkZ, xOff, zOff;
 	public boolean debug = false;
+	public boolean doubleRender = false;
 	public double dist;
 	Handler handler;
 	Player player;
@@ -28,43 +30,54 @@ public class Chunk {
 	}
 	
 	public void tick(){
-		for (Cube object: chunk){
+		for (CubeObject object: blocks){
 			object.tick();
 		}
 	}
 	
 	public void render(Graphics g){
-		for (Cube object:chunk){
+		for (CubeObject object:blocks){
 			object.render(g);
 		}
 		facesToRender.sort(new sortFaces());
 		for (BlockFace face:facesToRender){
 			if (face != null){
-				if (face.getVisible()) {
-					g.setColor(face.getColor());
+				g.setColor(face.getColor());
 				// Face polygon
-					g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
-					if (debug){
-						g.setColor(Color.BLACK);
-						g.drawString(""+face.getCubeIndex(),face.getXCoords()[0],face.getYCoords()[0]);
-					}
+				g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
+				if (debug){
+					g.setColor(Color.BLACK);
+					g.drawString(""+Math.round(face.getDist()),face.getXCoords()[0],face.getYCoords()[0]);
+//					g.drawString(""+face.getX(),face.getXCoords()[0],face.getYCoords()[0]);
+				}
 //					g.draw(at.createTransformedShape(g)); // Draw the transformed shape
 //					PerspectiveTransform test = new PerspectiveTransform();
 //					g.drawImage(img.getImage(), Main.WIDTH/2, Main.WIDTH/2, null);
-				}
 				//i++;
 			}
 		}
 		facesToRender = new LinkedList<BlockFace>();
+		if (doubleRender){
+			for (CombinedCube object:combinedBlocks){
+				object.render(g);
+			}
+		}
 	}
 	
 	public void addFace(BlockFace face){
 		facesToRender.add(face);
-	}public void addCube(Cube cube){
-		chunk.add(cube);
+	}public void addCube(CubeObject cube){
+		blocks.add(cube);
 	}public double getDist(){
 		dist = Math.sqrt(Math.pow((16*chunkX)-player.getX()+8, 2)+Math.pow((16*chunkZ)-player.getZ()+8, 2));
 		return dist;
+	}public void setDebug(boolean debug){
+		this.debug = debug;
+		for (CubeObject cube:blocks){
+			cube.setDebug(debug);
+		}for (CombinedCube cube:combinedBlocks){
+			cube.setDebug(debug);
+		}
 	}
 }class sortFaces implements Comparator<BlockFace>{
 
