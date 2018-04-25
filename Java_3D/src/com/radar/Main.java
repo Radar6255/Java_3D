@@ -27,20 +27,32 @@ public class Main extends Canvas implements Runnable{
 	static int WIDTH = 800;
 	static int HEIGHT = 600;
 	int i = 0;
+	int iz = -50;
 	ImageIcon img = new ImageIcon("./dirt.png");
 	
 	public Main(){
 		handler = new Handler();
-		Player thePlayer = new Player(1,3,2,0,0);
+		Player thePlayer = new Player(1,3,2,180,-30);
 		handler.addPlayer(thePlayer);
 		handler.addGeneration(new WorldGen(handler,thePlayer));
-//		Chunk test = new Chunk(0,0,handler,thePlayer);
-//		while(i < 5){
-//			Cube tempCube = new Cube(2*i,0,0,2,1,1,handler,i,0,0,test);
-//			handler.addCube(tempCube);
-//			i++;
-//		}
-//		handler.addChunk(test);
+		Chunk test = new Chunk(0,0,handler,thePlayer);
+		int ix = -50;
+		int y = 0;
+		while(ix < 50){
+			y = (int) Math.round(Math.pow((0.16-Math.pow((0.6-Math.pow((Math.pow(ix*0.04,2)+Math.pow(iz*0.04,2)),0.5)),2)),0.5)*20);
+			if (y != 0){
+				CombinedCube tempCube = new CombinedCube(ix,y,iz,1,1,1,handler,i,0,0,test);
+				test.addCube(tempCube);
+				tempCube = new CombinedCube(ix,-y,iz,1,1,1,handler,i,0,0,test);
+				test.addCube(tempCube);
+			}
+			iz++;
+			if (iz == 50){
+				ix++;
+				iz = -50;
+			}
+		}
+		handler.addChunk(test);
 
 		this.addKeyListener(new KeyInput(handler));
 		new Window(WIDTH,HEIGHT,"3D Stuff",this);

@@ -19,11 +19,11 @@ public class WorldGen {
 		world.add(new LinkedList<LinkedList<Integer>>());
 		world.get(0).add(new LinkedList<Integer>());
 		i = 0;
-		while (i < 257){
-		//while (i < 2){
-			world.get(0).get(0).add(1);
-			i++;
-		}
+//		while (i < 257){
+//		//while (i < 2){
+//			world.get(0).get(0).add(1);
+//			i++;
+//		}
 		//tempList = world.get(0).get(0);
 		
 	}
@@ -79,8 +79,10 @@ public class WorldGen {
 						if (Math.round(Math.random()*(double) 2) == 1){
 							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
 						}else{
-							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
+							//TODO Change to make random
+							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
 						}
+						
 						i++;
 //						System.out.println("Generating... "+i);
 					}

@@ -123,6 +123,7 @@ public class Handler {
 					}else{
 						cCubeCount++;
 						objects.add(new CombinedCube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)+1),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating));
+						System.out.println("Combined");
 					}
 					chunkSize++;
 					//System.out.println((((i-256*Math.floor(i/(double) 256))%16)+16*chunkZ+1)+" "+i);
@@ -168,7 +169,10 @@ public class Handler {
 		}
 	}
 	public void tick(){
-//		gen.tick();
+		//TODO Make conversion from file to render better... Cubes extend in wrong direction
+		if (debug){
+			//gen.tick();
+		}
 //		for (Cube object: objects){
 //			if (object != null){
 //				object.tick();

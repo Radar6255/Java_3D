@@ -22,6 +22,7 @@ public class Player {
 	public Point tempPoint;
 	
 	public double rate = 0.2;
+	public int fov = 70;
 	
 	public Player(double x,double y,double z,double rotLat,double rotVert){
 		this.x = x;
@@ -86,6 +87,8 @@ public class Player {
 		return sv;
 	}public double getCosineVert(){
 		return cv;
+	}public int getFov(){
+		return fov;
 	}
 	public void setUp(boolean up){
 		this.up = up;

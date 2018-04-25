@@ -22,6 +22,7 @@ public class Chunk {
 	public double dist;
 	Handler handler;
 	Player player;
+	int i = 0;
 	public Chunk(int chunkX, int chunkZ, Handler handler, Player player){
 		this.chunkX = chunkX;
 		this.chunkZ = chunkZ;
@@ -45,9 +46,11 @@ public class Chunk {
 				g.setColor(face.getColor());
 				// Face polygon
 				g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
+				i++;
 				if (debug){
 					g.setColor(Color.BLACK);
-					g.drawString(""+Math.round(face.getDist()),face.getXCoords()[0],face.getYCoords()[0]);
+					g.drawString(""+face.getDist(),face.getXCoords()[1],face.getYCoords()[1]);
+					
 //					g.drawString(""+face.getX(),face.getXCoords()[0],face.getYCoords()[0]);
 				}
 //					g.draw(at.createTransformedShape(g)); // Draw the transformed shape
@@ -56,12 +59,16 @@ public class Chunk {
 				//i++;
 			}
 		}
+		g.setColor(Color.BLACK);
+		g.drawString("Faces Rendering:"+Integer.toString(i), 10, 60);
+		i = 0;
 		facesToRender = new LinkedList<BlockFace>();
-		if (doubleRender){
-			for (CombinedCube object:combinedBlocks){
-				object.render(g);
-			}
-		}
+		//TODO Double check if this could ever work
+//		if (doubleRender){
+//			for (CombinedCube object:combinedBlocks){
+//				object.render(g);
+//			}
+//		}
 	}
 	
 	public void addFace(BlockFace face){
