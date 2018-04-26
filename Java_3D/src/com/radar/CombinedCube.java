@@ -42,6 +42,8 @@ public class CombinedCube extends CubeObject{
 	public BlockFace[] renderFaces = new BlockFace[3];
 	public BlockFace tempFace;
 
+	public double upperBound, lowerBound = 0;
+	
 	public CombinedCube(int x, int y, int z, int w, int h, int d, Handler handler, int cubeIndex,int chunkX,int chunkZ, Chunk chunk) {
 		this.x = x;
 		this.y = y;
@@ -71,19 +73,19 @@ public class CombinedCube extends CubeObject{
 		} else {
 			fov = Main.HEIGHT;
 		}
-		repeat = false;
-		if (!renderUpdate()){
-			repeat = true;
-		}
+//		repeat = false;
+//		if (!renderUpdate()){
+//			repeat = true;
+//		}
 		chunk.addCube(this);
 	}
 	
 	public void render(Graphics g) {
-		if (!repeat && test < 10){
-			test++;
-			repeat = renderUpdate();
-			System.out.println("Repeating...");
-		}
+//		if (!repeat && test < 10){
+//			test++;
+//			repeat = renderUpdate();
+//			System.out.println("Repeating...");
+//		}
 		player = handler.getPlayer();
 		px = player.getX();
 		py = player.getY();
@@ -102,10 +104,11 @@ public class CombinedCube extends CubeObject{
 		
 		//Goal: Find if cube is in FOV in a 3D manner
 		//Need to get viewing angle and use it to make V in which cubes should be rendered
+		renderBlock = true;
 		renderBlock = false;
 //		System.out.println("Start");
-		double lowerBound = (360 - rotLat) - 60;
-		double upperBound = (360 - rotLat) + 60;
+		lowerBound = (360 - rotLat) - 60;
+		upperBound = (360 - rotLat) + 60;
 		
 		if ((x-px) == 0){
 			bound = Math.toDegrees(Math.atan(z-pz));
@@ -131,7 +134,7 @@ public class CombinedCube extends CubeObject{
 		if ((bound > lowerBound && bound < upperBound) || (bound > lowerBound+360 && bound < upperBound+360) || (bound > lowerBound-360 && bound < upperBound-360)){
 			renderBlock = true;
 		}
-		if (renderBlock == true){
+		if (renderBlock){
 			//Loop through all vertices to find which is farthest from player
 			ir = 0;
 			pointsRemoved = new int[8];

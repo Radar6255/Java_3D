@@ -16,7 +16,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 //Main class initializes all classes and runs the game loop
 public class Main extends Canvas implements Runnable{
-	public String version = "1.0.6";
+	public String version = "1.1.0";
 	public int frames,fps;
 	private static final long serialVersionUID = 1L;
 	private Thread thread;
@@ -24,8 +24,8 @@ public class Main extends Canvas implements Runnable{
 	static boolean pause;
 	static boolean changeMouse = true;
 	private Handler handler;
-	static int WIDTH = 800;
-	static int HEIGHT = 600;
+	static int WIDTH = 1000;
+	static int HEIGHT = 700;
 	int i = 0;
 	int iz = -50;
 	ImageIcon img = new ImageIcon("./dirt.png");
@@ -35,11 +35,18 @@ public class Main extends Canvas implements Runnable{
 		Player thePlayer = new Player(1,3,2,180,-30);
 		handler.addPlayer(thePlayer);
 		handler.addGeneration(new WorldGen(handler,thePlayer));
+		
+//		Chunk test = new Chunk(0,0,handler,thePlayer);
+//		CombinedCube tempCube = new CombinedCube(0,0,0,-2,-2,0,handler,i,0,0,test);
+//		test.addCube(tempCube);
+//		handler.addChunk(test);
+		
 		Chunk test = new Chunk(0,0,handler,thePlayer);
 		int ix = -50;
 		int y = 0;
 		while(ix < 50){
-			y = (int) Math.round(Math.pow((0.16-Math.pow((0.6-Math.pow((Math.pow(ix*0.04,2)+Math.pow(iz*0.04,2)),0.5)),2)),0.5)*20);
+			//y = (int) Math.round(Math.pow((0.16-Math.pow((0.6-Math.pow((Math.pow(ix*0.04,2)+Math.pow(iz*0.04,2)),0.5)),2)),0.5)*20);
+			y  = (int) Math.round(Math.sqrt(5/(Math.pow(ix*0.1,2)*Math.pow(iz*0.1, 2))));
 			if (y != 0){
 				CombinedCube tempCube = new CombinedCube(ix,y,iz,1,1,1,handler,i,0,0,test);
 				test.addCube(tempCube);

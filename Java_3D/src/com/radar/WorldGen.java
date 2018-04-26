@@ -3,7 +3,7 @@ package com.radar;
 import java.util.LinkedList;
 
 public class WorldGen {
-	int i,index,all,chunkX,chunkY,chunkZ,xOff,zOff,ix,iz = 0;
+	int i,index,all,chunkX,chunkY,chunkZ,xOff,zOff,ix,iz,h,tx,ty,tz = 0;
 	boolean test = true;
 	double x,y,z;
 	Handler handler;
@@ -19,11 +19,29 @@ public class WorldGen {
 		world.add(new LinkedList<LinkedList<Integer>>());
 		world.get(0).add(new LinkedList<Integer>());
 		i = 0;
-//		while (i < 257){
-//		//while (i < 2){
-//			world.get(0).get(0).add(1);
-//			i++;
-//		}
+		while (h < 0){
+			while (i < 256){
+				//while (i < 2){
+//				ty  = (int) Math.round(Math.sqrt(5/(Math.pow(tx*0.1,2)*Math.pow(tz*0.1, 2))));
+//				ty = (int) Math.round(Math.pow((0.16-Math.pow((0.6-Math.pow((Math.pow(tx*0.04,2)+Math.pow(tz*0.04,2)),0.5)),2)),0.5)*20);
+				ty = 2;
+				if (ty == h){
+//					System.out.println("Added Cube to world");
+					world.get(0).get(0).add(1);
+				}else{
+					world.get(0).get(0).add(0);
+				}
+				i++;
+				tx++;
+				if (tx > 16){
+					tx = 0;
+					tz++;
+				}
+			}
+			h++;
+			i = 0;
+			tz = 0;
+		}
 		//tempList = world.get(0).get(0);
 		
 	}
@@ -74,17 +92,41 @@ public class WorldGen {
 				if (world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).isEmpty()){
 					//world.get(chunkX+xOff).set(chunkZ+zOff,new LinkedList<Integer>());
 					//System.out.println("Generating new chunk at X:"+chunkX+ix+" Z:"+chunkZ+iz);
+//					i = 0;
+//					while (i < 257){
+//						if (Math.round(Math.random()*(double) 2) == 1){
+//							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
+//						}else{
+//							//TODO Change to make random
+//							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
+//						}
+//						
+//						i++;
+////						System.out.println("Generating... "+i);
+//					}
+					h = 0;
 					i = 0;
-					while (i < 257){
-						if (Math.round(Math.random()*(double) 2) == 1){
-							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
-						}else{
-							//TODO Change to make random
-							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
+					while (h < 16){
+						while (i < 257){
+							//while (i < 2){
+//							ty  = (int) Math.round(Math.sqrt(5/(Math.pow((tx+(16*(chunkX+xOff+ix)))*0.1,2)*Math.pow((tz+(16*(chunkZ+zOff+iz)))*0.1, 2))));
+							y = 3;
+							if (ty == h){
+								//System.out.println("Added Cube to world");
+								world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
+							}else{
+								world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
+							}
+							i++;
+							tx++;
+							if (tx > 16){
+								tx = 0;
+								tz++;
+							}
 						}
-						
-						i++;
-//						System.out.println("Generating... "+i);
+						h++;
+						i = 0;
+						tz = 0;
 					}
 				}
 			}catch(Exception e){
