@@ -155,10 +155,6 @@ public class CombinedCube extends CubeObject{
 				}else{
 					tz = point[2];
 				}
-	
-	//			points3D[i][0] = tx+x;
-	//			points3D[i][1] = ty+y;
-	//			points3D[i][2] = tz+z;
 				
 				tx = (float) (tx + (x - px));
 				ty = (float) (ty + (y - py));
@@ -187,7 +183,6 @@ public class CombinedCube extends CubeObject{
 				}
 				if (f > 0){
 					renderBlock = false;
-					//System.out.println("I did something");
 				}
 				
 				//Corner points render mostly for debugging
@@ -301,7 +296,6 @@ public class CombinedCube extends CubeObject{
 									tx = pointsX[i]+distOff-(float)0;
 								}
 							}
-//							System.out.println("right?");
 						}
 						if (pointsY[0] < 0 || pointsY[1] < 0 || pointsY[2] < 0 || pointsY[3] < 0){ //If any point is below the player
 							for(i=0;i < 4;i++){
@@ -316,7 +310,6 @@ public class CombinedCube extends CubeObject{
 									tz = pointsZ[i]-distOff-(float)0;
 								}
 							}
-//							System.out.println("Left???");
 						}
 						
 						//Right side of cube... These are very relative terms
@@ -340,24 +333,16 @@ public class CombinedCube extends CubeObject{
 									tz = pointsZ[i]+distOff-(float)0;
 								}
 							}
-							//System.out.println(px+" "+tz);
 						}
-						//TODO
 						test2 = false;
 						if (px > x && x+w > px && !lside && !rside){
-							//System.out.println(tx);
 							tx = 0;
-							//System.out.println(tx+" "+ty+" "+tz);
 							test2 = true;
 						}if (py+1 > y && y+h > py+1 && !up && !down){
-							//System.out.println(ty);
 							ty = 0;
-							//System.out.println(tx+" "+ty+" "+tz);
 							test2 = true;
 						}if (pz > z && z+d > pz && !back && !front){
-							//System.out.println(tz);
 							tz = 0;
-							//System.out.println(tx+" "+ty+" "+tz);
 							test2 = true;
 						}
 //						if (test2&&debug){
@@ -556,7 +541,7 @@ public class CombinedCube extends CubeObject{
 			}
 			if (!visible && w < 2 && d < 2 && h < 2){
 				face[5] = 0;
-				System.out.println("Not visible");
+//				System.out.println("Not visible");
 			}else{
 				face[5] = 1;
 			}

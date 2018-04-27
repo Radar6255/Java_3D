@@ -104,6 +104,8 @@ public class Handler {
 			while(i < currentChunk.size()-1){
 				if (currentChunk.get(i) == 1){
 					width = 1;
+//					objects.add( new CombinedCube( (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX+ix), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ+iz),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating ) );
+//					System.out.println((int) (((i/16.0)-Math.floor(i/16.0))*16.0));
 					try{
 						if (currentChunk.get(i) == 1 && currentChunk.get(i+1) == 1){
 							tx = i;
@@ -124,13 +126,13 @@ public class Handler {
 					if (width == 1){
 						sCubeCount++;
 						//objects.add(new Cube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)+1),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating));
-						objects.add(new CombinedCube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)+1),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating));
+						objects.add(new CombinedCube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating));
 					}else{
 						cCubeCount++;
 						//System.out.println((int) Math.floor(((tx/256.0)-Math.floor(tx/256.0))*16.0));
-						objects.add( new CombinedCube( (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX+ix), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ+iz),1,1,-width,this,i,chunkX+ix,chunkZ+iz,chunkCreating ) );
+						objects.add( new CombinedCube( (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX+ix), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ+iz),1,1,-width+2,this,i,chunkX+ix,chunkZ+iz,chunkCreating ) );
 						if ((int) Math.floor(i/256.0) == 3){
-							System.out.println(i);
+//							System.out.println(i);
 						}
 						//objects.add(new CombinedCube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)+1),-width,1,1,this,i,chunkX+ix,chunkZ+iz,chunkCreating));
 						//objects.add(new CombinedCube((int) (((tx-256*Math.floor(tx/256.0))/16) + 16*(chunkX+ix)),(int) Math.floor(tx/(double) 256),(int) (((tx-256*Math.floor(tx/256.0))%16)+16*(chunkZ+iz)),1,1,width+1,this,tx,chunkX+ix,chunkZ+iz,chunkCreating));
@@ -138,7 +140,8 @@ public class Handler {
 					}
 					chunkSize++;
 					//System.out.println((((i-256*Math.floor(i/(double) 256))%16)+16*chunkZ+1)+" "+i);
-				}i++;
+				}
+				i++;
 			}
 			renderChunks.add(chunkCreating);
 			//Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,objects.size()-1};
