@@ -9,5 +9,7 @@ public abstract class CubeObject {
 		
 	}public void setDebug(boolean t){
 		
+	}public double getDist(){
+		return 0.0;
 	}
 }

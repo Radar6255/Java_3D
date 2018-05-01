@@ -19,6 +19,11 @@ public class WorldGen {
 		world.add(new LinkedList<LinkedList<Integer>>());
 		world.get(0).add(new LinkedList<Integer>());
 		i = 0;
+//		while (i < 768){
+//			world.get(0).get(0).add(1);
+//			i++;
+//		}i = 0;
+		
 		while (h < 3){
 			while (i < 256){
 				//while (i < 2){
@@ -93,45 +98,60 @@ public class WorldGen {
 				if (world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).isEmpty()){
 					//world.get(chunkX+xOff).set(chunkZ+zOff,new LinkedList<Integer>());
 					//System.out.println("Generating new chunk at X:"+chunkX+ix+" Z:"+chunkZ+iz);
-//					i = 0;
-//					while (i < 257){
-//						if (Math.round(Math.random()*(double) 2) == 1){
-//							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
-//						}else{
-//							//TODO Change to make random
-//							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
-//						}
-//						
-//						i++;
-////						System.out.println("Generating... "+i);
-//					}
-					h = 0;
 					i = 0;
-					tx = 0;
-					while (h < 30){
-						while (i < 256){
-							//while (i < 2){
-							System.out.println((16-tx)+(16*(chunkX+ix)));
-//							ty  = (int) Math.round(Math.sqrt(5/(Math.pow(((16-tx)+(16*(chunkX+ix)))*0.1,2)*Math.pow(((16-tz)+(16*(chunkZ+iz)))*0.1, 2))));
-							ty = (int) Math.round(Math.pow((tx+(16*(chunkX+ix)))*0.2, 2)+Math.pow((tz+(16*(chunkZ+iz)))*0.2, 2));
-//							ty = 3;
-							
-							if (ty == h){
-								world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
-							}else{
-								world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
-							}
-							i++;
-							tx++;
-							if (tx > 15){
-								tx = 0;
-								tz++;
-							}
+					while (i < 256){
+						if (Math.round(Math.random()*(double) 2) == 1){
+							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
+						}else{
+							//TODO Change to make random
+							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
 						}
-						h++;
-						i = 0;
-						tz = 0;
+						
+						i++;
+//						System.out.println("Generating... "+i);
 					}
+//					h = 0;
+//					i = 0;
+//					tx = 0;
+//					tz = 0;
+//					while (h < 60){
+//						while (i < 256){
+//							//while (i < 2){
+////							ty  = (int) Math.round(Math.sqrt(5/(Math.pow(((16-tx)+(16*(chunkX+ix)))*0.1,2)*Math.pow(((16-tz)+(16*(chunkZ+iz)))*0.1, 2))));
+//							ty = 0;
+//							
+//							//Rotate ty = (int) Math.round(0.4*(Math.pow(((16-tx)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((tz)+(16*(chunkZ+iz)))*0.2, 2))); 90 degrees
+//							if ((chunkX+ix) >= 0 && (chunkZ+iz) >= 0){ //1st Quad
+//								ty = (int) Math.round(0.4*(Math.pow(((tx)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((tz)+(16*(chunkZ+iz)))*0.2, 2)));
+//							}
+//							else if ((chunkX+ix) < 0 && (chunkZ+iz) > 0){ //2nd Quad
+//								ty = (int) Math.round(0.4*(Math.pow(((16-tx)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((16-tz)+(16*(chunkZ+iz)))*0.2, 2)));
+//							}
+//							else if ((chunkX+ix) < 0 && (chunkZ+iz) < 0){ //3rd Quad
+//								ty = (int) Math.round(0.4*(Math.pow(((tx)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((tz)+(16*(chunkZ+iz)))*0.2, 2)));
+//							}
+//							else{ //4th Quad
+//								ty = (int) Math.round(0.4*(Math.pow(((16-tx)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((16-tz)+(16*(chunkZ+iz)))*0.2, 2)));
+//							}
+////							ty = 3;
+////							ty = (int) Math.round(tz);
+//							if (ty == h){
+//								world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
+//							}else{
+//								world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
+//							}
+//							i++;
+//							tx++;
+//							if (tx > 15){
+//								tx = 0;
+//								tz++;
+//							}
+//						}
+//						h++;
+//						i = 0;
+//						tz = 0;
+//						tx = 0;
+//					}
 				}
 			}catch(Exception e){
 				System.out.println("World gen error : ");

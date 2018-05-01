@@ -8,10 +8,9 @@ import java.util.LinkedList;
 //Does all calculations for where BlockFaces should render and how far they are from the player
 
 public class CombinedCube extends CubeObject{
-	public int x, y, z, w, h, d, i, fov, far,pfov, index, cubeIndex,count,pcx,pcy,pcz,xOff,zOff,ir;
+	public int x, y, z, w, h, d, i, fov, far,pfov, index, cubeIndex,count,pcx,pcy,pcz,xOff,zOff,ir, chunkMax;
 	BlockFace testFace;
 //	public float p1x, p1y, p1z,p2x, p2y, p2z,p3x, p3y, p3z,p4x, p4y, p4z;
-	public float distOff = 0.0f;
 	public float tx, ty, tz, sum;
 	public double f, f2, px, py, pz, rotLat, rotVert, dist, ldist, dist2,sl,cl,sv,cv, bound;
 	public float[] point = new float[2];
@@ -20,7 +19,8 @@ public class CombinedCube extends CubeObject{
 	public Color faceColor;
 	public boolean visible, changed, looping, render,repeat,renderBlock,right,left,up,down,lside,rside,back,front;
 	//ImageIcon img = new ImageIcon("./dirt.png");
-	LinkedList<LinkedList<LinkedList<Integer>>> world = new LinkedList<LinkedList<LinkedList<Integer>>>();
+	LinkedList<Integer> chunkData = new LinkedList<Integer>();
+//	LinkedList<LinkedList<LinkedList<Integer>>> world = new LinkedList<LinkedList<LinkedList<Integer>>>();
 	Player player;
 	private Handler handler;
 	Chunk chunk;
@@ -39,7 +39,7 @@ public class CombinedCube extends CubeObject{
 	public double[] distances = new double[8];
 	private int[] xCoords = new int[4];
 	private int[] yCoords = new int[4];
-	public BlockFace[] renderFaces = new BlockFace[3];
+	LinkedList<BlockFace> renderFaces = new LinkedList<BlockFace>();
 	public BlockFace tempFace;
 
 	public double upperBound, lowerBound = 0;
@@ -78,6 +78,7 @@ public class CombinedCube extends CubeObject{
 //			repeat = true;
 //		}
 		chunk.addCube(this);
+		renderUpdate();
 	}
 	
 	public void render(Graphics g) {
@@ -203,7 +204,7 @@ public class CombinedCube extends CubeObject{
 			if (renderBlock){
 			index = 0;
 			count = 0;
-			renderFaces = new BlockFace[3];
+			renderFaces = new LinkedList<BlockFace>();;
 			for (int[] face : faces) {
 				if (face[5] == 0){}
 				else{
@@ -282,9 +283,9 @@ public class CombinedCube extends CubeObject{
 						pointsY[3] = points3D[face[3]][1];
 						pointsZ[3] = points3D[face[3]][2];
 						
-						tx = pointsX[0]-distOff;
-						ty = pointsY[0]-distOff;
-						tz = pointsZ[0]-distOff;
+						tx = pointsX[0];
+						ty = pointsY[0];
+						tz = pointsZ[0];
 						//Debug proof the values are of the 3D points
 //						for(i=0;i < 4;i++){
 //							System.out.println(pointsX[i]+" "+pointsY[i]+" "+pointsZ[i]);
@@ -292,22 +293,22 @@ public class CombinedCube extends CubeObject{
 						
 						if (pointsX[0] < 0 || pointsX[1] < 0 || pointsX[2] < 0 || pointsX[3] < 0){ //If any point is left of the player
 							for(i=0;i < 4;i++){
-								if (tx < pointsX[i]+distOff){ //Find left most point in cube
-									tx = pointsX[i]+distOff-(float)0;
+								if (tx < pointsX[i]){ //Find left most point in cube
+									tx = pointsX[i]-(float)0;
 								}
 							}
 						}
 						if (pointsY[0] < 0 || pointsY[1] < 0 || pointsY[2] < 0 || pointsY[3] < 0){ //If any point is below the player
 							for(i=0;i < 4;i++){
-								if (ty < pointsY[i]-distOff){
-									ty = pointsY[i]-distOff-(float)0;
+								if (ty < pointsY[i]){
+									ty = pointsY[i]-(float)0;
 								}
 							}
 						}
 						if (pointsZ[0] < 0 || pointsZ[1] < 0 || pointsZ[2] < 0 || pointsZ[3] < 0){
 							for(i=0;i < 4;i++){
-								if (tz < pointsZ[i]-distOff){
-									tz = pointsZ[i]-distOff-(float)0;
+								if (tz < pointsZ[i]){
+									tz = pointsZ[i]-(float)0;
 								}
 							}
 						}
@@ -315,22 +316,22 @@ public class CombinedCube extends CubeObject{
 						//Right side of cube... These are very relative terms
 						if (pointsX[0] > 0 || pointsX[1] > 0 || pointsX[2] > 0 || pointsX[3] > 0){
 							for(i=0;i < 4;i++){
-								if (tx > pointsX[i]-distOff){
-									tx = pointsX[i]-distOff-(float)0;
+								if (tx > pointsX[i]){
+									tx = pointsX[i]-(float)0;
 								}
 							}
 						}
 						if (pointsY[0] > 0 || pointsY[1] > 0 || pointsY[2] > 0 || pointsY[3] > 0){
 							for(i=0;i < 4;i++){
-								if (ty > pointsY[i]+distOff){
-									ty = pointsY[i]+distOff-(float)0;
+								if (ty > pointsY[i]){
+									ty = pointsY[i]-(float)0;
 								}
 							}
 						}
 						if (pointsZ[0] > 0 || pointsZ[1] > 0 || pointsZ[2] > 0 || pointsZ[3] > 0){
 							for(i=0;i < 4;i++){
-								if (tz > pointsZ[i]+distOff){
-									tz = pointsZ[i]+distOff-(float)0;
+								if (tz > pointsZ[i]){
+									tz = pointsZ[i]-(float)0;
 								}
 							}
 						}
@@ -356,11 +357,12 @@ public class CombinedCube extends CubeObject{
 //						}
 						
 						//Sending blockface to be rendered at the chunk
-						dist = (float) Math.sqrt(Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2));
-						tempFace = new BlockFace(xCoords, yCoords, face, dist, faceColor,cubeIndex);
-						chunk.addFace(tempFace);
+						dist = (float) Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2);
+//						tempFace = new BlockFace(xCoords, yCoords, face, dist, faceColor,cubeIndex);
+//						renderFaces[count] = tempFace;
+//						chunk.addFace(tempFace);
 
-						/* visible = false;
+						visible = false;
 						
 						//Determines if cube face is on screen
 						right = false;
@@ -399,24 +401,36 @@ public class CombinedCube extends CubeObject{
 						if (visible){
 							tempFace = new BlockFace(xCoords, yCoords, face, dist, faceColor,cubeIndex);
 							chunk.addFace(tempFace);
+//							renderFaces.add(tempFace);
 						}
 						//renderFaces[index] = new BlockFace(xCoords, yCoords, face, dist, faceColor, visible,cubeIndex);
-						index++;
-						sum = 0;*/
+						
+						sum = 0;
 					}
 				}
 				count++;
 			}
+			
+//			renderFaces.sort(new sortFaces());
+//			
+//			for (BlockFace face:renderFaces){
+//				if (face != null){
+//					g.setColor(face.getColor());
+//					// Face polygon
+//					g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
+//				}
+//			}
+			
 			}
 		}
 	}
 	
-//	public double getDist() {
-//		tx = (float) (x - px);
-//		ty = (float) (y - py);
-//		tz = (float) (z - pz);
-//		return (Math.sqrt(Math.pow(tx, 2) + Math.pow(ty, 2) + Math.pow(tz, 2)));
-//	}
+	public double getDist() {
+		tx = (float) (x - px);
+		ty = (float) (y - py);
+		tz = (float) (z - pz);
+		return (Math.sqrt(Math.pow(tx, 2) + Math.pow(ty, 2) + Math.pow(tz, 2)));
+	}
 
 	public int getIndex() {
 		return cubeIndex;
@@ -429,126 +443,54 @@ public class CombinedCube extends CubeObject{
 //		zOff = handler.getZOff();
 //		xOff = handler.getXOff();
 	}
+	//TODO Replace code possibly doing culling in chunk before render, optimize order of if statements
 	public boolean renderUpdate(){
-		world = handler.getWorld();
-		xOff = handler.getXOff();
-		zOff = handler.getZOff();
+		xOff= handler.getXOff();
+		zOff= handler.getZOff();
+		chunkData = handler.getWorld().get(pcx+xOff).get(pcz+zOff);
+		chunkMax = chunkData.size();
+		
 		count = 0;
-		for (int[] face:faces){
+		for (int[] face : faces){
+			
 			visible = true;
-			try{
-				if (visible && world.get(pcx+xOff).get(pcz+zOff)!=null){
-					if (count == 0){
-						//+x face direction
-						if (world.get(pcx+xOff).get(pcz+zOff).size()-1 > cubeIndex+1){
-							if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+1) != 0){
-								visible = false;
-							}
-						}if (!visible && (cubeIndex+1)%16 == 0){
-							//if (world.get(pcx+xOff).size()-1 > pcz+zOff+1){
-								if (world.get(pcx+xOff).get(pcz+zOff+1) != null && !world.get(pcx+xOff).get(pcz+zOff+1).isEmpty()){
-									if (0 <= cubeIndex-15 && world.get(pcx+xOff).get(pcz+zOff+1).size()-1 > cubeIndex-15){
-										if (world.get(pcx+xOff).get(pcz+zOff+1).get(cubeIndex-15) == 0){
-											visible = true;
-										}
-									}else{
-										visible = true;
-									}
-								}else{
-									visible = true;
-								}
-							//}else{
-							//	visible = true;
-							//}
-//						if (cubeIndex == 17){
-//							System.out.println("ChunkX:"+pcx+" ChunkZ:"+pcz+" Value:"+world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+16)+" Visble "+visible);
-//						}
-						}//if(!visible && (cubeIndex)/256){
-							
-						//}
-					}else if (count == 1){
-						//-x face direction
-						if (cubeIndex-1 >= 0){
-							//if (cubeIndex%16 != 0){
-							if (world.get(pcx+xOff).get(pcz+zOff).size()-1>cubeIndex-1){
-								if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex-1) != 0){
-									visible = false;
-								}
-							}
-						}if (!visible && cubeIndex%16 == 0){
-							if (pcz+zOff-1 >= 0){
-								if (world.get(pcx+xOff).get(pcz+zOff-1) != null && !world.get(pcx+xOff).get(pcz+zOff-1).isEmpty()){
-									if (world.get(pcx+xOff).get(pcz+zOff-1).size()-1 > cubeIndex+15){
-										if (world.get(pcx+xOff).get(pcz+zOff-1).get(cubeIndex+15) == 0){
-											visible = true;
-										}
-									}else{
-										visible = true;
-									}
-								}else{
-									visible = true;
-								}
-							}else{
-								visible = true;
-							}
-						}
-//					visible = true;
-					}else if (count == 2){
-						//-z face direction Green
-						if (world.get(pcx+xOff).get(pcz+zOff).size()-1 > cubeIndex+16){
-							if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+16) != 0){
-								visible = false;
-							}
-//							if (cubeIndex == 0){
-//								System.out.println("ChunkX:"+pcx+" ChunkZ:"+pcz+" Value:"+world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+16)+" Visble "+visible);
-//							}
-						}
-					}else if (count == 3){
-						//+z face direction
-						if (cubeIndex - 16 >= 0 && world.get(pcx+xOff).get(pcz+zOff).size()-1 >= cubeIndex-16){
-							if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex-16) != 0){
-								visible = false;
-							}
-						}
-//						visible = true;
-					}else if (count == 4){
-						//-y face direction
-//						visible = false;
-						if (cubeIndex-256 >= 0){
-							if (world.get(pcx+xOff).get(pcz+xOff).get(cubeIndex-256) != 0){
-								visible = false;
-							}
-						}
-						
-					}else if (count == 5){
-						//+y face direction
-						if (world.get(pcx+xOff).get(pcz+zOff).size()-1 >= cubeIndex+257){
-							if (world.get(pcx+xOff).get(pcz+zOff).get(cubeIndex+257) != 0){
-								visible = false;
-							}
-						}
-						//visible = false;
-					}
-				}
-				//else if (visible){
-				//	System.out.println(world.get(pcx+xOff).get(pcz+zOff));
-					//System.out.println("Off X:"+xOff+" Off Z:"+zOff+" Chunk X:"+pcx+" Chunk Z:"+pcz+" Real Chunk X:"+(pcx+xOff)+" Chunk Z:"+(pcz+zOff));
-				//}
-			}catch(Exception e){
-				e.printStackTrace();
-				System.out.println(e.getCause());
-				return false;
+			//Blue Side
+			if (count == 0 && cubeIndex+1 < chunkMax && chunkData.get(cubeIndex+1) == 1 && (cubeIndex+1) % 16 != 0){
+				visible = false;
 			}
-			if (!visible && w < 2 && d < 2 && h < 2){
-				face[5] = 0;
-//				System.out.println("Not visible");
-			}else{
+			//Red Side
+			if (count == 1 && cubeIndex-1 >= 0 && chunkData.get(cubeIndex-1) == 1 && cubeIndex% 16 != 0){
+				visible = false;
+			}
+			
+			//Green Side
+			if (count == 2 && cubeIndex+16 < chunkMax && chunkData.get(cubeIndex+16) == 1 && ((cubeIndex+16) % 256 < 0 || (cubeIndex+16) % 256 > 15)){
+				visible = false;
+			}
+			//Orange Side
+			if (count == 3 && cubeIndex-16 >= 0 && chunkData.get(cubeIndex-16) == 1 && (cubeIndex % 256 < 0 || cubeIndex % 256 > 15)){
+				visible = false;
+			}
+			
+			//Yellow Side
+			if (count == 4 && cubeIndex-256 >= 0 && chunkData.get(cubeIndex-256) == 1){
+				visible = false;
+			}
+			//Light Blue Side
+			if (count == 5 && cubeIndex+257 < chunkMax && chunkData.get(cubeIndex+257) == 1){
+				visible = false;
+			}
+			
+			if (visible){
 				face[5] = 1;
+			}else{
+				face[5] = 0;
 			}
 			count++;
 		}
 		return true;
 	}
+	
 	private float[] rotate2D(float x, float y, double s,double c) {
 //		float s = (float) Math.sin(rad);
 //		float c = (float) Math.cos(rad);

@@ -37,6 +37,8 @@ public class Chunk {
 	}
 	
 	public void render(Graphics g){
+		
+//		blocks.sort(new blockSort());
 		for (CubeObject object:blocks){
 			object.render(g);
 		}
@@ -56,7 +58,7 @@ public class Chunk {
 //					g.draw(at.createTransformedShape(g)); // Draw the transformed shape
 //					PerspectiveTransform test = new PerspectiveTransform();
 //					g.drawImage(img.getImage(), Main.WIDTH/2, Main.WIDTH/2, null);
-				//i++;
+				i++;
 			}
 		}
 		g.setColor(Color.BLACK);
@@ -70,7 +72,9 @@ public class Chunk {
 //			}
 //		}
 	}
-	
+//	public LinkedList<Integer> getChunk(){
+//		return 
+//	}
 	public void addFace(BlockFace face){
 		facesToRender.add(face);
 	}public void addCube(CubeObject cube){
@@ -86,18 +90,30 @@ public class Chunk {
 			cube.setDebug(debug);
 		}
 	}
-}class sortFaces implements Comparator<BlockFace>{
+}
+class blockSort implements Comparator<CubeObject>{
 
-	public int compare(BlockFace o1, BlockFace o2) {
+	public int compare(CubeObject o1, CubeObject o2) {
 		//return Double.compare(o1.getDist(), o2.getDist());
 //		if (o1 == null || o2 == null){
 //			return 0;
 //		}
 		if (o1.getDist() < o2.getDist()){
 			return 1;
-		}if (o1.getDist() > o2.getDist()){
+		}else if (o1.getDist() > o2.getDist()){
 			return -1;
-		}return 0;
+		}else{return 0;}
+	}
+	
+}
+class sortFaces implements Comparator<BlockFace>{
+
+	public int compare(BlockFace o1, BlockFace o2) {
+		if (o1.getDist() < o2.getDist()){
+			return 1;
+		}else if (o1.getDist() > o2.getDist()){
+			return -1;
+		}else{return 0;}
 	}
 	
 }
