@@ -186,7 +186,7 @@ public class Handler {
 	}
 	public void tick(){
 		//TODO Make conversion from file to render better... Cubes extend in wrong direction
-		if (debug){
+		if (!debug){
 			gen.tick();
 		}
 //		for (Cube object: objects){

@@ -16,7 +16,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 //Main class initializes all classes and runs the game loop
 public class Main extends Canvas implements Runnable{
-	public String version = "1.1.0";
+	public String version = "1.1.1";
 	public int frames,fps;
 	private static final long serialVersionUID = 1L;
 	private Thread thread;

@@ -20,7 +20,6 @@ public class CombinedCube extends CubeObject{
 	public boolean visible, changed, looping, render,repeat,renderBlock,right,left,up,down,lside,rside,back,front;
 	//ImageIcon img = new ImageIcon("./dirt.png");
 	LinkedList<Integer> chunkData = new LinkedList<Integer>();
-//	LinkedList<LinkedList<LinkedList<Integer>>> world = new LinkedList<LinkedList<LinkedList<Integer>>>();
 	Player player;
 	private Handler handler;
 	Chunk chunk;
@@ -54,17 +53,7 @@ public class CombinedCube extends CubeObject{
 		this.chunk = chunk;
 		pcx = chunkX;
 		pcz = chunkZ;
-//		if (x > 0){
-//			pcx = (int) Math.floor(x/16.1);
-//		}else{
-//			pcx = (int) Math.floor((x-1)/16.1);
-//		}
 		pcy = (int) y;
-//		if (z > 0){
-//			pcz = (int) Math.floor(z/16.1);
-//		}else{
-//			pcz = (int) Math.floor((z-1)/16.1);
-//		}
 		
 		this.cubeIndex = cubeIndex;
 		this.handler = handler;
@@ -73,20 +62,11 @@ public class CombinedCube extends CubeObject{
 		} else {
 			fov = Main.HEIGHT;
 		}
-//		repeat = false;
-//		if (!renderUpdate()){
-//			repeat = true;
-//		}
 		chunk.addCube(this);
 		renderUpdate();
 	}
 	
 	public void render(Graphics g) {
-//		if (!repeat && test < 10){
-//			test++;
-//			repeat = renderUpdate();
-//			System.out.println("Repeating...");
-//		}
 		player = handler.getPlayer();
 		px = player.getX();
 		py = player.getY();
@@ -455,20 +435,20 @@ public class CombinedCube extends CubeObject{
 			
 			visible = true;
 			//Blue Side
-			if (count == 0 && cubeIndex+1 < chunkMax && chunkData.get(cubeIndex+1) == 1 && (cubeIndex+1) % 16 != 0){
+			if (count == 0 && cubeIndex+1 < chunkMax && (cubeIndex+1) % 16 != 0 && chunkData.get(cubeIndex+1) == 1){
 				visible = false;
 			}
 			//Red Side
-			if (count == 1 && cubeIndex-1 >= 0 && chunkData.get(cubeIndex-1) == 1 && cubeIndex% 16 != 0){
+			if (count == 1 && cubeIndex-1 >= 0 && cubeIndex% 16 != 0 && chunkData.get(cubeIndex-1) == 1){
 				visible = false;
 			}
 			
 			//Green Side
-			if (count == 2 && cubeIndex+16 < chunkMax && chunkData.get(cubeIndex+16) == 1 && ((cubeIndex+16) % 256 < 0 || (cubeIndex+16) % 256 > 15)){
+			if (count == 2 && cubeIndex+16 < chunkMax && ((cubeIndex+16) % 256 < 0 || (cubeIndex+16) % 256 > 15) && chunkData.get(cubeIndex+16) == 1){
 				visible = false;
 			}
 			//Orange Side
-			if (count == 3 && cubeIndex-16 >= 0 && chunkData.get(cubeIndex-16) == 1 && (cubeIndex % 256 < 0 || cubeIndex % 256 > 15)){
+			if (count == 3 && cubeIndex-16 >= 0 && (cubeIndex % 256 < 0 || cubeIndex % 256 > 15) && chunkData.get(cubeIndex-16) == 1){
 				visible = false;
 			}
 			
@@ -477,7 +457,7 @@ public class CombinedCube extends CubeObject{
 				visible = false;
 			}
 			//Light Blue Side
-			if (count == 5 && cubeIndex+257 < chunkMax && chunkData.get(cubeIndex+257) == 1){
+			if (count == 5 && cubeIndex+256 < chunkMax && chunkData.get(cubeIndex+256) == 1){
 				visible = false;
 			}
 			

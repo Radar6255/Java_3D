@@ -50,8 +50,8 @@ public class Chunk {
 				g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
 				i++;
 				if (debug){
-					g.setColor(Color.BLACK);
-					g.drawString(""+face.getDist(),face.getXCoords()[1],face.getYCoords()[1]);
+//					g.setColor(Color.BLACK);
+//					g.drawString(""+face.getDist(),face.getXCoords()[1],face.getYCoords()[1]);
 					
 //					g.drawString(""+face.getX(),face.getXCoords()[0],face.getYCoords()[0]);
 				}
@@ -72,9 +72,6 @@ public class Chunk {
 //			}
 //		}
 	}
-//	public LinkedList<Integer> getChunk(){
-//		return 
-//	}
 	public void addFace(BlockFace face){
 		facesToRender.add(face);
 	}public void addCube(CubeObject cube){
