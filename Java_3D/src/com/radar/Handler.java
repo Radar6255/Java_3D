@@ -39,6 +39,7 @@ public class Handler {
 		objects.add(object);
 		ci++;
 	}public void debugMode(boolean debug){
+		gen.setDebug(debug);
 		for (Chunk chunk:renderChunks){
 			chunk.setDebug(debug);
 		}players[0].setDebug(debug);
@@ -186,9 +187,9 @@ public class Handler {
 	}
 	public void tick(){
 		//TODO Make conversion from file to render better... Cubes extend in wrong direction
-		if (!debug){
-			gen.tick();
-		}
+//		if (!debug){
+//			gen.tick();
+//		}
 //		for (Cube object: objects){
 //			if (object != null){
 //				object.tick();

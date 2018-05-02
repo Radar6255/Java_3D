@@ -34,7 +34,9 @@ public class Main extends Canvas implements Runnable{
 		handler = new Handler();
 		Player thePlayer = new Player(1,3,2,180,-30);
 		handler.addPlayer(thePlayer);
-		handler.addGeneration(new WorldGen(handler,thePlayer));
+		WorldGen genThread = new WorldGen(handler,thePlayer);
+		handler.addGeneration(genThread);
+		genThread.start();
 		
 //		Chunk test = new Chunk(0,0,handler,thePlayer);
 //		CombinedCube tempCube = new CombinedCube(0,0,0,-2,-2,0,handler,i,0,0,test);

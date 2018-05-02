@@ -349,7 +349,7 @@ public class CombinedCube extends CubeObject{
 						left = false;
 						for (int xc : xCoords) {
 //							if (xc > 0 && xc < Main.WIDTH) {
-							if (xc > -200 && xc < Main.WIDTH+200) {
+							if (xc > 0 && xc < Main.WIDTH) {
 								visible = true;
 							}
 //							if (xc < 0){
