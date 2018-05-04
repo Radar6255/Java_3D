@@ -8,8 +8,6 @@ public class WorldGen extends Thread{
 	double x,y,z;
 	Handler handler;
 	Player thePlayer;
-	Cube[] layer = new Cube[256];
-	public Cube[] subchunk = new Cube[64];
 	public LinkedList<LinkedList<LinkedList<Integer>>> world = new LinkedList<LinkedList<LinkedList<Integer>>>();
 	LinkedList<LinkedList<Integer>> chunk = new LinkedList<LinkedList<Integer>>();
 	
@@ -19,37 +17,6 @@ public class WorldGen extends Thread{
 		world.add(new LinkedList<LinkedList<Integer>>());
 		world.get(0).add(new LinkedList<Integer>());
 		i = 0;
-//		while (i < 768){
-//			world.get(0).get(0).add(1);
-//			i++;
-//		}i = 0;
-		
-		while (h < 0){
-			while (i < 256){
-				//while (i < 2){
-//				ty  = (int) Math.round(Math.sqrt(5/(Math.pow((tx+(16*(chunkX+ix)))*0.1,2)*Math.pow((tz+(16*(chunkZ+iz)))*0.1, 2))));
-//				ty  = (int) Math.round(Math.sqrt(5/(Math.pow(tx*0.1,2)*Math.pow(tz*0.1, 2))));
-//				ty = (int) Math.round(Math.pow((0.16-Math.pow((0.6-Math.pow((Math.pow(tx*0.04,2)+Math.pow(tz*0.04,2)),0.5)),2)),0.5)*20);
-				ty = (int) Math.round(Math.pow((0.16-Math.pow((0.6-Math.pow((Math.pow(ix*0.04,2)+Math.pow(iz*0.04,2)),0.5)),2)),0.5)*20);
-				if (h == ty && h != 0){
-//					System.out.println("Added Cube to world");
-					world.get(0).get(0).add(1);
-				}else{
-					world.get(0).get(0).add(0);
-				}
-				i++;
-				tx++;
-				if (tx > 16){
-					tx = 0;
-					tz++;
-				}
-			}
-			h++;
-			i = 0;
-			tz = 0;
-		}
-		//tempList = world.get(0).get(0);
-		
 	}
 	public void run(){
 		while (!debug){
@@ -82,39 +49,17 @@ public class WorldGen extends Thread{
 						while(world.getLast().size() < zOff+iz){
 							world.getLast().add(new LinkedList<Integer>());
 						}
-						//System.out.println("Adding to X... "+chunkX);
 					}
 					while (world.get(chunkX+xOff+ix).size() <= chunkZ+zOff+5+iz){
 						world.get(chunkX+xOff+ix).add(new LinkedList<Integer>());
-						//System.out.println("Adding to Z... "+chunkZ);
 					}
-					//System.out.println((chunkX+xOff)+" "+(chunkZ+zOff));
-	//				if (chunkX == 0 && chunkZ == 0 && test){
-	//					System.out.println(world.get(chunkX+xOff).get(chunkZ+zOff));
-	//					test = false;
-	//				}
 					if (world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).isEmpty()){
-						//world.get(chunkX+xOff).set(chunkZ+zOff,new LinkedList<Integer>());
-						//System.out.println("Generating new chunk at X:"+chunkX+ix+" Z:"+chunkZ+iz);
-	//					i = 0;
-	//					while (i < 256){
-	//						if (Math.round(Math.random()*(double) 2) == 1){
-	//							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
-	//						}else{
-	//							//TODO Change to make random
-	//							world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
-	//						}
-	//						
-	//						i++;
-	////						System.out.println("Generating... "+i);
-	//					}
 						h = 0;
 						i = 0;
 						tx = 0;
 						tz = 0;
 						while (h < 60){
 							while (i < 256){
-								//while (i < 2){
 //								ty  = (int) Math.round(Math.sqrt(5/(Math.pow(((16-tx)+(16*(chunkX+ix)))*0.1,2)*Math.pow(((16-tz)+(16*(chunkZ+iz)))*0.1, 2))));
 								ty = 0;
 //								Rotate ty = (int) Math.round(0.4*(Math.pow(((16-tx)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((tz)+(16*(chunkZ+iz)))*0.2, 2))); 90 degrees

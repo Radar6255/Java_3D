@@ -9,7 +9,6 @@ import java.util.LinkedList;
 //Uses created chunks sorted to render all BlockFaces
 public class Handler {
 	
-	//Cube[] objects = new Cube[20];
 	LinkedList<CubeObject> objects = new LinkedList<CubeObject>();
 	LinkedList<Chunk> renderChunks = new LinkedList<Chunk>();
 	LinkedList<Chunk> renderQueue = new LinkedList<Chunk>();
@@ -26,7 +25,6 @@ public class Handler {
 	int x,y,z, osize,xOff,zOff,chunkX,chunkZ,width,ix,iz,sCubeCount,chunkSize,cCubeCount,tx;
 	Player[] players = new Player[2];
 	WorldGen gen;
-	Cube tempCube;
 	boolean looping,changed,out,loadChunk,debug;
 	Chunk chunkCreating;
 	LinkedList<LinkedList<LinkedList<Integer>>> chunks = new LinkedList<LinkedList<LinkedList<Integer>>>();
@@ -43,10 +41,8 @@ public class Handler {
 	}public void addPlayer(Player player){
 		players[pi] = player;
 		pi++;
-	}public void addCube(Cube object){
-		objects.add(object);
-		ci++;
-	}public void debugMode(boolean debug){
+	}
+	public void debugMode(boolean debug){
 		gen.setDebug(debug);
 		for (Chunk chunk:renderChunks){
 			chunk.setDebug(debug);
@@ -66,9 +62,6 @@ public class Handler {
 		cCubeCount = 0;
 	}public void addChunk(Chunk chunk){
 		renderQueue.add(chunk);
-		
-		//Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,objects.size()-1};
-		
 	}
 	public void render(Graphics g){
 		
@@ -79,17 +72,9 @@ public class Handler {
 		chunkZ = players[0].getChunkZ();
 		try{
 			currentChunk = chunks.get(chunkX+xOff+ix).get(chunkZ+zOff+iz);
-//			if (objects == null){
-//				currentChunk = chunks.get(xOff).get(zOff);
-//				currentChunk = null;
-//			}
 		}catch(Exception e){
-			//currentChunk = chunks.get(xOff).get(zOff);
-//			System.out.println("Null chunk");
 			currentChunk = null;
 		}
-		
-//		objects = new LinkedList<Cube>();
 		
 		//Checks if needs to load current chunk player is in or if it has already been put in rendering array
 		if(currentChunk != null){
@@ -99,7 +84,6 @@ public class Handler {
 					if (info[0]!=null && info[1]!=null){
 						if (info[0] == chunkX+ix && info[1] == chunkZ+iz){
 							loadChunk = false;
-							//System.out.println(chunkI);
 						}
 					}
 				}
@@ -114,14 +98,6 @@ public class Handler {
 			Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,chunkSize};
 			renderedChunks.add(chunkI,tempArray);
 			chunkI++;
-			
-			
-//			for (Integer[] data:loadedChunks){
-//				if (data[0] != null){
-//					System.out.println(data[0]+" "+data[1]);
-//				}
-//			}
-			//System.out.println((chunks.get(chunkX+xOff).get(chunkZ+zOff) == currentChunk)+" X Off "+xOff+" Z Off "+zOff);
 			
 		}
 		ix++;

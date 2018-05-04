@@ -91,7 +91,6 @@ public class Main extends Canvas implements Runnable{
 			frames++;
 			if (System.currentTimeMillis() - timer > 1000){
 				timer += 1000;
-				//System.out.println("FPS:  "+frames);
 				fps = frames;
 				frames = 0;
 			}
@@ -138,13 +137,6 @@ public class Main extends Canvas implements Runnable{
 		g.setColor(Color.BLACK);
 		g.drawString(Integer.toString(fps), WIDTH-40, 20);
 		g.drawString(version, 10, HEIGHT-40);
-//		Graphics2D g2d = (Graphics2D) g.create();
-//		AffineTransform backup = g2d.getTransform();
-//		AffineTransform at = AffineTransform.getTranslateInstance(16, 16); //Create the AffineTransform instance
-//		at.rotate(0); // Apply the transforms you wish
-//		g2d.transform(at);
-//		g2d.drawImage(img.getImage(), 50, 50,16,16, null);
-//		g2d.setTransform(backup);
 		g.dispose();
 		bs.show();
 	}

@@ -14,7 +14,7 @@ import java.util.LinkedList;
 
 public class Chunk {
 	LinkedList<CubeObject> blocks = new LinkedList<CubeObject>();
-	LinkedList<CombinedCube> combinedBlocks = new LinkedList<CombinedCube>();
+	LinkedList<Cube> combinedBlocks = new LinkedList<Cube>();
 	LinkedList<BlockFace> facesToRender = new LinkedList<BlockFace>();
 	public int chunkX, chunkZ, xOff, zOff;
 	public boolean debug = false;
@@ -54,9 +54,6 @@ public class Chunk {
 					
 //					g.drawString(""+face.getX(),face.getXCoords()[0],face.getYCoords()[0]);
 				}
-//					g.draw(at.createTransformedShape(g)); // Draw the transformed shape
-//					PerspectiveTransform test = new PerspectiveTransform();
-//					g.drawImage(img.getImage(), Main.WIDTH/2, Main.WIDTH/2, null);
 				i++;
 			}
 		}
@@ -86,7 +83,7 @@ public class Chunk {
 		this.debug = debug;
 		for (CubeObject cube:blocks){
 			cube.setDebug(debug);
-		}for (CombinedCube cube:combinedBlocks){
+		}for (Cube cube:combinedBlocks){
 			cube.setDebug(debug);
 		}
 	}
@@ -94,10 +91,6 @@ public class Chunk {
 class blockSort implements Comparator<CubeObject>{
 
 	public int compare(CubeObject o1, CubeObject o2) {
-		//return Double.compare(o1.getDist(), o2.getDist());
-//		if (o1 == null || o2 == null){
-//			return 0;
-//		}
 		if (o1.getDist() < o2.getDist()){
 			return 1;
 		}else if (o1.getDist() > o2.getDist()){
