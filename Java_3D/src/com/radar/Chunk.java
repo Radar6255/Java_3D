@@ -70,6 +70,10 @@ public class Chunk {
 //				object.render(g);
 //			}
 //		}
+	}public int getChunkX(){
+		return chunkX;
+	}public int getChunkZ(){
+		return chunkZ;
 	}
 	public void addFace(BlockFace face){
 		facesToRender.add(face);
