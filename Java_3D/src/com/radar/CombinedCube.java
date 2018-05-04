@@ -32,7 +32,7 @@ public class CombinedCube extends CubeObject{
 	public float[] pointsX = new float[4];
 	public float[] pointsY = new float[4];
 	public float[] pointsZ = new float[4];
-	
+	boolean first = true;
 	public int[][] points = new int[8][3];
 	public int[] pointsRemoved = new int[8];
 	public double[] distances = new double[8];
@@ -43,30 +43,35 @@ public class CombinedCube extends CubeObject{
 
 	public double upperBound, lowerBound = 0;
 	
-	public CombinedCube(int x, int y, int z, int w, int h, int d, Handler handler, int cubeIndex,int chunkX,int chunkZ, Chunk chunk) {
+	public CombinedCube(int x, int y, int z, int w, int h, int d,Handler handler, int cubeIndex,int chunkX,int chunkZ, Chunk chunk) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.w = w;
 		this.h = h;
 		this.d = d;
+		this.handler = handler;
 		this.chunk = chunk;
 		pcx = chunkX;
 		pcz = chunkZ;
 		pcy = (int) y;
 		
 		this.cubeIndex = cubeIndex;
-		this.handler = handler;
 		if (Main.WIDTH < Main.HEIGHT) {
 			fov = Main.WIDTH;
 		} else {
 			fov = Main.HEIGHT;
 		}
 		chunk.addCube(this);
-		renderUpdate();
+//		renderUpdate();
+		
 	}
 	
 	public void render(Graphics g) {
+		if (first){
+			renderUpdate();
+			first = false;
+		}
 		player = handler.getPlayer();
 		px = player.getX();
 		py = player.getY();
@@ -83,11 +88,11 @@ public class CombinedCube extends CubeObject{
 		dist2 = 0;
 		far = 0;
 		
-		//Goal: Find if cube is in FOV in a 3D manner
 		//Need to get viewing angle and use it to make V in which cubes should be rendered
 		renderBlock = true;
 		renderBlock = false;
 //		System.out.println("Start");
+		//TODO Push the V backwards from players perspective, need to use sin + cos to find where the bottom of the v starts
 		lowerBound = (360 - rotLat) - 60;
 		upperBound = (360 - rotLat) + 60;
 		
@@ -418,12 +423,8 @@ public class CombinedCube extends CubeObject{
 		this.debug = debug;
 	}
 
-	public void tick() {
-//		world = handler.getWorld();
-//		zOff = handler.getZOff();
-//		xOff = handler.getXOff();
-	}
-	//TODO Replace code possibly doing culling in chunk before render, optimize order of if statements
+	public void tick() {}
+	//Code to cull the faces next to each other that would be overwritten anyways
 	public boolean renderUpdate(){
 		xOff= handler.getXOff();
 		zOff= handler.getZOff();

@@ -8,11 +8,19 @@ import java.util.LinkedList;
 //Gets info from world then creates chunks and cubes from them
 //Uses created chunks sorted to render all BlockFaces
 public class Handler {
+	
 	//Cube[] objects = new Cube[20];
 	LinkedList<CubeObject> objects = new LinkedList<CubeObject>();
 	LinkedList<Chunk> renderChunks = new LinkedList<Chunk>();
+	LinkedList<Chunk> renderChunks2 = new LinkedList<Chunk>();
 	LinkedList<Chunk> objectsSorted = new LinkedList<Chunk>();
 	LinkedList<Integer> currentChunk = new LinkedList<Integer>();
+	public CubeGen cubeGen;
+	public Handler(){
+		cubeGen = new CubeGen(players, this);
+		cubeGen.start();
+	}
+	
 	//Holds indices of chunks loaded into render and where they start in the objects linkedList
 	LinkedList<Integer[]> renderedChunks = new LinkedList<Integer[]>();
 	int x,y,z, osize,xOff,zOff,chunkX,chunkZ,width,ix,iz,sCubeCount,chunkSize,cCubeCount,tx;
@@ -57,9 +65,14 @@ public class Handler {
 		sCubeCount = 0;
 		cCubeCount = 0;
 	}public void addChunk(Chunk chunk){
-		renderChunks.add(chunk);
+		renderChunks2.add(chunk);
+		
+		//Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,objects.size()-1};
+		
 	}
+	@SuppressWarnings("unchecked")
 	public void render(Graphics g){
+		
 		chunks = gen.getWorld();
 		i = 0;
 		xOff = gen.getXOff();
@@ -99,64 +112,20 @@ public class Handler {
 		//Loads chunks from world making them into cube objects to be rendered and ticked
 		i = 0;
 		if (loadChunk && currentChunk != null && !currentChunk.isEmpty()){
-			chunkCreating = new Chunk(chunkX+ix, chunkZ+iz, this, players[0]);
-//			osize = objects.size()-1;
-			osize = chunkSize;
-			while(i < currentChunk.size()){
-				if (currentChunk.get(i) == 1){
-//					width = 1;
-////					objects.add( new CombinedCube( (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX+ix), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ+iz),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating ) );
-////					System.out.println((int) (((i/16.0)-Math.floor(i/16.0))*16.0));
-//					try{
-//						if (currentChunk.get(i) == 1 && currentChunk.get(i+1) == 1){
-//							tx = i;
-//						}
-//						while (currentChunk.get(i) == 1 && currentChunk.get(i+1) == 1){
-//							//System.out.println(width);
-//							//if ((int) ((((i+1)-256*Math.floor((i+1)/(double) 256))/16) + 16*(chunkX+ix)+1) != (int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1)){
-//							if ((int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) != (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)){
-//								break;
-//							}
-//							width++;
-//							i++;
-////							System.out.println("Width:"+width+" i:"+i);
-//						}
-//					}catch(Exception e){}
-//					
-//					//new Cube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)+1),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating);
-//					if (width == 1){
-//						sCubeCount++;
-//						//objects.add(new Cube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)+1),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating));
-////						objects.add(new CombinedCube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating));
-//						objects.add( new CombinedCube( (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX+ix), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ+iz),1,1,-width+2,this,i,chunkX+ix,chunkZ+iz,chunkCreating ) );
-//					}else{
-//						cCubeCount++;
-//						//System.out.println((int) Math.floor(((tx/256.0)-Math.floor(tx/256.0))*16.0));
-//						objects.add( new CombinedCube( (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX+ix), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ+iz),1,1,-width+2,this,i,chunkX+ix,chunkZ+iz,chunkCreating ) );
-//						if ((int) Math.floor(i/256.0) == 3){
-////							System.out.println(i);
-//						}
-//						//objects.add(new CombinedCube((int) (((i-256*Math.floor(i/(double) 256))/16) + 16*(chunkX+ix)+1),(int) Math.floor(i/(double) 256),(int) (((i-256*Math.floor(i/(double) 256))%16)+16*(chunkZ+iz)+1),-width,1,1,this,i,chunkX+ix,chunkZ+iz,chunkCreating));
-//						//objects.add(new CombinedCube((int) (((tx-256*Math.floor(tx/256.0))/16) + 16*(chunkX+ix)),(int) Math.floor(tx/(double) 256),(int) (((tx-256*Math.floor(tx/256.0))%16)+16*(chunkZ+iz)),1,1,width+1,this,tx,chunkX+ix,chunkZ+iz,chunkCreating));
-//						//System.out.println("Combined");
-//					}
-					objects.add( new CombinedCube( (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX+ix), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ+iz),1,1, 1 ,this,i,chunkX+ix,chunkZ+iz,chunkCreating ) );
-					chunkSize++;
-					//System.out.println((((i-256*Math.floor(i/(double) 256))%16)+16*chunkZ+1)+" "+i);
-				}
-				i++;
+			
+			if (cubeGen.createChunk(currentChunk,chunkX+ix,chunkZ+iz)){	
+				Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,chunkSize};
+				renderedChunks.add(chunkI,tempArray);
+				chunkI++;
 			}
-			renderChunks.add(chunkCreating);
-			//Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,objects.size()-1};
-			Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,chunkSize};
-			renderedChunks.add(chunkI,tempArray);
+			
 //			for (Integer[] data:loadedChunks){
 //				if (data[0] != null){
 //					System.out.println(data[0]+" "+data[1]);
 //				}
 //			}
 			//System.out.println((chunks.get(chunkX+xOff).get(chunkZ+zOff) == currentChunk)+" X Off "+xOff+" Z Off "+zOff);
-			chunkI++;
+			
 		}
 		ix++;
 		if (ix == 3){
@@ -178,7 +147,7 @@ public class Handler {
 //		}
 		for (Chunk chunk:renderChunks){
 			chunk.render(g);
-		}
+		}renderChunks = (LinkedList<Chunk>) renderChunks2.clone();
 		players[0].render(g);
 		if (debug){
 			g.drawString("Single Cubes:"+sCubeCount,10,70);
@@ -186,7 +155,6 @@ public class Handler {
 		}
 	}
 	public void tick(){
-		//TODO Make conversion from file to render better... Cubes extend in wrong direction
 //		if (!debug){
 //			gen.tick();
 //		}

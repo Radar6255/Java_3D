@@ -23,10 +23,9 @@ public class Chunk {
 	Handler handler;
 	Player player;
 	int i = 0;
-	public Chunk(int chunkX, int chunkZ, Handler handler, Player player){
+	public Chunk(int chunkX, int chunkZ, Player player){
 		this.chunkX = chunkX;
 		this.chunkZ = chunkZ;
-		this.handler = handler;
 		this.player = player;
 	}
 	
