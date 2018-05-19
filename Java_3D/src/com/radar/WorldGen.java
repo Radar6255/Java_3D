@@ -2,7 +2,7 @@ package com.radar;
 
 import java.util.LinkedList;
 
-public class WorldGen extends Thread{
+public class WorldGen{
 	int i,index,all,chunkX,chunkY,chunkZ,xOff,zOff,ix,iz,h,tx,ty,tz = 0;
 	boolean debug = false;
 	double x,y,z;
@@ -16,10 +16,11 @@ public class WorldGen extends Thread{
 		this.thePlayer = thePlayer;
 		world.add(new LinkedList<LinkedList<Integer>>());
 		world.get(0).add(new LinkedList<Integer>());
+//		world.get(0).get(0).add(1);
 		i = 0;
 	}
-	public void run(){
-		while (!debug){
+	public void tick(){
+//		while (!debug){
 			x = thePlayer.getX();
 			y = thePlayer.getY();
 			z = thePlayer.getZ();
@@ -58,7 +59,9 @@ public class WorldGen extends Thread{
 						i = 0;
 						tx = 0;
 						tz = 0;
+						//TODO Fix to revive world gen
 						while (h < 60){
+//						while (h < 0){
 							while (i < 256){
 //								ty  = (int) Math.round(Math.sqrt(5/(Math.pow(((16-tx)+(16*(chunkX+ix)))*0.1,2)*Math.pow(((16-tz)+(16*(chunkZ+iz)))*0.1, 2))));
 								ty = 0;
@@ -66,7 +69,7 @@ public class WorldGen extends Thread{
 //								ty = (int) Math.round(0.4*(Math.pow(((tz)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((tx)+(16*(chunkZ+iz)))*0.2, 2)));
 //								ty = (int) Math.round(Math.pow((0.16-Math.pow((0.6-Math.pow((Math.pow(((tz)+(16*(chunkX+ix)))*0.04,2)+Math.pow(((tx)+(16*(chunkZ+iz)))*0.04,2)),0.5)),2)),0.5)*20);
 								ty = (int) ((Math.sin(((tz)+(16*(chunkX+ix)))*0.2)*Math.cos(((tx)+(16*(chunkZ+iz)))*0.2))*5.0)+10;
-								if (ty == h){
+								if (ty > h){
 									world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
 								}else{
 									world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
@@ -95,7 +98,7 @@ public class WorldGen extends Thread{
 					ix = -2;
 				}
 			}
-		}
+//		}
 	}public LinkedList<LinkedList<LinkedList<Integer>>> getWorld(){
 		return world;
 	}public int getXOff(){

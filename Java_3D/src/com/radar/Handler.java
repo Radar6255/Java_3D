@@ -15,9 +15,11 @@ public class Handler {
 	LinkedList<Chunk> objectsSorted = new LinkedList<Chunk>();
 	LinkedList<Integer> currentChunk = new LinkedList<Integer>();
 	public CubeGen cubeGen;
+	public PolygonRaster raster;
 	public Handler(){
 		cubeGen = new CubeGen(players, this);
 		cubeGen.start();
+		raster = new PolygonRaster();
 	}
 	
 	//Holds indices of chunks loaded into render and where they start in the objects linkedList
@@ -108,7 +110,8 @@ public class Handler {
 			iz = -2;
 		}
 		renderChunks.sort(new chunkCompare());
-		
+
+
 		for (Chunk chunk:renderChunks){
 			chunk.render(g);
 		}
@@ -117,7 +120,7 @@ public class Handler {
 		}renderQueue.clear();
 		i = 0;
 		while (i < renderChunks.size()){
-			if (renderChunks.get(i).getDist() > 90){
+			if (renderChunks.get(i).getDist() > 100){
 				i2 = 0;
 				for (Integer[] data: renderedChunks){
 					if (data[0] == renderChunks.get(i).getChunkX() && data[1] == renderChunks.get(i).getChunkZ()){
@@ -140,6 +143,7 @@ public class Handler {
 	}
 	
 	public void tick(){
+		gen.tick();
 		for (Chunk chunk:renderChunks){
 			chunk.tick();
 		}

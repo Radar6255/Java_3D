@@ -34,9 +34,8 @@ public class Main extends Canvas implements Runnable{
 		handler = new Handler();
 		Player thePlayer = new Player(1,3,2,180,-30);
 		handler.addPlayer(thePlayer);
-		WorldGen genThread = new WorldGen(handler,thePlayer);
-		handler.addGeneration(genThread);
-		genThread.start();
+		WorldGen gen = new WorldGen(handler,thePlayer);
+		handler.addGeneration(gen);
 		
 //		Chunk test = new Chunk(0,0,handler,thePlayer);
 //		CombinedCube tempCube = new CombinedCube(0,0,0,-2,-2,0,handler,i,0,0,test);
@@ -67,12 +66,12 @@ public class Main extends Canvas implements Runnable{
 		this.addKeyListener(new KeyInput(handler));
 		new Window(WIDTH,HEIGHT,"3D Stuff",this);
 	}
-	
+	long startTime, endTime;
 	@Override
 	public void run() {
 		this.requestFocus();
 		long lastTime = System.nanoTime();
-		double amountOfTicks = 60.0;
+		double amountOfTicks = 20.0;
 		double ns = 1000000000 / amountOfTicks;
 		double delta = 0;
 		long timer = System.currentTimeMillis();
@@ -131,7 +130,7 @@ public class Main extends Canvas implements Runnable{
 		//Help my sorting of cubes in handler
 		//System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
 		final Graphics g = bs.getDrawGraphics();
-		g.setColor(Color.WHITE);
+		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		handler.render(g);
 		g.setColor(Color.BLACK);

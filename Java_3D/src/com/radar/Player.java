@@ -21,7 +21,7 @@ public class Player {
 	public PointerInfo mouseLoc;
 	public Point tempPoint;
 	
-	public double rate = 0.2;
+	public double rate = 0.4;
 	public int fov = 70;
 	
 	public Player(double x,double y,double z,double rotLat,double rotVert){
