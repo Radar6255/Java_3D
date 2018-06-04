@@ -7,19 +7,17 @@ import java.awt.Color;
 public class BlockFace {
 	private int[] xCoords;
 	private int[] yCoords;
-	private int[] xCoordsC;
-	private int[] yCoordsC;
+	private int[] zCoords;
 	private int[] face;
 	private Color color;
 	private boolean hasFar = false;
 	private double dist;
 	public int cubeIndex,x;
 	
-	public BlockFace(int[] xCoords,int[] yCoords,int[] face,double dist, Color color, int cubeIndex){
+	public BlockFace(int[] xCoords,int[] yCoords,int[] zCoords,int[] face,double dist, Color color, int cubeIndex){
 		this.xCoords = xCoords.clone();
 		this.yCoords = yCoords.clone();
-		this.xCoordsC = xCoords.clone();
-		this.yCoordsC = yCoords.clone();
+		this.zCoords = zCoords.clone();
 		this.face = face;
 		this.color = color;
 		this.dist = dist;
@@ -36,7 +34,11 @@ public class BlockFace {
 		return xCoords;
 	}public int[] getYCoords(){
 		return yCoords;
-	}public Color getColor(){
+	}public int[] getZCoords(){
+		return zCoords;
+	}
+	
+	public Color getColor(){
 		return color;
 	}public void setHasFar(boolean hasFar){
 		this.hasFar = hasFar;
@@ -46,9 +48,5 @@ public class BlockFace {
 		return dist;
 	}public void setDist(double dist){
 		this.dist = dist;
-	}public int[] getXCoordsC(){
-		return xCoordsC;
-	}public int[] getYCoordsC(){
-		return yCoordsC;
 	}
 }

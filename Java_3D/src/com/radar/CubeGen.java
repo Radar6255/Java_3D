@@ -36,7 +36,7 @@ public class CubeGen extends Thread{
 					i = 0;
 					chunkX = chunkPos.get(0);
 					chunkZ = chunkPos.get(1);
-					chunkCreating = new Chunk(chunkX, chunkZ, players[0]);
+					chunkCreating = new Chunk(chunkX, chunkZ, players[0],handler);
 
 					if (combined){
 						while(i < currentChunk.size()){

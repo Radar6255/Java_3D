@@ -17,9 +17,9 @@ public class Handler {
 	public CubeGen cubeGen;
 	public PolygonRaster raster;
 	public Handler(){
+		raster = new PolygonRaster();
 		cubeGen = new CubeGen(players, this);
 		cubeGen.start();
-		raster = new PolygonRaster();
 	}
 	
 	//Holds indices of chunks loaded into render and where they start in the objects linkedList
@@ -43,6 +43,8 @@ public class Handler {
 	}public void addPlayer(Player player){
 		players[pi] = player;
 		pi++;
+	}public PolygonRaster getRaster(){
+		return raster;
 	}
 	public void debugMode(boolean debug){
 		gen.setDebug(debug);
@@ -111,15 +113,20 @@ public class Handler {
 		}
 		renderChunks.sort(new chunkCompare());
 
-
 		for (Chunk chunk:renderChunks){
 			chunk.render(g);
 		}
+
+		
 		for (Chunk toAdd:renderQueue){
 			renderChunks.add(toAdd);
 		}renderQueue.clear();
+//		raster.render(g);
+		
+		
 		i = 0;
 		while (i < renderChunks.size()){
+			//TODO Tie this with render distance setting
 			if (renderChunks.get(i).getDist() > 100){
 				i2 = 0;
 				for (Integer[] data: renderedChunks){
@@ -144,9 +151,9 @@ public class Handler {
 	
 	public void tick(){
 		gen.tick();
-		for (Chunk chunk:renderChunks){
-			chunk.tick();
-		}
+//		for (Chunk chunk:renderChunks){
+//			chunk.tick();
+//		}
 		players[0].tick();
 	}
 	

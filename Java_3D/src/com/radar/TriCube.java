@@ -338,7 +338,7 @@ public class TriCube extends CubeObject{
 							}
 						}
 						if (visible){
-							tempFace = new BlockFace(xCoords, yCoords, face, dist, faceColor,cubeIndex);
+//							tempFace = new BlockFace(xCoords, yCoords, face, dist, faceColor,cubeIndex);
 							chunk.addFace(tempFace);
 //							renderFaces.add(tempFace);
 //							facesRender[count] = face;

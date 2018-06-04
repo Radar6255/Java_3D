@@ -39,6 +39,7 @@ public class Cube extends CubeObject{
 	public double[] distances = new double[8];
 	private int[] xCoords = new int[4];
 	private int[] yCoords = new int[4];
+	private int[] zCoords = new int[4];
 	LinkedList<BlockFace> renderFaces = new LinkedList<BlockFace>();
 	public BlockFace tempFace;
 
@@ -169,6 +170,7 @@ public class Cube extends CubeObject{
 				//Puts 2D points into array for later when I need to render the polygons
 				points[i][0] = (int) ((tx * f) + (Main.WIDTH / 2));
 				points[i][1] = (int) ((ty * f) + (Main.HEIGHT));
+				points[i][2] = (int) (tz);
 				
 				//Finds point farthest from the player
 				if (ldist < dist) {
@@ -207,6 +209,10 @@ public class Cube extends CubeObject{
 						yCoords[2] = points[face[2]][1];
 						yCoords[3] = points[face[3]][1];
 						
+						zCoords[0] = points[face[0]][2];
+						zCoords[1] = points[face[1]][2];
+						zCoords[2] = points[face[2]][2];
+						zCoords[3] = points[face[3]][2];
 						visible = false;
 						
 						//Determines if cube face is on screen
@@ -333,7 +339,7 @@ public class Cube extends CubeObject{
 							}
 							//Sending blockface to be rendered at the chunk
 							dist = (float) Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2);
-							tempFace = new BlockFace(xCoords, yCoords, face, dist, faceColor,cubeIndex);
+							tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, faceColor,cubeIndex);
 							chunk.addFace(tempFace);
 //							renderFaces.add(tempFace);
 //							facesRender[count] = face;
