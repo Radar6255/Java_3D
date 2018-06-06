@@ -55,15 +55,12 @@ public class WorldGen{
 						world.get(chunkX+xOff+ix).add(new LinkedList<Integer>());
 					}
 					if (world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).isEmpty()){
-						//Return to 0
-						h = -9;
+						h = -12;
 						i = 0;
 						tx = 0;
 						tz = 0;
-						//TODO Fix to revive world gen
 						//Normally 60
-						while (h < 15){
-//						while (h < 0){
+						while (h < 17){
 							while (i < 256){
 //								ty  = (int) Math.round(Math.sqrt(5/(Math.pow(((16-tx)+(16*(chunkX+ix)))*0.1,2)*Math.pow(((16-tz)+(16*(chunkZ+iz)))*0.1, 2))));
 								ty = 0;
@@ -77,8 +74,8 @@ public class WorldGen{
 //									ty = (int) ( (((tx)+(16*(chunkZ+iz))) + 2) / (((tz)+(16*(chunkX+ix))) + 3) );
 //								}
 								ty = (int) Math.sqrt(Math.pow((tx)+(16*(chunkZ+iz)),2) + Math.pow((tz)+(16*(chunkX+ix)),2));
-//								if (h!=0 && ty == h){
-								if ( ty == (int) (4.0*((h*0.15) * Math.sin((h*0.15))))+4){
+//								if (ty > h){
+								if ( ty == (int) (6.0*((h*0.1) * Math.sin((h*0.1))))+2){
 									world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
 								}else{
 									world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);

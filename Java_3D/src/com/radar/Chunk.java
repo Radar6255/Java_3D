@@ -99,7 +99,7 @@ public class Chunk {
 
 			facesToRender.sort(new sortFaces());
 			for (BlockFace face:facesToRender){
-				raster.addFace(face);
+//				raster.addFace(face);
 				if (face != null){
 					g.setColor(face.getColor());
 					//TODO Face polygon
