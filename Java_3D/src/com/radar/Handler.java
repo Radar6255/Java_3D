@@ -121,8 +121,11 @@ public class Handler {
 		for (Chunk toAdd:renderQueue){
 			renderChunks.add(toAdd);
 		}renderQueue.clear();
-//		raster.render(g);
+		raster.render(g);
 		
+//		for (Chunk chunk:renderChunks){
+//			chunk.render(g);
+//		}
 		
 		i = 0;
 		while (i < renderChunks.size()){
@@ -150,7 +153,9 @@ public class Handler {
 	}
 	
 	public void tick(){
-		gen.tick();
+		//TODO to fix gen
+//		gen.tick();
+		
 //		for (Chunk chunk:renderChunks){
 //			chunk.tick();
 //		}

@@ -65,7 +65,7 @@ public class Cube extends CubeObject{
 			fov = Main.HEIGHT;
 		}
 		chunk.addCube(this,x,y,z);
-		renderUpdate();
+//		renderUpdate();
 		
 	}
 	public double[] verts3d;
@@ -339,12 +339,15 @@ public class Cube extends CubeObject{
 							}
 							//Sending blockface to be rendered at the chunk
 							dist = (float) Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2);
+							//Making a block face for each cube doesn't seem to affect performance much so I'll keep it to use for the raster
 							tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, faceColor,cubeIndex);
 							chunk.addFace(tempFace);
+							
 //							renderFaces.add(tempFace);
 //							facesRender[count] = face;
 //							colorFace[count] = faceColor;
 //							count++;
+							
 //							g.setColor(faceColor);
 //							g.fillPolygon(xCoords, yCoords, 4);
 							

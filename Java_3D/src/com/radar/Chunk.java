@@ -26,7 +26,6 @@ public class Chunk {
 	public double dist;
 	Handler handler;
 	Player player;
-	int i = 0;
 	PolygonRaster raster;
 	public Chunk(int chunkX, int chunkZ, Player player, Handler handler){
 		this.chunkX = chunkX;
@@ -51,7 +50,6 @@ public class Chunk {
 	public void render(Graphics g){
 		
 //		renderChunk = false;
-//		//TODO Push the V backwards from players perspective, need to use sin + cos to find where the bottom of the v starts
 //		lowerBound = (360 - rotLat) - 30;
 //		upperBound = (360 - rotLat) + 30;
 //		
@@ -99,27 +97,25 @@ public class Chunk {
 
 			facesToRender.sort(new sortFaces());
 			for (BlockFace face:facesToRender){
-//				raster.addFace(face);
+				//TODO Stop data leak
+				raster.addFace(face);
 				if (face != null){
 					g.setColor(face.getColor());
-					//TODO Face polygon
 					g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
-					i++;
 					if (debug){
 						g.setColor(Color.BLACK);
 						g.drawString(""+face.getDist(),face.getXCoords()[1],face.getYCoords()[1]);
-						
 	//					g.drawString(""+face.getX(),face.getXCoords()[0],face.getYCoords()[0]);
 					}
-					i++;
 				}
 			}
 			
-			g.setColor(Color.BLACK);
-			g.drawString("Faces Rendering:"+Integer.toString(i), 10, 60);
-			i = 0;
+//			g.setColor(Color.BLACK);
+//			g.drawString("Faces Rendering:"+Integer.toString(i), 10, 60);
+			
 			facesToRender.clear();
 			facesToRender = new LinkedList<BlockFace>();
+			
 			//TODO Double check if this could ever work
 	//		if (doubleRender){
 	//			for (CombinedCube object:combinedBlocks){
