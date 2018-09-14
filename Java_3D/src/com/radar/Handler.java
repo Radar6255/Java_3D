@@ -14,12 +14,20 @@ public class Handler {
 	LinkedList<Chunk> renderQueue = new LinkedList<Chunk>();
 	LinkedList<Chunk> objectsSorted = new LinkedList<Chunk>();
 	LinkedList<Integer> currentChunk = new LinkedList<Integer>();
+	public RenderThread renderThread1;
+	public RenderThread renderThread2;
 	public CubeGen cubeGen;
 	public PolygonRaster raster;
 	public Handler(){
 		raster = new PolygonRaster();
 		cubeGen = new CubeGen(players, this);
 		cubeGen.start();
+		renderThread1 = new RenderThread("1");
+		renderThread2 = new RenderThread("2");
+		renderThread1.setName("Render1");
+		renderThread2.setName("Render2");
+		renderThread1.start();
+		renderThread2.start();
 	}
 	
 	//Holds indices of chunks loaded into render and where they start in the objects linkedList
@@ -114,14 +122,14 @@ public class Handler {
 		renderChunks.sort(new chunkCompare());
 
 		for (Chunk chunk:renderChunks){
-			chunk.render(g);
+			chunk.render(g, renderThread1, renderThread2);
 		}
 
 		
 		for (Chunk toAdd:renderQueue){
 			renderChunks.add(toAdd);
 		}renderQueue.clear();
-		raster.render(g);
+//		raster.render(g);
 		
 //		for (Chunk chunk:renderChunks){
 //			chunk.render(g);
@@ -130,7 +138,7 @@ public class Handler {
 		i = 0;
 		while (i < renderChunks.size()){
 			//TODO Tie this with render distance setting
-			if (renderChunks.get(i).getDist() > 100){
+			if (renderChunks.get(i).getDist() > 80){
 				i2 = 0;
 				for (Integer[] data: renderedChunks){
 					if (data[0] == renderChunks.get(i).getChunkX() && data[1] == renderChunks.get(i).getChunkZ()){
@@ -154,7 +162,7 @@ public class Handler {
 	
 	public void tick(){
 		//TODO to fix gen
-//		gen.tick();
+		gen.tick();
 		
 //		for (Chunk chunk:renderChunks){
 //			chunk.tick();

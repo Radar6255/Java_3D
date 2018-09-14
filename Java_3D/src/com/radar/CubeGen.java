@@ -18,7 +18,7 @@ public class CubeGen extends Thread{
 		this.handler = handler;
 	}
 	//TODO Switch cube type
-	boolean combined = true;
+	boolean combined = false;
 	
 	public boolean running = true;
 	int width,tx = 0;

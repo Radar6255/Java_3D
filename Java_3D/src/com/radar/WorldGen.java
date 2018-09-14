@@ -17,11 +17,11 @@ public class WorldGen{
 		world.add(new LinkedList<LinkedList<Integer>>());
 		world.get(0).add(new LinkedList<Integer>());
 		//TODO
-		i = 0;
-		while(i < 20){
-			world.get(0).get(0).add(1);
-			i++;
-		}
+//		i = 0;
+//		while(i < 20){
+//			world.get(0).get(0).add(1);
+//			i++;
+//		}
 		i = 0;
 	}
 	public void tick(){
@@ -79,7 +79,7 @@ public class WorldGen{
 //									ty = (int) ( (((tx)+(16*(chunkZ+iz))) + 2) / (((tz)+(16*(chunkX+ix))) + 3) );
 //								}
 //								ty = (int) Math.sqrt(Math.pow((tx)+(16*(chunkZ+iz)),2) + Math.pow((tz)+(16*(chunkX+ix)),2));
-								if (ty > h){
+								if (ty == h){
 //								if ( ty == (int) (6.0*((h*0.1) * Math.sin((h*0.1))))+2){
 									world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
 								}else{

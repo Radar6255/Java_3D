@@ -1,5 +1,6 @@
 //Made by Riley Adams
-//Credit to RealTutsGML who taught me how to program games in java and gave me a base platform that this is designed off of.
+//Started around September of 2017
+//Credit to RealTutsGML who taught me how to program games in Java and gave me a base platform that this is designed off of.
 //and DLC ENERGY who helped me understand 3D rendering from scratch, borrowed his 2D rotation class from his java example.
 
 package com.radar;
@@ -12,11 +13,10 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-
 import javax.swing.ImageIcon;
 //Main class initializes all classes and runs the game loop
 public class Main extends Canvas implements Runnable{
-	public String version = "1.1.1";
+	public String version = "1.1.2";
 	public int frames,fps;
 	private static final long serialVersionUID = 1L;
 	private Thread thread;
@@ -103,7 +103,7 @@ public class Main extends Canvas implements Runnable{
 		//Help my sorting of cubes in handler
 		//System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
 		final Graphics g = bs.getDrawGraphics();
-		g.setColor(Color.WHITE);
+		g.setColor(Color.GRAY);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		handler.render(g);
 		g.setColor(Color.BLACK);

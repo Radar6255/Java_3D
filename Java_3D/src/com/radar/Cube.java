@@ -18,6 +18,10 @@ public class Cube extends CubeObject{
 	public Color faceColor;
 	public boolean visible, changed, looping, render,repeat,renderBlock,right,left,up,down,lside,rside,back,front;
 	LinkedList<Integer> chunkData = new LinkedList<Integer>();
+	LinkedList<Integer> chunkPosX = new LinkedList<Integer>();
+	LinkedList<Integer> chunkNegX = new LinkedList<Integer>();
+	LinkedList<Integer> chunkPosY = new LinkedList<Integer>();
+	LinkedList<Integer> chunkNegY = new LinkedList<Integer>();
 	Player player;
 	private Handler handler;
 	Chunk chunk;
@@ -65,7 +69,7 @@ public class Cube extends CubeObject{
 			fov = Main.HEIGHT;
 		}
 		chunk.addCube(this,x,y,z);
-//		renderUpdate();
+		renderUpdate();
 		
 	}
 	public double[] verts3d;
@@ -398,19 +402,23 @@ public class Cube extends CubeObject{
 
 	public void tick() {}
 	public boolean isVisible(){
-		boolean out = false;
 		for (int[] face:faces){
 			if (face[5] == 1){
-				out = true;
+				return true;
 			}
 		}
-		return out;
+		return false;
 	}
 	//Code to cull the faces next to each other that would be overwritten anyways
 	public boolean renderUpdate(){
 		xOff= handler.getXOff();
 		zOff= handler.getZOff();
 		chunkData = handler.getWorld().get(pcx+xOff).get(pcz+zOff);
+//		System.out.println(pcx +" "+ pcz);
+//		chunkPosX = handler.getWorld().get(pcx+xOff+1).get(pcz+zOff);
+//		chunkNegX = handler.getWorld().get(pcx+xOff-1).get(pcz+zOff);
+//		chunkPosY = handler.getWorld().get(pcx+xOff).get(pcz+zOff+1);
+//		chunkNegY = handler.getWorld().get(pcx+xOff).get(pcz+zOff-1);
 		chunkMax = chunkData.size();
 		
 		count = 0;
@@ -422,27 +430,32 @@ public class Cube extends CubeObject{
 				visible = false;
 			}
 			//Red Side
-			if (count == 1 && cubeIndex-1 >= 0 && cubeIndex% 16 != 0 && chunkData.get(cubeIndex-1) == 1){
+			else if (count == 1 && cubeIndex-1 >= 0 && cubeIndex% 16 != 0 && chunkData.get(cubeIndex-1) == 1){
 				visible = false;
 			}
 			
 			//Green Side
-			if (count == 2 && cubeIndex+16 < chunkMax && ((cubeIndex+16) % 256 < 0 || (cubeIndex+16) % 256 > 15) && chunkData.get(cubeIndex+16) == 1){
+			else if (count == 2 && cubeIndex+16 < chunkMax && ((cubeIndex+16) % 256 < 0 || (cubeIndex+16) % 256 > 15) && chunkData.get(cubeIndex+16) == 1){
 				visible = false;
 			}
 			//Orange Side
-			if (count == 3 && cubeIndex-16 >= 0 && (cubeIndex % 256 < 0 || cubeIndex % 256 > 15) && chunkData.get(cubeIndex-16) == 1){
+			else if (count == 3 && cubeIndex-16 >= 0 && (cubeIndex % 256 < 0 || cubeIndex % 256 > 15) && chunkData.get(cubeIndex-16) == 1){
 				visible = false;
 			}
 			
 			//Yellow Side
-			if (count == 4 && cubeIndex-256 >= 0 && chunkData.get(cubeIndex-256) == 1){
+			else if (count == 4 && cubeIndex-256 >= 0 && chunkData.get(cubeIndex-256) == 1){
 				visible = false;
 			}
 			//Light Blue Side
-			if (count == 5 && cubeIndex+256 < chunkMax && chunkData.get(cubeIndex+256) == 1){
+			else if (count == 5 && cubeIndex+256 < chunkMax && chunkData.get(cubeIndex+256) == 1){
 				visible = false;
 			}
+			//Adjacent Chunk Blue Side
+//			else if (count == 0 && chunkPosX != null) {// && cubeIndex < handler.getWorld().get(pcx+xOff+1).get(pcz+zOff).size() //&& handler.getWorld().get(pcx+xOff+1).get(pcz+zOff).get(cubeIndex) == 1) {
+//				visible = false;
+//			}
+			
 			
 			if (visible){
 				face[5] = 1;
