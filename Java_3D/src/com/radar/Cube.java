@@ -69,7 +69,7 @@ public class Cube extends CubeObject{
 			fov = Main.HEIGHT;
 		}
 		chunk.addCube(this,x,y,z);
-		renderUpdate();
+//		renderUpdate();
 		
 	}
 	public double[] verts3d;
