@@ -24,8 +24,8 @@ public class Main extends Canvas implements Runnable{
 	static boolean pause;
 	static boolean changeMouse = true;
 	private Handler handler;
-	static int WIDTH = 1000;
-	static int HEIGHT = 700;
+	static int WIDTH = 1200;
+	static int HEIGHT = 800;
 	int i = 0;
 	int iz = -50;
 	ImageIcon img = new ImageIcon("./dirt.png");
@@ -107,7 +107,7 @@ public class Main extends Canvas implements Runnable{
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		handler.render(g);
 		g.setColor(Color.BLACK);
-		g.drawString("FPS:"+Integer.toString(fps), WIDTH-55, 20);
+		g.drawString("FPS:"+Integer.toString(fps), WIDTH-75, 20);
 //		g.drawString(version, 10, HEIGHT-40);
 		g.dispose();
 		bs.show();
