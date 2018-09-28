@@ -106,7 +106,7 @@ public class Chunk {
 //			renderThread2.render(this,visibleBlocks,g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
 			i  = 0;
 			while (i < visibleBlocks.size()/2) {
-				visibleBlocks.get(visibleBlocks.size()-i-1).render(g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
+				visibleBlocks.get(i).render(g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
 				i++;
 			}
 			while (!threadReady) {}

@@ -161,9 +161,7 @@ public class Handler {
 	}
 	
 	public void tick(){
-		//TODO to fix gen
 		gen.tick();
-		
 //		for (Chunk chunk:renderChunks){
 //			chunk.tick();
 //		}

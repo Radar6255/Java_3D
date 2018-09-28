@@ -61,7 +61,7 @@ public class RenderThread extends Thread{
 		int i = 0;
 		ready = false;
 		while (i < visibleBlocks.size()/2) {
-			if (index == "1") {
+			if (index == "2") {
 				this.visibleBlocks.add(visibleBlocks.get(i));
 				//visibleBlocks.get(i).render(g,px,py,pz,rotLat,rotVert,sl,cl,sv,cv);
 			}else {
