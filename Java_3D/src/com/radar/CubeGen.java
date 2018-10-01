@@ -1,5 +1,6 @@
 package com.radar;
 
+import java.awt.Color;
 import java.util.LinkedList;
 
 public class CubeGen extends Thread{
@@ -13,23 +14,22 @@ public class CubeGen extends Thread{
 	boolean go = true;
 	Player[] players;
 	private Handler handler;
+	Color[] faceColors = {Color.GREEN, Color.GREEN,Color.GREEN,Color.GREEN,Color.GREEN, new Color(0,132,0)};
+	Color[] faceColorsS = {Color.gray, Color.gray,Color.gray,Color.gray,Color.gray, Color.darkGray};
+	Color[] cubeColors = new Color[6];
 	public CubeGen(Player[] players, Handler handler){
 		this.players = players;
 		this.handler = handler;
 	}
 	//TODO Switch cube type
-	boolean combined = false;
+	boolean combined = true;
 	
-	public boolean running = true;
+	public volatile boolean running = true;
 	int width,tx = 0;
 	public void run(){
 		while(running){
-			try {// TODO Find alternative to sleep function possibly
-				Thread.sleep(5);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			if (!chunkQueue.isEmpty()){
+//			System.out.println("Resumed");
+			while (!chunkQueue.isEmpty()){
 				if (!chunkQueue.get(0).isEmpty()){
 					
 					currentChunk = chunkQueue.get(0);
@@ -37,15 +37,20 @@ public class CubeGen extends Thread{
 					chunkX = chunkPos.get(0);
 					chunkZ = chunkPos.get(1);
 					chunkCreating = new Chunk(chunkX, chunkZ, players[0],handler);
-
+					//TODO rewrite to use for loop instead of get i which is very slow
 					if (combined){
 						while(i < currentChunk.size()){
-							if (currentChunk.get(i) == 1){
+							if (currentChunk.get(i) != 0){
+								if (currentChunk.get(i) == 1) {
+									cubeColors = faceColors;
+								}else {
+									cubeColors = faceColorsS;
+								}
 								width = 1;
 	//							objects.add( new CombinedCube( (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX+ix), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ+iz),1,1,width,this,i,chunkX+ix,chunkZ+iz,chunkCreating ) );
 	//							System.out.println((int) (((i/16.0)-Math.floor(i/16.0))*16.0));
 								try{
-									if (currentChunk.get(i) == 1 && currentChunk.get(i+1) == 1){
+									if (currentChunk.get(i) != 0 && currentChunk.get(i+1) != 0){
 										tx = i;
 									}
 									while (currentChunk.get(i) == 1 && currentChunk.get(i+1) == 1){
@@ -57,9 +62,9 @@ public class CubeGen extends Thread{
 									}
 								}catch(Exception e){}
 								if (width == 1){
-									new Cube( (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ),1,1,-width+2,handler,i,chunkX,chunkZ,chunkCreating );
+									new Cube(cubeColors, (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ),1,1,-width+2,handler,i,chunkX,chunkZ,chunkCreating );
 								}else{
-									new Cube( (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ),1,1,-width+2,handler,i,chunkX,chunkZ,chunkCreating );
+									new Cube(cubeColors, (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ),1,1,-width+2,handler,i,chunkX,chunkZ,chunkCreating );
 								}
 								//System.out.println((((i-256*Math.floor(i/(double) 256))%16)+16*chunkZ+1)+" "+i);
 							}
@@ -68,7 +73,7 @@ public class CubeGen extends Thread{
 					}else{
 						while(i < currentChunk.size()){
 							if (currentChunk.get(i) == 1){
-								new Cube( (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ),1,1,1,handler,i,chunkX,chunkZ,chunkCreating);
+								new Cube(cubeColors, (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ),1,1,1,handler,i,chunkX,chunkZ,chunkCreating);
 //								new TriCube( (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ),1,1,1,handler,i,chunkX,chunkZ,chunkCreating);
 							}
 							i++;
@@ -80,16 +85,21 @@ public class CubeGen extends Thread{
 					handler.addChunk(chunkCreating);
 					chunkQueue.removeFirst();
 					index-=2;
-
+					
 				}
 			}
+			try {
+//				System.out.println("Paused");
+				synchronized(handler) {
+					handler.wait();
+				}
+			}catch (InterruptedException e) {e.printStackTrace();}
 		}
 	}
-	public boolean createChunk(LinkedList<Integer> chunk, int chunkX, int chunkZ){
+	public void createChunk(LinkedList<Integer> chunk, int chunkX, int chunkZ){
 			chunkPos.add(chunkX);
 			chunkPos.add(chunkZ);
 			index+=2;
 			chunkQueue.add(chunk);
-			return true;
 	}
 }

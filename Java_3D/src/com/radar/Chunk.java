@@ -14,7 +14,7 @@ import java.util.LinkedList;
 
 public class Chunk {
 	public static float[] verts = { 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f , -0.5f, -0.5f, 0.5f , -0.5f, 0.5f, 0.5f , 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f , -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f };
-	
+	int size;
 	LinkedList<Integer> blockPos = new LinkedList<Integer>();
 	LinkedList<CubeObject> blocks = new LinkedList<CubeObject>();
 	LinkedList<CubeObject> visibleBlocks = new LinkedList<CubeObject>();
@@ -55,7 +55,7 @@ public class Chunk {
 		threadReady2 = true;
 	}
 	
-	public void render(Graphics g, RenderThread renderThread1, RenderThread renderThread2){
+	public void render(Graphics g, RenderThread renderThread1){
 		
 //		renderChunk = false;
 //		lowerBound = (360 - rotLat) - 30;
@@ -101,12 +101,14 @@ public class Chunk {
 //				object.render(g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
 //			}
 			threadReady = false;
-			threadReady2 = false;
 			renderThread1.render(this,visibleBlocks,g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
 //			renderThread2.render(this,visibleBlocks,g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
+			
 			i  = 0;
-			while (i < visibleBlocks.size()/2) {
-				visibleBlocks.get(i).render(g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
+			size = (visibleBlocks.size()/2)-2;
+			for (CubeObject block: visibleBlocks) {
+				block.render(g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
+				if (i > size) {break;}
 				i++;
 			}
 			while (!threadReady) {}
@@ -116,8 +118,6 @@ public class Chunk {
 			
 			facesToRender.sort(new sortFaces());
 			for (BlockFace face:facesToRender){
-				//TODO Stop data leak
-				//raster.addFace(face);
 				if (face != null){
 					g.setColor(face.getColor());
 					g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);

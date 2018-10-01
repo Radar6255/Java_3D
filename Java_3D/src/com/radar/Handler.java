@@ -15,7 +15,7 @@ public class Handler {
 	LinkedList<Chunk> objectsSorted = new LinkedList<Chunk>();
 	LinkedList<Integer> currentChunk = new LinkedList<Integer>();
 	public RenderThread renderThread1;
-	public RenderThread renderThread2;
+//	public RenderThread renderThread2;
 	public CubeGen cubeGen;
 	public PolygonRaster raster;
 	public Handler(){
@@ -23,11 +23,11 @@ public class Handler {
 		cubeGen = new CubeGen(players, this);
 		cubeGen.start();
 		renderThread1 = new RenderThread("1");
-		renderThread2 = new RenderThread("2");
+//		renderThread2 = new RenderThread("2");
 		renderThread1.setName("Render1");
-		renderThread2.setName("Render2");
+//		renderThread2.setName("Render2");
 		renderThread1.start();
-		renderThread2.start();
+//		renderThread2.start();
 	}
 	
 	//Holds indices of chunks loaded into render and where they start in the objects linkedList
@@ -105,8 +105,10 @@ public class Handler {
 		}
 		//Loads chunks from world making them into cube objects to be rendered and ticked
 		if (loadChunk && currentChunk != null && !currentChunk.isEmpty()){
-			
 			cubeGen.createChunk(currentChunk,chunkX+ix,chunkZ+iz);
+			synchronized(this) {
+				this.notify();
+			}
 			Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,chunkSize};
 			renderedChunks.add(chunkI,tempArray);
 			chunkI++;
@@ -122,10 +124,10 @@ public class Handler {
 		renderChunks.sort(new chunkCompare());
 
 		for (Chunk chunk:renderChunks){
-			chunk.render(g, renderThread1, renderThread2);
+			chunk.render(g, renderThread1);
 		}
 
-		
+		//TODO The has errored once
 		for (Chunk toAdd:renderQueue){
 			renderChunks.add(toAdd);
 		}renderQueue.clear();

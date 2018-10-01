@@ -1,7 +1,8 @@
 //Made by Riley Adams
 //Started around September of 2017
-//Credit to RealTutsGML who taught me how to program games in Java and gave me a base platform that this is designed off of.
+//Credit to RealTutsGML who taught me how to program games in Java and gave me a base platform that this is designed off of
 //and DLC ENERGY who helped me understand 3D rendering from scratch, borrowed his 2D rotation class from his java example.
+//Credit to Stefan Gustavson's paper on simplex noise at http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
 
 package com.radar;
 
@@ -13,7 +14,6 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import javax.swing.ImageIcon;
 //Main class initializes all classes and runs the game loop
 public class Main extends Canvas implements Runnable{
 	public String version = "1.1.2";
@@ -28,7 +28,7 @@ public class Main extends Canvas implements Runnable{
 	static int HEIGHT = 800;
 	int i = 0;
 	int iz = -50;
-	ImageIcon img = new ImageIcon("./dirt.png");
+//	ImageIcon img = new ImageIcon("./dirt.png");
 	
 	public Main(){
 		handler = new Handler();
@@ -103,7 +103,7 @@ public class Main extends Canvas implements Runnable{
 		//Help my sorting of cubes in handler
 		//System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
 		final Graphics g = bs.getDrawGraphics();
-		g.setColor(Color.GRAY);
+		g.setColor(new Color(114, 154, 219));
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		handler.render(g);
 		g.setColor(Color.BLACK);

@@ -5,20 +5,16 @@ import java.awt.Graphics;
 import java.util.LinkedList;
 public class Cube extends CubeObject{
 	public int x, y, z, w, h, d, i, fov, far,pfov, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax;
-	BlockFace testFace;
 	public float tx, ty, tz;
 	public double f, f2, px, py, pz, rotLat, rotVert, dist, ldist, dist2,sl,cl,sv,cv, bound;
-	public float[] point = new float[2];
-	public boolean hasFar,debug,test2 = false;
-	public int test = 0;
-	public Color faceColor;
+	public boolean hasFar,debug = false;
+	public Color[] faceColors = new Color[6];
 	public boolean visible, changed, looping, render,repeat,renderBlock,right,left,up,down,lside,rside,back,front;
 	LinkedList<Integer> chunkData = new LinkedList<Integer>();
 	LinkedList<Integer> chunkPosX = new LinkedList<Integer>();
 	LinkedList<Integer> chunkNegX = new LinkedList<Integer>();
 	LinkedList<Integer> chunkPosY = new LinkedList<Integer>();
 	LinkedList<Integer> chunkNegY = new LinkedList<Integer>();
-	Player player;
 	private Handler handler;
 	Chunk chunk;
 	
@@ -27,25 +23,21 @@ public class Cube extends CubeObject{
 	private int[][] faces = { { 0, 1, 2, 3, 0, 1}, { 4, 5, 6, 7, 1, 1}, { 0, 4, 5, 1, 2, 1}, { 2, 6, 7, 3, 3, 1},{ 1, 5, 6, 2, 4, 1}, { 3, 7, 4, 0, 5, 1} };
 	public float[][] points3D = new float[9][3];
 	
-	public int[][] facesRender = new int[4][4];
-	public Color[] colorFace = new Color[4];
-	
 	public float[] pointsX = new float[4];
 	public float[] pointsY = new float[4];
 	public float[] pointsZ = new float[4];
 	boolean first = true;
 	public int[][] points = new int[8][3];
-	//public int[] pointsRemoved = new int[8];
 	public double[] distances = new double[8];
 	private int[] xCoords = new int[4];
 	private int[] yCoords = new int[4];
 	private int[] zCoords = new int[4];
-	LinkedList<BlockFace> renderFaces = new LinkedList<BlockFace>();
 	public BlockFace tempFace;
 
 	public double upperBound, lowerBound = 0;
 	
-	public Cube(int x, int y, int z, int w, int h, int d,Handler handler, int cubeIndex,int chunkX,int chunkZ, Chunk chunk) {
+	public Cube(Color[] faceColors,int x, int y, int z, int w, int h, int d,Handler handler, int cubeIndex,int chunkX,int chunkZ, Chunk chunk) {
+		this.faceColors = faceColors;
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -65,7 +57,7 @@ public class Cube extends CubeObject{
 			fov = Main.HEIGHT;
 		}
 		chunk.addCube(this,x,y,z);
-		renderUpdate();
+//		renderUpdate();
 		
 	}
 	public void render(Graphics g, double px, double py, double pz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
@@ -168,6 +160,7 @@ public class Cube extends CubeObject{
 				//g.fillOval((int) ((tx * f) + (Main.WIDTH / 2) - 2), (int) ((ty * f) + (Main.HEIGHT) - 2), 4, 4);
 				
 				//Puts 2D points into array for later when I need to render the polygons
+
 				points[i][0] = (int) ((tx * f) + (Main.WIDTH / 2));
 				points[i][1] = (int) ((ty * f) + (Main.HEIGHT));
 				points[i][2] = (int) (tz);
@@ -179,7 +172,7 @@ public class Cube extends CubeObject{
 					far = i;
 				}
 				i++;
-			}
+			}//System.out.println(i);
 			if (renderBlock){
 //			renderFaces = new LinkedList<BlockFace>();
 			for (int[] face : faces) {
@@ -237,22 +230,16 @@ public class Cube extends CubeObject{
 							down = false;
 							
 							if (face[4] == 0) {
-								faceColor = Color.BLUE;
 								back = true;
 							}else if (face[4] == 1) {
-								faceColor = Color.RED;
 								front = true;
 							}else if (face[4] == 2) {
-								faceColor = Color.GREEN;
 								rside = true;
 							}else if (face[4] == 3) {
-								faceColor = Color.ORANGE;
 								lside = true;
 							}else if (face[4] == 4) {
-								faceColor = Color.YELLOW;
 								down = true;
 							}else if (face[4] == 5) {
-								faceColor = Color.CYAN;
 								up = true;
 							}
 	//						g.fillOval((int) ((tx * f) + (Main.WIDTH / 2) - 2), (int) ((ty * f) + (Main.HEIGHT) - 2), 4, 4);
@@ -338,7 +325,7 @@ public class Cube extends CubeObject{
 							//Sending blockface to be rendered at the chunk
 							dist = (float) Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2);
 							//Making a block face for each cube doesn't seem to affect performance much so I'll keep it to use for the raster
-							tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, faceColor,cubeIndex);
+							tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, faceColors[face[4]],cubeIndex);
 							chunk.addFace(tempFace);
 							
 //							renderFaces.add(tempFace);
@@ -457,7 +444,7 @@ public class Cube extends CubeObject{
 				face[5] = 0;
 			}
 			count++;
-		}
+		}chunkData.clear();
 	}
 	//Code used from DLC Energy now changed a bit
 	private float[] rotate2D(float x, float y, double s,double c) {
