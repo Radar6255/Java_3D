@@ -8,11 +8,14 @@ public class WorldGen{
 	double x,y,z;
 	Handler handler;
 	Player thePlayer;
+//	public ArrayList<ArrayList<ArrayList<Integer>>> world2 = new ArrayList<ArrayList<ArrayList<Integer>>>();
 	public LinkedList<LinkedList<LinkedList<Integer>>> world = new LinkedList<LinkedList<LinkedList<Integer>>>();
 	LinkedList<LinkedList<Integer>> chunk = new LinkedList<LinkedList<Integer>>();
 	public WorldGen(Handler handler, Player thePlayer){
 		this.handler = handler;
 		this.thePlayer = thePlayer;
+//		world2.add(new ArrayList<ArrayList<Integer>>());
+//		world2.get(0).add(new ArrayList<Integer>)
 		world.add(new LinkedList<LinkedList<Integer>>());
 		world.get(0).add(new LinkedList<Integer>());
 		//TODO

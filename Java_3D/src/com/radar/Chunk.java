@@ -21,20 +21,20 @@ public class Chunk {
 	LinkedList<Cube> combinedBlocks = new LinkedList<Cube>();
 	volatile LinkedList<BlockFace> facesToRender = new LinkedList<BlockFace>();
 	volatile LinkedList<BlockFace> facesToRender2 = new LinkedList<BlockFace>();
+	RenderThread renderThread1;
 	public int chunkX, chunkZ, xOff, zOff,off, i;
 	public boolean debug = false;
-	public volatile boolean threadReady, threadReady2 = false;
+	public volatile boolean threadReady = false;
 	public boolean doubleRender = false;
 	public double dist;
 	Handler handler;
 	Player player;
-	PolygonRaster raster;
-	public Chunk(int chunkX, int chunkZ, Player player, Handler handler){
+	public Chunk(int chunkX, int chunkZ, Player player, Handler handler,RenderThread renderThread1){
 		this.chunkX = chunkX;
 		this.chunkZ = chunkZ;
 		this.player = player;
 		this.handler = handler;
-		this.raster = handler.getRaster();
+		this.renderThread1 = renderThread1;
 	}
 	
 	public void tick(){
@@ -51,11 +51,9 @@ public class Chunk {
 	float[] playerCoords = new float[3];
 	public void moveOn () {
 		threadReady = true;
-	}public void moveOn2 () {
-		threadReady2 = true;
 	}
 	
-	public void render(Graphics g, RenderThread renderThread1){
+	public void render(Graphics g){
 		
 //		renderChunk = false;
 //		lowerBound = (360 - rotLat) - 30;
@@ -102,7 +100,6 @@ public class Chunk {
 //			}
 			threadReady = false;
 			renderThread1.render(this,visibleBlocks,g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
-//			renderThread2.render(this,visibleBlocks,g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
 			
 			i  = 0;
 			size = (visibleBlocks.size()/2)-2;
@@ -112,8 +109,6 @@ public class Chunk {
 				i++;
 			}
 			while (!threadReady) {}
-//			while (!threadReady2) {}
-			
 			facesToRender.addAll(facesToRender2);
 			
 			facesToRender.sort(new sortFaces());
@@ -148,6 +143,10 @@ public class Chunk {
 		return chunkX;
 	}public int getChunkZ(){
 		return chunkZ;
+	}public void fovUpdate() {
+		for (CubeObject cube : visibleBlocks) {
+			cube.updateFov();
+		}
 	}
 	public void addFace(BlockFace face){
 		if (Thread.currentThread().getName() == "Render1") {

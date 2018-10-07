@@ -13,5 +13,7 @@ public abstract class CubeObject {
 		return 0.0;
 	}public boolean isVisible(){
 		return false;
+	}public void updateFov() {
+		
 	}
 }

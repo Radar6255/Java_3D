@@ -36,8 +36,6 @@ public class RenderThread extends Thread{
 					ready = false;
 					if (index == "1") {
 						chunk.moveOn();
-					}else {
-						chunk.moveOn2();
 					}
 				}
 				//running = false;
@@ -63,10 +61,8 @@ public class RenderThread extends Thread{
 		while (i < visibleBlocks.size()/2) {
 			if (index == "2") {
 				this.visibleBlocks.add(visibleBlocks.get(i));
-				//visibleBlocks.get(i).render(g,px,py,pz,rotLat,rotVert,sl,cl,sv,cv);
 			}else {
 				this.visibleBlocks.add(visibleBlocks.get(visibleBlocks.size()-i-1));
-				//visibleBlocks.get(visibleBlocks.size()-i-1).render(g,px,py,pz,rotLat,rotVert,sl,cl,sv,cv);
 			}
 			i++;
 		}

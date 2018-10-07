@@ -43,7 +43,9 @@ public class Player {
 		chunkY = (int) y;
 		chunkZ = (int) Math.floor(z/16);
 		if (!Main.pause){
+			//TODO Errored
 			mouseLoc = MouseInfo.getPointerInfo();
+			
 			tempPoint = mouseLoc.getLocation();
 			mx = tempPoint.getX();
 			my = tempPoint.getY();

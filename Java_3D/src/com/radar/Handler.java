@@ -15,19 +15,15 @@ public class Handler {
 	LinkedList<Chunk> objectsSorted = new LinkedList<Chunk>();
 	LinkedList<Integer> currentChunk = new LinkedList<Integer>();
 	public RenderThread renderThread1;
-//	public RenderThread renderThread2;
 	public CubeGen cubeGen;
-	public PolygonRaster raster;
-	public Handler(){
-		raster = new PolygonRaster();
-		cubeGen = new CubeGen(players, this);
-		cubeGen.start();
+	public Main main;
+	public Handler(Main main){
 		renderThread1 = new RenderThread("1");
-//		renderThread2 = new RenderThread("2");
+		cubeGen = new CubeGen(players, this, renderThread1);
+		cubeGen.start();
 		renderThread1.setName("Render1");
-//		renderThread2.setName("Render2");
 		renderThread1.start();
-//		renderThread2.start();
+		this.main = main;
 	}
 	
 	//Holds indices of chunks loaded into render and where they start in the objects linkedList
@@ -39,7 +35,15 @@ public class Handler {
 	Chunk chunkCreating;
 	LinkedList<LinkedList<LinkedList<Integer>>> chunks = new LinkedList<LinkedList<LinkedList<Integer>>>();
 	int ci,pi,i,i2,chunkI = 0;
-	
+	public int getHeight() {
+		return main.getHeight();
+	}public int getWidth() {
+		return main.getWidth();
+	}public void fovChange() {
+		for (Chunk chunk : renderChunks) {
+			chunk.fovUpdate();
+		}
+	}
 	public void addGeneration(WorldGen gen){
 		this.gen = gen;
 	}public LinkedList<LinkedList<LinkedList<Integer>>> getWorld(){
@@ -51,8 +55,6 @@ public class Handler {
 	}public void addPlayer(Player player){
 		players[pi] = player;
 		pi++;
-	}public PolygonRaster getRaster(){
-		return raster;
 	}
 	public void debugMode(boolean debug){
 		gen.setDebug(debug);
@@ -124,14 +126,13 @@ public class Handler {
 		renderChunks.sort(new chunkCompare());
 
 		for (Chunk chunk:renderChunks){
-			chunk.render(g, renderThread1);
+			chunk.render(g);
 		}
 
-		//TODO The has errored once
+		//TODO The has thrown an error once
 		for (Chunk toAdd:renderQueue){
 			renderChunks.add(toAdd);
 		}renderQueue.clear();
-//		raster.render(g);
 		
 //		for (Chunk chunk:renderChunks){
 //			chunk.render(g);

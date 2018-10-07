@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.LinkedList;
 public class Cube extends CubeObject{
-	public int x, y, z, w, h, d, i, fov, far,pfov, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax;
+	public int x, y, z, w, h, d, i, fov, far,pfov, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax, height, width;
 	public float tx, ty, tz;
 	public double f, f2, px, py, pz, rotLat, rotVert, dist, ldist, dist2,sl,cl,sv,cv, bound;
 	public boolean hasFar,debug = false;
@@ -49,19 +49,21 @@ public class Cube extends CubeObject{
 		pcx = chunkX;
 		pcz = chunkZ;
 		pcy = (int) y;
-		
 		this.cubeIndex = cubeIndex;
-		if (Main.WIDTH < Main.HEIGHT) {
-			fov = Main.WIDTH;
+		
+		width = handler.getWidth();
+		height = handler.getHeight();
+		if (width < height) {
+			fov = width;
 		} else {
-			fov = Main.HEIGHT;
+			fov = height;
 		}
+		
 		chunk.addCube(this,x,y,z);
 //		renderUpdate();
 		
 	}
 	public void render(Graphics g, double px, double py, double pz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
-		
 		//Uncomment to run on main thread, else it runs on the cubeGen thread
 //		if (first){
 //			renderUpdate();
@@ -161,8 +163,8 @@ public class Cube extends CubeObject{
 				
 				//Puts 2D points into array for later when I need to render the polygons
 
-				points[i][0] = (int) ((tx * f) + (Main.WIDTH / 2));
-				points[i][1] = (int) ((ty * f) + (Main.HEIGHT));
+				points[i][0] = (int) ((tx * f) + (width / 2));
+				points[i][1] = (int) ((ty * f) + (height));
 				points[i][2] = (int) (tz);
 				
 				//Finds point farthest from the player
@@ -204,14 +206,14 @@ public class Cube extends CubeObject{
 						
 						//Determines if cube face is on screen
 						for (int xc : xCoords) {
-							if (xc > 0 && xc < Main.WIDTH) {
+							if (xc > 0 && xc < width) {
 								visible = true;
 							}
 						}
 						if (visible) {
 							visible = false;
 							for (int yc : yCoords) {
-								if (yc > 0 && yc < Main.HEIGHT) {
+								if (yc > 0 && yc < height) {
 									visible = true;
 								}
 							}
@@ -367,7 +369,15 @@ public class Cube extends CubeObject{
 			}
 		}
 	}
-	
+	public void updateFov() {
+		width = handler.getWidth();
+		height = handler.getHeight();
+		if (width < height) {
+			fov = width;
+		} else {
+			fov = height;
+		}
+	}
 	public double getDist() {
 		tx = (float) (x - px);
 		ty = (float) (y - py);
@@ -444,7 +454,7 @@ public class Cube extends CubeObject{
 				face[5] = 0;
 			}
 			count++;
-		}chunkData.clear();
+		}//chunkData.clear();
 	}
 	//Code used from DLC Energy now changed a bit
 	private float[] rotate2D(float x, float y, double s,double c) {

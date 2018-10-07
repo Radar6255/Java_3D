@@ -24,14 +24,14 @@ public class Main extends Canvas implements Runnable{
 	static boolean pause;
 	static boolean changeMouse = true;
 	private Handler handler;
-	static int WIDTH = 1200;
-	static int HEIGHT = 800;
+	int WIDTH = 1200;
+	int HEIGHT = 800;
 	int i = 0;
 	int iz = -50;
 //	ImageIcon img = new ImageIcon("./dirt.png");
 	
 	public Main(){
-		handler = new Handler();
+		handler = new Handler(this);
 		Player thePlayer = new Player(1,3,2,180,-30);
 		handler.addPlayer(thePlayer);
 		WorldGen gen = new WorldGen(handler,thePlayer);
@@ -111,6 +111,16 @@ public class Main extends Canvas implements Runnable{
 //		g.drawString(version, 10, HEIGHT-40);
 		g.dispose();
 		bs.show();
+	}
+	public int getHeight(){
+		return HEIGHT;
+	}public int getWidth(){
+		return WIDTH;
+	}public void setHeight(int height) {
+		this.HEIGHT = height;
+		handler.fovChange();
+	}public void setWidth(int width) {
+		this.WIDTH = width;
 	}
 	
 	public static void main(String[] args){
