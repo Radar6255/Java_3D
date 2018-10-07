@@ -1,6 +1,8 @@
 //Made by Riley Adams
-//Credit to RealTutsGML who taught me how to program games in java and gave me a base platform that this is designed off of.
+//Started around September of 2017
+//Credit to RealTutsGML who taught me how to program games in Java and gave me a base platform that this is designed off of
 //and DLC ENERGY who helped me understand 3D rendering from scratch, borrowed his 2D rotation class from his java example.
+//Credit to Stefan Gustavson's paper on simplex noise at http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
 
 package com.radar;
 
@@ -12,11 +14,9 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-
-import javax.swing.ImageIcon;
 //Main class initializes all classes and runs the game loop
 public class Main extends Canvas implements Runnable{
-	public String version = "1.1.1";
+	public String version = "1.1.2";
 	public int frames,fps;
 	private static final long serialVersionUID = 1L;
 	private Thread thread;
@@ -24,11 +24,11 @@ public class Main extends Canvas implements Runnable{
 	static boolean pause;
 	static boolean changeMouse = true;
 	private Handler handler;
-	static int WIDTH = 1000;
-	static int HEIGHT = 700;
+	static int WIDTH = 1200;
+	static int HEIGHT = 800;
 	int i = 0;
 	int iz = -50;
-	ImageIcon img = new ImageIcon("./dirt.png");
+//	ImageIcon img = new ImageIcon("./dirt.png");
 	
 	public Main(){
 		handler = new Handler();
@@ -36,33 +36,6 @@ public class Main extends Canvas implements Runnable{
 		handler.addPlayer(thePlayer);
 		WorldGen gen = new WorldGen(handler,thePlayer);
 		handler.addGeneration(gen);
-		
-//		Chunk test = new Chunk(0,0,handler,thePlayer);
-//		CombinedCube tempCube = new CombinedCube(0,0,0,-2,-2,0,handler,i,0,0,test);
-//		test.addCube(tempCube);
-//		handler.addChunk(test);
-		
-//		Chunk test = new Chunk(0,0,handler,thePlayer);
-//		int ix = -50;
-//		int y = 0;
-//		while(ix < 50){
-//			//y = (int) Math.round(Math.pow((0.16-Math.pow((0.6-Math.pow((Math.pow(ix*0.04,2)+Math.pow(iz*0.04,2)),0.5)),2)),0.5)*20);
-////			y  = (int) Math.round(Math.sqrt(5/(Math.pow(ix*0.1,2)*Math.pow(iz*0.1, 2))));
-//			y = (int) Math.round(Math.pow((ix)*0.2, 2)+Math.pow((iz)*0.2, 2));
-//			if (y != 0){
-//				CombinedCube tempCube = new CombinedCube(ix,y,iz,1,1,1,handler,i,0,0,test);
-//				test.addCube(tempCube);
-////				tempCube = new CombinedCube(ix,-y,iz,1,1,1,handler,i,0,0,test);
-////				test.addCube(tempCube);
-//			}
-//			iz++;
-//			if (iz == 50){
-//				ix++;
-//				iz = -50;
-//			}
-//		}
-//		handler.addChunk(test);
-
 		this.addKeyListener(new KeyInput(handler));
 		new Window(WIDTH,HEIGHT,"3D Stuff",this);
 	}
@@ -130,12 +103,12 @@ public class Main extends Canvas implements Runnable{
 		//Help my sorting of cubes in handler
 		//System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
 		final Graphics g = bs.getDrawGraphics();
-		g.setColor(Color.LIGHT_GRAY);
+		g.setColor(new Color(114, 154, 219));
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		handler.render(g);
 		g.setColor(Color.BLACK);
-		g.drawString(Integer.toString(fps), WIDTH-40, 20);
-		g.drawString(version, 10, HEIGHT-40);
+		g.drawString("FPS:"+Integer.toString(fps), WIDTH-75, 20);
+//		g.drawString(version, 10, HEIGHT-40);
 		g.dispose();
 		bs.show();
 	}

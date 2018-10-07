@@ -14,19 +14,20 @@ import java.util.LinkedList;
 
 public class Chunk {
 	public static float[] verts = { 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f , -0.5f, -0.5f, 0.5f , -0.5f, 0.5f, 0.5f , 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f , -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f };
-	
+	int size;
 	LinkedList<Integer> blockPos = new LinkedList<Integer>();
 	LinkedList<CubeObject> blocks = new LinkedList<CubeObject>();
 	LinkedList<CubeObject> visibleBlocks = new LinkedList<CubeObject>();
 	LinkedList<Cube> combinedBlocks = new LinkedList<Cube>();
-	LinkedList<BlockFace> facesToRender = new LinkedList<BlockFace>();
-	public int chunkX, chunkZ, xOff, zOff,off;
+	volatile LinkedList<BlockFace> facesToRender = new LinkedList<BlockFace>();
+	volatile LinkedList<BlockFace> facesToRender2 = new LinkedList<BlockFace>();
+	public int chunkX, chunkZ, xOff, zOff,off, i;
 	public boolean debug = false;
+	public volatile boolean threadReady, threadReady2 = false;
 	public boolean doubleRender = false;
 	public double dist;
 	Handler handler;
 	Player player;
-	int i = 0;
 	PolygonRaster raster;
 	public Chunk(int chunkX, int chunkZ, Player player, Handler handler){
 		this.chunkX = chunkX;
@@ -48,10 +49,15 @@ public class Chunk {
 	boolean renderChunk = false;
 	boolean first = true;
 	float[] playerCoords = new float[3];
-	public void render(Graphics g){
+	public void moveOn () {
+		threadReady = true;
+	}public void moveOn2 () {
+		threadReady2 = true;
+	}
+	
+	public void render(Graphics g, RenderThread renderThread1){
 		
 //		renderChunk = false;
-//		//TODO Push the V backwards from players perspective, need to use sin + cos to find where the bottom of the v starts
 //		lowerBound = (360 - rotLat) - 30;
 //		upperBound = (360 - rotLat) + 30;
 //		
@@ -91,35 +97,46 @@ public class Chunk {
 			sv = player.getSineVert();
 			cv = player.getCosineVert();
 
-//			allVerts = DoubleStream.iterate(0, i -> i + 1).parallel().limit(visibleBlocks.size()*8*3).map(i->verts[(int) Math.round(i%24)] + blockPos.get((int) ((i%3) + 3*(Math.floor(i/24))))-playerCoords[(int) (i%3)] ).toArray();
-
-			for (CubeObject object:visibleBlocks){
-				object.render(g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
+//			for (CubeObject object:visibleBlocks){
+//				object.render(g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
+//			}
+			threadReady = false;
+			renderThread1.render(this,visibleBlocks,g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
+//			renderThread2.render(this,visibleBlocks,g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
+			
+			i  = 0;
+			size = (visibleBlocks.size()/2)-2;
+			for (CubeObject block: visibleBlocks) {
+				block.render(g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
+				if (i > size) {break;}
+				i++;
 			}
-
+			while (!threadReady) {}
+//			while (!threadReady2) {}
+			
+			facesToRender.addAll(facesToRender2);
+			
 			facesToRender.sort(new sortFaces());
 			for (BlockFace face:facesToRender){
-//				raster.addFace(face);
 				if (face != null){
 					g.setColor(face.getColor());
-					//TODO Face polygon
 					g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
-					i++;
 					if (debug){
 						g.setColor(Color.BLACK);
 						g.drawString(""+face.getDist(),face.getXCoords()[1],face.getYCoords()[1]);
-						
 	//					g.drawString(""+face.getX(),face.getXCoords()[0],face.getYCoords()[0]);
 					}
-					i++;
 				}
 			}
 			
-			g.setColor(Color.BLACK);
-			g.drawString("Faces Rendering:"+Integer.toString(i), 10, 60);
-			i = 0;
+//			g.setColor(Color.BLACK);
+//			g.drawString("Faces Rendering:"+Integer.toString(i), 10, 60);
+			
 			facesToRender.clear();
+			facesToRender2.clear();
 			facesToRender = new LinkedList<BlockFace>();
+			facesToRender2 = new LinkedList<BlockFace>();
+			
 			//TODO Double check if this could ever work
 	//		if (doubleRender){
 	//			for (CombinedCube object:combinedBlocks){
@@ -133,15 +150,21 @@ public class Chunk {
 		return chunkZ;
 	}
 	public void addFace(BlockFace face){
-		facesToRender.add(face);
+		if (Thread.currentThread().getName() == "Render1") {
+			facesToRender.add(face);
+		}else if (Thread.currentThread().getName() == "Render2") {
+			facesToRender2.add(face);
+		}else {
+			facesToRender2.add(face);
+		}
 	}public void addCube(CubeObject cube,int x, int y, int z){
 		blocks.add(cube);
 		if (cube.isVisible()){
 			visibleBlocks.add(cube);
 		}
-		blockPos.add(x);
-		blockPos.add(y);
-		blockPos.add(z);
+//		blockPos.add(x);
+//		blockPos.add(y);
+//		blockPos.add(z);
 	}
 	public double getDist(){
 		dist = Math.sqrt(Math.pow((16*chunkX)-player.getX()+8, 2)+Math.pow((16*chunkZ)-player.getZ()+8, 2));

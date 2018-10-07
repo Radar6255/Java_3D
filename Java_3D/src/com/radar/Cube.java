@@ -3,22 +3,18 @@ package com.radar;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.LinkedList;
-
-//Cube class is created on chunk reading from the handler
-//Does all calculations for where BlockFaces should render and how far they are from the player
-
 public class Cube extends CubeObject{
-	public int x, y, z, w, h, d, i, fov, far,pfov, cubeIndex,count,pcx,pcy,pcz,xOff,zOff,ir, chunkMax;
-	BlockFace testFace;
+	public int x, y, z, w, h, d, i, fov, far,pfov, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax;
 	public float tx, ty, tz;
 	public double f, f2, px, py, pz, rotLat, rotVert, dist, ldist, dist2,sl,cl,sv,cv, bound;
-	public float[] point = new float[2];
-	public boolean hasFar,debug,test2 = false;
-	public int test = 0;
-	public Color faceColor;
+	public boolean hasFar,debug = false;
+	public Color[] faceColors = new Color[6];
 	public boolean visible, changed, looping, render,repeat,renderBlock,right,left,up,down,lside,rside,back,front;
 	LinkedList<Integer> chunkData = new LinkedList<Integer>();
-	Player player;
+	LinkedList<Integer> chunkPosX = new LinkedList<Integer>();
+	LinkedList<Integer> chunkNegX = new LinkedList<Integer>();
+	LinkedList<Integer> chunkPosY = new LinkedList<Integer>();
+	LinkedList<Integer> chunkNegY = new LinkedList<Integer>();
 	private Handler handler;
 	Chunk chunk;
 	
@@ -27,25 +23,21 @@ public class Cube extends CubeObject{
 	private int[][] faces = { { 0, 1, 2, 3, 0, 1}, { 4, 5, 6, 7, 1, 1}, { 0, 4, 5, 1, 2, 1}, { 2, 6, 7, 3, 3, 1},{ 1, 5, 6, 2, 4, 1}, { 3, 7, 4, 0, 5, 1} };
 	public float[][] points3D = new float[9][3];
 	
-	public int[][] facesRender = new int[4][4];
-	public Color[] colorFace = new Color[4];
-	
 	public float[] pointsX = new float[4];
 	public float[] pointsY = new float[4];
 	public float[] pointsZ = new float[4];
 	boolean first = true;
 	public int[][] points = new int[8][3];
-	public int[] pointsRemoved = new int[8];
 	public double[] distances = new double[8];
 	private int[] xCoords = new int[4];
 	private int[] yCoords = new int[4];
 	private int[] zCoords = new int[4];
-	LinkedList<BlockFace> renderFaces = new LinkedList<BlockFace>();
 	public BlockFace tempFace;
 
 	public double upperBound, lowerBound = 0;
 	
-	public Cube(int x, int y, int z, int w, int h, int d,Handler handler, int cubeIndex,int chunkX,int chunkZ, Chunk chunk) {
+	public Cube(Color[] faceColors,int x, int y, int z, int w, int h, int d,Handler handler, int cubeIndex,int chunkX,int chunkZ, Chunk chunk) {
+		this.faceColors = faceColors;
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -65,25 +57,20 @@ public class Cube extends CubeObject{
 			fov = Main.HEIGHT;
 		}
 		chunk.addCube(this,x,y,z);
-		renderUpdate();
+//		renderUpdate();
 		
 	}
-	public double[] verts3d;
 	public void render(Graphics g, double px, double py, double pz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
 		
-		//Uncomment to run on main thread else it runs on the cubeGen thread
+		//Uncomment to run on main thread, else it runs on the cubeGen thread
 //		if (first){
 //			renderUpdate();
 //			first = false;
 //		}
 		//Consider grabbing in the render from chunk
-		i = 0;
-		ldist = 0;
-		dist2 = 0;
-		far = 0;
 		
 		//Need to get viewing angle and use it to make V in which cubes should be rendered
-		renderBlock = true;
+//		renderBlock = true;
 		renderBlock = false;
 //		System.out.println("Start");
 		//TODO Push the V backwards from players perspective, need to use sin + cos to find where the bottom of the v starts
@@ -114,8 +101,12 @@ public class Cube extends CubeObject{
 		}
 		if (renderBlock){
 			//Loop through all vertices to find which is farthest from player
-			ir = 0;
-			pointsRemoved = new int[8];
+			//pointsRemoved = new int[8];
+			i = 0;
+			ldist = 0;
+			dist2 = 0;
+			far = 0;
+			
 			for (float[] point : verts) {
 				//Pulls x,y,z of points taking into account width, height, and depth
 				if (point[0] > 0.0){
@@ -144,6 +135,7 @@ public class Cube extends CubeObject{
 				
 				
 				//Calculates distance from player to vertex
+				//TODO This may lower performance so find a way to remove nicely
 				dist = Math.sqrt(Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2));
 				//Rotates points so that player appears to look around
 				point = rotate2D(tx, tz, sl,cl);
@@ -168,6 +160,7 @@ public class Cube extends CubeObject{
 				//g.fillOval((int) ((tx * f) + (Main.WIDTH / 2) - 2), (int) ((ty * f) + (Main.HEIGHT) - 2), 4, 4);
 				
 				//Puts 2D points into array for later when I need to render the polygons
+
 				points[i][0] = (int) ((tx * f) + (Main.WIDTH / 2));
 				points[i][1] = (int) ((ty * f) + (Main.HEIGHT));
 				points[i][2] = (int) (tz);
@@ -179,18 +172,16 @@ public class Cube extends CubeObject{
 					far = i;
 				}
 				i++;
-			}
-			count = 0;
+			}//System.out.println(i);
 			if (renderBlock){
 //			renderFaces = new LinkedList<BlockFace>();
 			for (int[] face : faces) {
 				if (face[5] != 0){
 					//Finds if the face has the point farthest from screen
 					hasFar = false;
-					i = 0;
-					for (int point : face) {
+					for (int i = 0;i < face.length;i++) {
 						if (i < 4) {
-							if (point == far) {
+							if (face[i] == far) {
 								hasFar = true;
 								break;
 							}
@@ -209,10 +200,6 @@ public class Cube extends CubeObject{
 						yCoords[2] = points[face[2]][1];
 						yCoords[3] = points[face[3]][1];
 						
-						zCoords[0] = points[face[0]][2];
-						zCoords[1] = points[face[1]][2];
-						zCoords[2] = points[face[2]][2];
-						zCoords[3] = points[face[3]][2];
 						visible = false;
 						
 						//Determines if cube face is on screen
@@ -229,6 +216,10 @@ public class Cube extends CubeObject{
 								}
 							}
 						}
+						zCoords[0] = points[face[0]][2];
+						zCoords[1] = points[face[1]][2];
+						zCoords[2] = points[face[2]][2];
+						zCoords[3] = points[face[3]][2];
 						if (visible){
 						//Finds which face it is and what color it should be by index
 							back = false;
@@ -239,22 +230,16 @@ public class Cube extends CubeObject{
 							down = false;
 							
 							if (face[4] == 0) {
-								faceColor = Color.BLUE;
 								back = true;
-							}if (face[4] == 1) {
-								faceColor = Color.RED;
+							}else if (face[4] == 1) {
 								front = true;
-							}if (face[4] == 2) {
-								faceColor = Color.GREEN;
+							}else if (face[4] == 2) {
 								rside = true;
-							}if (face[4] == 3) {
-								faceColor = Color.ORANGE;
+							}else if (face[4] == 3) {
 								lside = true;
-							}if (face[4] == 4) {
-								faceColor = Color.YELLOW;
+							}else if (face[4] == 4) {
 								down = true;
-							}if (face[4] == 5) {
-								faceColor = Color.CYAN;
+							}else if (face[4] == 5) {
 								up = true;
 							}
 	//						g.fillOval((int) ((tx * f) + (Main.WIDTH / 2) - 2), (int) ((ty * f) + (Main.HEIGHT) - 2), 4, 4);
@@ -339,12 +324,15 @@ public class Cube extends CubeObject{
 							}
 							//Sending blockface to be rendered at the chunk
 							dist = (float) Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2);
-							tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, faceColor,cubeIndex);
+							//Making a block face for each cube doesn't seem to affect performance much so I'll keep it to use for the raster
+							tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, faceColors[face[4]],cubeIndex);
 							chunk.addFace(tempFace);
+							
 //							renderFaces.add(tempFace);
 //							facesRender[count] = face;
 //							colorFace[count] = faceColor;
 //							count++;
+							
 //							g.setColor(faceColor);
 //							g.fillPolygon(xCoords, yCoords, 4);
 							
@@ -395,22 +383,26 @@ public class Cube extends CubeObject{
 
 	public void tick() {}
 	public boolean isVisible(){
-		boolean out = false;
 		for (int[] face:faces){
 			if (face[5] == 1){
-				out = true;
+				return true;
 			}
 		}
-		return out;
+		return false;
 	}
 	//Code to cull the faces next to each other that would be overwritten anyways
-	public boolean renderUpdate(){
+	public void renderUpdate(){
 		xOff= handler.getXOff();
 		zOff= handler.getZOff();
 		chunkData = handler.getWorld().get(pcx+xOff).get(pcz+zOff);
+//		System.out.println(pcx +" "+ pcz);
+//		chunkPosX = handler.getWorld().get(pcx+xOff+1).get(pcz+zOff);
+//		chunkNegX = handler.getWorld().get(pcx+xOff-1).get(pcz+zOff);
+//		chunkPosY = handler.getWorld().get(pcx+xOff).get(pcz+zOff+1);
+//		chunkNegY = handler.getWorld().get(pcx+xOff).get(pcz+zOff-1);
 		chunkMax = chunkData.size();
 		
-		count = 0;
+		int count = 0;
 		for (int[] face : faces){
 			
 			visible = true;
@@ -419,27 +411,32 @@ public class Cube extends CubeObject{
 				visible = false;
 			}
 			//Red Side
-			if (count == 1 && cubeIndex-1 >= 0 && cubeIndex% 16 != 0 && chunkData.get(cubeIndex-1) == 1){
+			else if (count == 1 && cubeIndex-1 >= 0 && cubeIndex% 16 != 0 && chunkData.get(cubeIndex-1) == 1){
 				visible = false;
 			}
 			
 			//Green Side
-			if (count == 2 && cubeIndex+16 < chunkMax && ((cubeIndex+16) % 256 < 0 || (cubeIndex+16) % 256 > 15) && chunkData.get(cubeIndex+16) == 1){
+			else if (count == 2 && cubeIndex+16 < chunkMax && ((cubeIndex+16) % 256 < 0 || (cubeIndex+16) % 256 > 15) && chunkData.get(cubeIndex+16) == 1){
 				visible = false;
 			}
 			//Orange Side
-			if (count == 3 && cubeIndex-16 >= 0 && (cubeIndex % 256 < 0 || cubeIndex % 256 > 15) && chunkData.get(cubeIndex-16) == 1){
+			else if (count == 3 && cubeIndex-16 >= 0 && (cubeIndex % 256 < 0 || cubeIndex % 256 > 15) && chunkData.get(cubeIndex-16) == 1){
 				visible = false;
 			}
 			
 			//Yellow Side
-			if (count == 4 && cubeIndex-256 >= 0 && chunkData.get(cubeIndex-256) == 1){
+			else if (count == 4 && cubeIndex-256 >= 0 && chunkData.get(cubeIndex-256) == 1){
 				visible = false;
 			}
 			//Light Blue Side
-			if (count == 5 && cubeIndex+256 < chunkMax && chunkData.get(cubeIndex+256) == 1){
+			else if (count == 5 && cubeIndex+256 < chunkMax && chunkData.get(cubeIndex+256) == 1){
 				visible = false;
 			}
+			//Adjacent Chunk Blue Side
+//			else if (count == 0 && chunkPosX != null) {// && cubeIndex < handler.getWorld().get(pcx+xOff+1).get(pcz+zOff).size() //&& handler.getWorld().get(pcx+xOff+1).get(pcz+zOff).get(cubeIndex) == 1) {
+//				visible = false;
+//			}
+			
 			
 			if (visible){
 				face[5] = 1;
@@ -447,8 +444,7 @@ public class Cube extends CubeObject{
 				face[5] = 0;
 			}
 			count++;
-		}
-		return true;
+		}chunkData.clear();
 	}
 	//Code used from DLC Energy now changed a bit
 	private float[] rotate2D(float x, float y, double s,double c) {
