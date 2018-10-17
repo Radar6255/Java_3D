@@ -60,7 +60,9 @@ public class Cube extends CubeObject{
 		}
 		
 		chunk.addCube(this,x,y,z);
-//		renderUpdate();
+		if (w == 1 && d == 1) {
+			renderUpdate();
+		}
 		
 	}
 	public void render(Graphics g, double px, double py, double pz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {

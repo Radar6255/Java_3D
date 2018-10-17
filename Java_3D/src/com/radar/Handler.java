@@ -9,7 +9,6 @@ import java.util.LinkedList;
 //Uses created chunks sorted to render all BlockFaces
 public class Handler {
 	
-	LinkedList<CubeObject> objects = new LinkedList<CubeObject>();
 	LinkedList<Chunk> renderChunks = new LinkedList<Chunk>();
 	LinkedList<Chunk> renderQueue = new LinkedList<Chunk>();
 	LinkedList<Chunk> objectsSorted = new LinkedList<Chunk>();
@@ -67,13 +66,10 @@ public class Handler {
 	}public WorldGen getGen(){
 		return gen;
 	}public void reloadChunks(){
-		objects = null;
-		objects = new LinkedList<CubeObject>();
+		renderChunks.clear();
 		renderedChunks = null;
 		renderedChunks = new LinkedList<Integer[]>();
 		chunkI = 0;
-		sCubeCount = 0;
-		cCubeCount = 0;
 	}public void addChunk(Chunk chunk){
 		renderQueue.add(chunk);
 	}
@@ -141,7 +137,7 @@ public class Handler {
 		i = 0;
 		while (i < renderChunks.size()){
 			//TODO Tie this with render distance setting
-			if (renderChunks.get(i).getDist() > 80){
+			if (renderChunks.get(i).getDist() > 120){
 				i2 = 0;
 				for (Integer[] data: renderedChunks){
 					if (data[0] == renderChunks.get(i).getChunkX() && data[1] == renderChunks.get(i).getChunkZ()){
@@ -168,6 +164,7 @@ public class Handler {
 //		for (Chunk chunk:renderChunks){
 //			chunk.tick();
 //		}
+		
 		players[0].tick();
 	}
 	

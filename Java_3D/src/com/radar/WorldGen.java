@@ -20,7 +20,7 @@ public class WorldGen{
 		world.get(0).add(new LinkedList<Integer>());
 		//TODO
 //		i = 0;
-//		while(i < 20){
+//		while(i < 50){
 //			world.get(0).get(0).add(1);
 //			i++;
 //		}
@@ -34,9 +34,9 @@ public class WorldGen{
 			chunkX = thePlayer.getChunkX();
 			chunkY = thePlayer.getChunkY();
 			chunkZ = thePlayer.getChunkZ();
-			ix = -2;
-			iz = -2;
-			while(iz < 3){
+			ix = -4;
+			iz = -4;
+			while(iz < 5){
 				try{
 					while((chunkX+xOff+ix) < 5){
 						world.addFirst(new LinkedList<LinkedList<Integer>>());
@@ -111,9 +111,9 @@ public class WorldGen{
 					System.out.println(e.getCause());
 				}
 				ix++;
-				if (ix == 3){
+				if (ix == 5){
 					iz++;
-					ix = -2;
+					ix = -4;
 				}
 			}
 //		}

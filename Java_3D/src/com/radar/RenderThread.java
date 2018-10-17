@@ -58,6 +58,9 @@ public class RenderThread extends Thread{
 		this.cv = cv;
 		int i = 0;
 		ready = false;
+		if (1 > visibleBlocks.size()/2) {
+			chunk.moveOn();
+		}
 		while (i < visibleBlocks.size()/2) {
 			if (index == "2") {
 				this.visibleBlocks.add(visibleBlocks.get(i));

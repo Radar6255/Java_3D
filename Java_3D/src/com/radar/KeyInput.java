@@ -21,13 +21,6 @@ public class KeyInput implements KeyListener {
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
 		if (key == KeyEvent.VK_P){
-//			i=0;
-//			while (i <255){
-//				handler.getGen().addBlock(0, 0, 0);
-//				i++;
-//			}
-//			handler.getGen().addBlock(1, 0, 0);
-//			System.out.println("Added block");
 			handler.getGen().printWorld();
 		}if (key == KeyEvent.VK_F3){
 			if (!debug){

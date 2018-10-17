@@ -47,6 +47,7 @@ public class Player {
 			mouseLoc = MouseInfo.getPointerInfo();
 			
 			tempPoint = mouseLoc.getLocation();
+
 			mx = tempPoint.getX();
 			my = tempPoint.getY();
 			rotLat = rotLat + ((mx-centerX)/6);
@@ -80,7 +81,7 @@ public class Player {
 		 //if(down){z+=rate;}
 		 if (left){z-=s*rate;x+=c*rate;}
 		 if (right){z+=s*rate;x-=c*rate;}
-		 
+
 	}public double getSineLat(){
 		return s;
 	}public double getCosineLat(){
