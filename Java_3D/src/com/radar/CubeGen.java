@@ -1,15 +1,16 @@
 package com.radar;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class CubeGen extends Thread{
-	LinkedList<LinkedList<Integer>> chunkQueue = new LinkedList<LinkedList<Integer>>();
+	ArrayList<ArrayList<Integer>> chunkQueue = new ArrayList<ArrayList<Integer>>();
 	LinkedList<Integer> chunkPos = new LinkedList<Integer>();
 	int index, i, i2 = 0;
 	int chunkX, chunkZ;
 	Chunk chunkCreating;
-	LinkedList<Integer> currentChunk;
+	ArrayList<Integer> currentChunk;
 	LinkedList<Integer> tempChunk;
 	LinkedList<Integer> removedBlocks = new LinkedList<Integer>();
 	boolean go = true;
@@ -84,7 +85,7 @@ public class CubeGen extends Thread{
 					chunkPos.removeFirst();
 					chunkPos.removeFirst();
 					handler.addChunk(chunkCreating);
-					chunkQueue.removeFirst();
+					chunkQueue.remove(0);
 					index-=2;
 					
 				}
@@ -97,7 +98,7 @@ public class CubeGen extends Thread{
 			}catch (InterruptedException e) {e.printStackTrace();}
 		}
 	}
-	public void createChunk(LinkedList<Integer> chunk, int chunkX, int chunkZ){
+	public void createChunk(ArrayList<Integer> chunk, int chunkX, int chunkZ){
 			chunkPos.add(chunkX);
 			chunkPos.add(chunkZ);
 			index+=2;

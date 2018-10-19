@@ -1,5 +1,6 @@
 package com.radar;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class WorldGen{
@@ -8,16 +9,13 @@ public class WorldGen{
 	double x,y,z;
 	Handler handler;
 	Player thePlayer;
-//	public ArrayList<ArrayList<ArrayList<Integer>>> world2 = new ArrayList<ArrayList<ArrayList<Integer>>>();
-	public LinkedList<LinkedList<LinkedList<Integer>>> world = new LinkedList<LinkedList<LinkedList<Integer>>>();
+	public ArrayList<ArrayList<ArrayList<Integer>>> world2 = new ArrayList<ArrayList<ArrayList<Integer>>>();
 	LinkedList<LinkedList<Integer>> chunk = new LinkedList<LinkedList<Integer>>();
 	public WorldGen(Handler handler, Player thePlayer){
 		this.handler = handler;
 		this.thePlayer = thePlayer;
-//		world2.add(new ArrayList<ArrayList<Integer>>());
-//		world2.get(0).add(new ArrayList<Integer>)
-		world.add(new LinkedList<LinkedList<Integer>>());
-		world.get(0).add(new LinkedList<Integer>());
+		world2.add(new ArrayList<ArrayList<Integer>>());
+		world2.get(0).add(new ArrayList<Integer>());
 		//TODO
 //		i = 0;
 //		while(i < 50){
@@ -39,29 +37,29 @@ public class WorldGen{
 			while(iz < 5){
 				try{
 					while((chunkX+xOff+ix) < 5){
-						world.addFirst(new LinkedList<LinkedList<Integer>>());
-						while(world.get(0).size() < zOff+ix){
-							world.get(0).add(new LinkedList<Integer>());
+						
+						world2.add(0,new ArrayList<ArrayList<Integer>>());
+						while (world2.get(0).size() < zOff+ix) {
+							world2.get(0).add(new ArrayList<Integer>());
 						}
 						xOff++;
 					}
 					while((chunkZ+zOff+iz) < 5){
-						for (LinkedList<LinkedList<Integer>> zChunks:world){
-							zChunks.addFirst(new LinkedList<Integer>());
+						for (ArrayList<ArrayList<Integer>> zChunks:world2){
+							zChunks.add(0, new ArrayList<Integer>());
 						}
 						zOff++;
 					}
-					
-					while (world.size() <= chunkX+5+xOff+ix){
-						world.add(new LinkedList<LinkedList<Integer>>());
-						while(world.getLast().size() < zOff+iz){
-							world.getLast().add(new LinkedList<Integer>());
+					while (world2.size() <= chunkX+5+xOff+ix){
+						world2.add(new ArrayList<ArrayList<Integer>>());
+						while(world2.get(world2.size()-1).size() < zOff+iz){
+							world2.get(world2.size()-1).add(new ArrayList<Integer>());
 						}
 					}
-					while (world.get(chunkX+xOff+ix).size() <= chunkZ+zOff+5+iz){
-						world.get(chunkX+xOff+ix).add(new LinkedList<Integer>());
+					while (world2.get(chunkX+xOff+ix).size() <= chunkZ+zOff+5+iz){
+						world2.get(chunkX+xOff+ix).add(new ArrayList<Integer>());
 					}
-					if (world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).isEmpty()){
+					if (world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).isEmpty()){
 						h = 0;
 						i = 0;
 						tx = 0;
@@ -85,12 +83,12 @@ public class WorldGen{
 //								ty = (int) Math.sqrt(Math.pow((tx)+(16*(chunkZ+iz)),2) + Math.pow((tz)+(16*(chunkX+ix)),2));
 								if (ty == h){
 									if (ty < 10) {
-										world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(2);
+										world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(2);
 									}else {
-										world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
+										world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
 									}
 								}else{
-									world.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
+									world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
 								}
 								i++;
 								tx++;
@@ -117,18 +115,18 @@ public class WorldGen{
 				}
 			}
 //		}
-	}public LinkedList<LinkedList<LinkedList<Integer>>> getWorld(){
-		return world;
+	}public ArrayList<ArrayList<ArrayList<Integer>>> getWorld(){
+		return world2;
 	}public int getXOff(){
 		return xOff;
 	}public int getZOff(){
 		return zOff;
 	}public void printWorld(){
-		System.out.println(world);
+		System.out.println(world2);
 	}public void setDebug(boolean debug){
 		this.debug = debug;
 	}public void addBlock(int blockNum, int chunkX, int chunkZ){
-		world.get(chunkX+xOff).get(chunkZ+zOff).add(blockNum);
+		world2.get(chunkX+xOff).get(chunkZ+zOff).add(blockNum);
 	}
 	//Credit to Stefan Gustavson's paper on simplex noise at http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
 	//Code taken from end of paper to generate 2d simplex noise

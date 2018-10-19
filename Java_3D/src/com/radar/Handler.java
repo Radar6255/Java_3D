@@ -1,6 +1,7 @@
 package com.radar;
 
 import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 
@@ -12,7 +13,7 @@ public class Handler {
 	LinkedList<Chunk> renderChunks = new LinkedList<Chunk>();
 	LinkedList<Chunk> renderQueue = new LinkedList<Chunk>();
 	LinkedList<Chunk> objectsSorted = new LinkedList<Chunk>();
-	LinkedList<Integer> currentChunk = new LinkedList<Integer>();
+	ArrayList<Integer> currentChunk = new ArrayList<Integer>();
 	public RenderThread renderThread1;
 	public CubeGen cubeGen;
 	public Main main;
@@ -32,7 +33,7 @@ public class Handler {
 	WorldGen gen;
 	boolean looping,changed,out,loadChunk,debug;
 	Chunk chunkCreating;
-	LinkedList<LinkedList<LinkedList<Integer>>> chunks = new LinkedList<LinkedList<LinkedList<Integer>>>();
+	ArrayList<ArrayList<ArrayList<Integer>>> chunks = new ArrayList<ArrayList<ArrayList<Integer>>>();
 	int ci,pi,i,i2,chunkI = 0;
 	public int getHeight() {
 		return main.getHeight();
@@ -45,7 +46,7 @@ public class Handler {
 	}
 	public void addGeneration(WorldGen gen){
 		this.gen = gen;
-	}public LinkedList<LinkedList<LinkedList<Integer>>> getWorld(){
+	}public ArrayList<ArrayList<ArrayList<Integer>>> getWorld(){
 		return gen.getWorld();
 	}public int getXOff(){
 		return gen.getXOff();

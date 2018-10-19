@@ -2,6 +2,7 @@ package com.radar;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.LinkedList;
 public class Cube extends CubeObject{
 	public int x, y, z, w, h, d, i, fov, far,pfov, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax, height, width;
@@ -10,7 +11,7 @@ public class Cube extends CubeObject{
 	public boolean hasFar,debug = false;
 	public Color[] faceColors = new Color[6];
 	public boolean visible, changed, looping, render,repeat,renderBlock,right,left,up,down,lside,rside,back,front;
-	LinkedList<Integer> chunkData = new LinkedList<Integer>();
+	ArrayList<Integer> chunkData = new ArrayList<Integer>();
 	LinkedList<Integer> chunkPosX = new LinkedList<Integer>();
 	LinkedList<Integer> chunkNegX = new LinkedList<Integer>();
 	LinkedList<Integer> chunkPosY = new LinkedList<Integer>();
