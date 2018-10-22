@@ -19,6 +19,7 @@ public class CubeGen extends Thread{
 	Color[] faceColors = {Color.GREEN, Color.GREEN,Color.GREEN,Color.GREEN,Color.GREEN, new Color(0,132,0)};
 	Color[] faceColorsS = {Color.gray, Color.gray,Color.gray,Color.gray,Color.gray, Color.darkGray};
 	Color[] faceColorsS2 = {new Color(109, 100, 37), new Color(109, 100, 37),new Color(109, 100, 37),new Color(109, 100, 37),new Color(160, 147, 57), new Color(160, 147, 57)};
+	Color[] testColors = {Color.BLUE, Color.RED, Color.GREEN, Color.ORANGE, Color.YELLOW,Color.CYAN};
 	Color[] cubeColors = new Color[6];
 	RenderThread renderThread1;
 	public CubeGen(Player[] players, Handler handler, RenderThread renderThread1){
@@ -30,6 +31,7 @@ public class CubeGen extends Thread{
 	boolean combined = true;
 	
 	public volatile boolean running = true;
+//	int width,depth,tx,left,right = 0;
 	int width,depth,tx = 0;
 	public void run(){
 		while(running){
@@ -53,11 +55,17 @@ public class CubeGen extends Thread{
 									cubeColors = faceColorsS;
 								}
 								depth = farthestDepth(i,16);
+								
 								while (depth > 1 && farthestDepth(i+1,depth) == depth && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
 									width++;
 									i++;
 //									cubeColors = faceColorsS2;
 								}
+//								if (depth == 1 && currentChunk.size() > i+16 && i > 16) {
+//									left = currentChunk.get(i+16);
+//									right = currentChunk.get(i-16);
+//								}
+//								while (depth == 1 && i > 16 && currentChunk.size() > i+16 && currentChunk.get(i+16) == left && currentChunk.get(i+16) == right && currentChunk.get(i+1) != 0 && !valueIn(removedBlocks,i+1) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
 								while (depth == 1 && currentChunk.size() > i+1 && currentChunk.get(i+1) != 0 && !valueIn(removedBlocks,i+1) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
 									width++;
 									i++;
@@ -66,6 +74,8 @@ public class CubeGen extends Thread{
 //								if (depth > 1) {
 //									cubeColors = faceColorsS2;
 //								}
+//								System.out.println(i);
+//								cubeColors = testColors;
 								new Cube(cubeColors, (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ),depth,1,-width+2,handler,i,chunkX,chunkZ,chunkCreating );
 							}
 							i++;
@@ -87,7 +97,6 @@ public class CubeGen extends Thread{
 					handler.addChunk(chunkCreating);
 					chunkQueue.remove(0);
 					index-=2;
-					
 				}
 			}
 			try {
@@ -110,10 +119,18 @@ public class CubeGen extends Thread{
 			}
 		}return false;
 	}public int farthestDepth(int i, int maxDepth) {
+//		int left, right;
 		if (currentChunk.get(i) == 0) {
 			return 0;
 		}
 		int depth = 1;
+//		if (currentChunk.size() > i+1 && i > 0) {
+//			left = currentChunk.get(i-1);
+//			right = currentChunk.get(i+1);
+//		}else {
+//			return 0;
+//		}
+//		while (depth < maxDepth && i > 0 && currentChunk.size() > i+16 && currentChunk.get(i+16) != 0 && currentChunk.get(i+1) == left && currentChunk.get(i-1) == right && !valueIn(removedBlocks,i+1) && (int) Math.floor(i/256.0) == (int) Math.floor((i+16)/256.0) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
 		while (depth < maxDepth && currentChunk.size() > i+16 && currentChunk.get(i+16) != 0 && !valueIn(removedBlocks,i+1) && (int) Math.floor(i/256.0) == (int) Math.floor((i+16)/256.0) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
 			removedBlocks.add(i+16);
 			i+=16;

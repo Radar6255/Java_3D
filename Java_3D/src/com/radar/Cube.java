@@ -64,6 +64,9 @@ public class Cube extends CubeObject{
 		if (w == 1 && d == 1) {
 			renderUpdate();
 		}
+//		else {
+//			combinedCubeUpdate();
+//		}
 		
 	}
 	public void render(Graphics g, double px, double py, double pz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
@@ -104,6 +107,7 @@ public class Cube extends CubeObject{
 		if ((bound > lowerBound && bound < upperBound) || (bound > lowerBound+360 && bound < upperBound+360) || (bound > lowerBound-360 && bound < upperBound-360)){
 			renderBlock = true;
 		}
+//		if (renderBlock || w!=1 || d!=1){
 		if (renderBlock){
 			//Loop through all vertices to find which is farthest from player
 			//pointsRemoved = new int[8];
@@ -136,12 +140,11 @@ public class Cube extends CubeObject{
 				
 				points3D[i][0] = tx;
 				points3D[i][1] = ty;
-				points3D[i][2] = tz;
 				
 				
 				//Calculates distance from player to vertex
 				//TODO This may lower performance so find a way to remove nicely
-				dist = Math.sqrt(Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2));
+//				dist = Math.sqrt(Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2));
 				//Rotates points so that player appears to look around
 				point = rotate2D(tx, tz, sl,cl);
 				tx = point[0];
@@ -150,7 +153,9 @@ public class Cube extends CubeObject{
 				point = rotate2D(ty, tz, sv,cv);
 				ty = point[0];
 				tz = point[1];
-				
+				points3D[i][2] = -tz;
+				//TODO Double check visual bugs
+				dist = -tz;
 				//Calculates field of view taking into account divide by zero errors
 				if (tz != 0) {
 					f = fov / tz;
@@ -193,6 +198,7 @@ public class Cube extends CubeObject{
 						}
 						i++;
 					}//If face doesn't have the farthest point then try to render it
+//					if (!hasFar  || w!=1 || d!=1) {
 					if (!hasFar) {
 						//Add points to array to send with BlockFace for rendering
 						xCoords[0] = points[face[0]][0];
@@ -225,149 +231,28 @@ public class Cube extends CubeObject{
 						zCoords[1] = points[face[1]][2];
 						zCoords[2] = points[face[2]][2];
 						zCoords[3] = points[face[3]][2];
+//						if (visible || w!=1 || d!=1){
 						if (visible){
 						//Finds which face it is and what color it should be by index
-							back = false;
-							front = false;
-							lside = false;
-							rside = false;
-							up = false;
-							down = false;
+							//Distance calculated to closest point on face not center of the face
 							
-							if (face[4] == 0) {
-								back = true;
-							}else if (face[4] == 1) {
-								front = true;
-							}else if (face[4] == 2) {
-								rside = true;
-							}else if (face[4] == 3) {
-								lside = true;
-							}else if (face[4] == 4) {
-								down = true;
-							}else if (face[4] == 5) {
-								up = true;
-							}
-	//						g.fillOval((int) ((tx * f) + (Main.WIDTH / 2) - 2), (int) ((ty * f) + (Main.HEIGHT) - 2), 4, 4);
-							//Calculates distance to the center point of face
-							//Distance should be calculated to closest point on face not center of the face
-							
-							//This should be the 3D points of the face
-							pointsX[0] = points3D[face[0]][0];
-							pointsY[0] = points3D[face[0]][1];
 							pointsZ[0] = points3D[face[0]][2];
-							
-							pointsX[1] = points3D[face[1]][0];
-							pointsY[1] = points3D[face[1]][1];
 							pointsZ[1] = points3D[face[1]][2];
-							
-							pointsX[2] = points3D[face[2]][0];
-							pointsY[2] = points3D[face[2]][1];
 							pointsZ[2] = points3D[face[2]][2];
-							
-							pointsX[3] = points3D[face[3]][0];
-							pointsY[3] = points3D[face[3]][1];
 							pointsZ[3] = points3D[face[3]][2];
 							
-							tx = pointsX[0];
-							ty = pointsY[0];
-							tz = pointsZ[0];
-							//Debug proof the values are of the 3D points
-	//						for(i=0;i < 4;i++){
-	//							System.out.println(pointsX[i]+" "+pointsY[i]+" "+pointsZ[i]);
-	//						}
-							
-							if (pointsX[0] < 0 || pointsX[1] < 0 || pointsX[2] < 0 || pointsX[3] < 0){ //If any point is left of the player
-								for(i=0;i < 4;i++){
-									if (tx < pointsX[i]){ //Find left most point in cube
-										tx = pointsX[i];
-									}
-								}
-							}
-							if (pointsY[0] < 0 || pointsY[1] < 0 || pointsY[2] < 0 || pointsY[3] < 0){ //If any point is below the player
-								for(i=0;i < 4;i++){
-									if (ty < pointsY[i]){
-										ty = pointsY[i];
-									}
-								}
-							}
-							if (pointsZ[0] < 0 || pointsZ[1] < 0 || pointsZ[2] < 0 || pointsZ[3] < 0){
-								for(i=0;i < 4;i++){
-									if (tz < pointsZ[i]){
-										tz = pointsZ[i];
-									}
-								}
-							}
-							
-							//Right side of cube... These are very relative terms
-							if (pointsX[0] > 0 || pointsX[1] > 0 || pointsX[2] > 0 || pointsX[3] > 0){
-								for(i=0;i < 4;i++){
-									if (tx > pointsX[i]){
-										tx = pointsX[i];
-									}
-								}
-							}
-							if (pointsY[0] > 0 || pointsY[1] > 0 || pointsY[2] > 0 || pointsY[3] > 0){
-								for(i=0;i < 4;i++){
-									if (ty > pointsY[i]){
-										ty = pointsY[i];
-									}
-								}
-							}
-							if (pointsZ[0] > 0 || pointsZ[1] > 0 || pointsZ[2] > 0 || pointsZ[3] > 0){
-								for(i=0;i < 4;i++){
-									if (tz > pointsZ[i]){
-										tz = pointsZ[i];
-									}
-								}
-							}
-							if (px > x && x+w > px && !lside && !rside){
-								tx = 0;
-							}if (py+1 > y && y+h > py+1 && !up && !down){
-								ty = 0;
-							}if (pz > z && z+d > pz && !back && !front){
-								tz = 0;
-							}
 							//Sending blockface to be rendered at the chunk
-							dist = (float) Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2);
-							//Making a block face for each cube doesn't seem to affect performance much so I'll keep it to use for the raster
+							//Making a block face for each cube doesn't seem to affect performance much
+							dist = 0;
+							for (float testz:pointsZ) {
+								dist+=testz;
+							}
 							tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, faceColors[face[4]],cubeIndex);
-							chunk.addFace(tempFace);
-							
-//							renderFaces.add(tempFace);
-//							facesRender[count] = face;
-//							colorFace[count] = faceColor;
-//							count++;
-							
-//							g.setColor(faceColor);
-//							g.fillPolygon(xCoords, yCoords, 4);
-							
+							chunk.addFace(tempFace);	
 						}
-						//renderFaces[index] = new BlockFace(xCoords, yCoords, face, dist, faceColor, visible,cubeIndex);
 					}
 				}
 			}
-			//Code for rendering by faces then cubes
-//			renderFaces.sort(new sortFaces());
-//			i = 0;
-////			for (int[] face:facesRender){
-//			while(i < count){
-////				face = facesRender[count];
-//				if (facesRender[count] != null){
-//					xCoords[0] = points[facesRender[count][0]][0];
-//					xCoords[1] = points[facesRender[count][1]][0];
-//					xCoords[2] = points[facesRender[count][2]][0];
-//					xCoords[3] = points[facesRender[count][3]][0];
-//	
-//					yCoords[0] = points[facesRender[count][0]][1];
-//					yCoords[1] = points[facesRender[count][1]][1];
-//					yCoords[2] = points[facesRender[count][2]][1];
-//					yCoords[3] = points[facesRender[count][3]][1];
-//					g.setColor(colorFace[count]);
-//					// Face polygon
-//					g.fillPolygon(xCoords, yCoords, 4);
-//				}
-//				i++;
-//			}
 			
 			}
 		}
@@ -402,9 +287,75 @@ public class Cube extends CubeObject{
 			}
 		}
 		return false;
+	}public void combinedCubeUpdate() {
+		
+		xOff= handler.getXOff();
+		zOff= handler.getZOff();
+		chunkData = handler.getWorld().get(pcx+xOff).get(pcz+zOff);
+		chunkMax = chunkData.size();
+		int xPos = 0;
+		int yPos = d;
+		for (int[] face : faces){
+			face[5] = 0;
+		}
+//		System.out.println("w: "+w+" d: "+d);
+		while (xPos <= w) {
+			while (yPos < 2) {
+				int count = 0;
+//				System.out.println("xPos:"+xPos+" yPos:"+yPos);
+				int testPos = cubeIndex - yPos - (16*xPos);
+//				System.out.println(cubeIndex);
+				for (int[] face : faces){
+					visible = true;
+					//Blue Side
+					if (face[5] == 1) {continue;}
+					else if (count == 0 && testPos+1 < chunkMax && (testPos+1) % 16 != 0 && chunkData.get(testPos+1) == 1){
+						visible = false;
+					}
+					//Red Side
+					else if (count == 1 && testPos-1 >= 0 && testPos% 16 != 0 && chunkData.get(testPos-1) == 1){
+						visible = false;
+					}
+					//Green Side
+					else if (count == 2 && testPos+16 < chunkMax && ((testPos+16) % 256 < 0 || (testPos+16) % 256 > 15) && chunkData.get(testPos+16) == 1){
+						visible = false;
+					}
+					//Orange Side
+					else if (count == 3 && testPos-16 >= 0 && (testPos % 256 < 0 || testPos % 256 > 15) && chunkData.get(testPos-16) == 1){
+						visible = false;
+					}
+					//Yellow Side
+					else if (count == 4 && testPos-256 >= 0 && chunkData.get(testPos-256) == 1){
+						visible = false;
+					}
+					//Light Blue Side
+					else if (count == 5 && testPos+256 < chunkMax && chunkData.get(testPos+256) == 1){
+						visible = false;
+					}else {
+						visible = true;
+					}
+					//Adjacent Chunk Blue Side
+//					else if (count == 0 && chunkPosX != null) {// && cubeIndex < handler.getWorld().get(pcx+xOff+1).get(pcz+zOff).size() //&& handler.getWorld().get(pcx+xOff+1).get(pcz+zOff).get(cubeIndex) == 1) {
+//						visible = false;
+//					}
+					
+					
+					if (visible){
+						face[5] = 1;
+					}else{
+						face[5] = 0;
+					}
+					count++;
+				}
+				yPos++;
+			}
+			xPos++;
+		}
 	}
-	//Code to cull the faces next to each other that would be overwritten anyways
 	public void renderUpdate(){
+		/**
+		 * Code to cull the faces next to each other that would be overwritten anyways
+		 */
 		xOff= handler.getXOff();
 		zOff= handler.getZOff();
 		chunkData = handler.getWorld().get(pcx+xOff).get(pcz+zOff);
@@ -420,16 +371,16 @@ public class Cube extends CubeObject{
 			
 			visible = true;
 			//Blue Side
-			if (count == 0 && cubeIndex+1 < chunkMax && (cubeIndex+1) % 16 != 0 && chunkData.get(cubeIndex+1) == 1){
+			if (count == 0 && cubeIndex+1 < chunkMax && (cubeIndex+1) % 16 != 0 && chunkData.get(cubeIndex+1) == 1 && d == 1){
 				visible = false;
 			}
 			//Red Side
-			else if (count == 1 && cubeIndex-1 >= 0 && cubeIndex% 16 != 0 && chunkData.get(cubeIndex-1) == 1){
+			else if (count == 1 && cubeIndex-1 >= 0 && cubeIndex% 16 != 0 && chunkData.get(cubeIndex-1) == 1 && d == 1){
 				visible = false;
 			}
 			
 			//Green Side
-			else if (count == 2 && cubeIndex+16 < chunkMax && ((cubeIndex+16) % 256 < 0 || (cubeIndex+16) % 256 > 15) && chunkData.get(cubeIndex+16) == 1){
+			else if (count == 2 && cubeIndex+16 < chunkMax && ((cubeIndex+16) % 256 < 0 || (cubeIndex+16) % 256 > 15) && chunkData.get(cubeIndex+16) == 1 && w == 1){
 				visible = false;
 			}
 			//Orange Side
@@ -457,7 +408,7 @@ public class Cube extends CubeObject{
 				face[5] = 0;
 			}
 			count++;
-		}//chunkData.clear();
+		}
 	}
 	//Code used from DLC Energy now changed a bit
 	private float[] rotate2D(float x, float y, double s,double c) {
