@@ -31,8 +31,8 @@ public class CubeGen extends Thread{
 	boolean combined = true;
 	
 	public volatile boolean running = true;
-//	int width,depth,tx,left,right = 0;
-	int width,depth,tx = 0;
+	int width,depth,tx,left,right = 0;
+//	int width,depth,tx = 0;
 	public void run(){
 		while(running){
 //			System.out.println("Resumed");
@@ -55,18 +55,19 @@ public class CubeGen extends Thread{
 									cubeColors = faceColorsS;
 								}
 								depth = farthestDepth(i,16);
-								
-								while (depth > 1 && farthestDepth(i+1,depth) == depth && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
+								if (depth == 1 && currentChunk.size() > i+16 && i > 16) {
+									left = currentChunk.get(i+16);
+									right = currentChunk.get(i-16);
+								}else if (i > 16){
+									left = currentChunk.get(i-16);
+								}
+								while (depth > 1 && i > 16 && currentChunk.get(i-15) == left && farthestDepth(i+1,depth) == depth && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
 									width++;
 									i++;
 //									cubeColors = faceColorsS2;
 								}
-//								if (depth == 1 && currentChunk.size() > i+16 && i > 16) {
-//									left = currentChunk.get(i+16);
-//									right = currentChunk.get(i-16);
-//								}
-//								while (depth == 1 && i > 16 && currentChunk.size() > i+16 && currentChunk.get(i+16) == left && currentChunk.get(i+16) == right && currentChunk.get(i+1) != 0 && !valueIn(removedBlocks,i+1) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
-								while (depth == 1 && currentChunk.size() > i+1 && currentChunk.get(i+1) != 0 && !valueIn(removedBlocks,i+1) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
+								while (depth == 1 && i > 16 && currentChunk.size() > i+16 && currentChunk.get(i+17) == left && currentChunk.get(i-15) == right && currentChunk.get(i+1) != 0 && !valueIn(removedBlocks,i+1) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
+//								while (depth == 1 && currentChunk.size() > i+1 && currentChunk.get(i+1) != 0 && !valueIn(removedBlocks,i+1) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
 									width++;
 									i++;
 //									cubeColors = faceColorsS2;
@@ -75,7 +76,7 @@ public class CubeGen extends Thread{
 //									cubeColors = faceColorsS2;
 //								}
 //								System.out.println(i);
-//								cubeColors = testColors;
+								cubeColors = testColors;
 								new Cube(cubeColors, (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ),depth,1,-width+2,handler,i,chunkX,chunkZ,chunkCreating );
 							}
 							i++;
@@ -119,19 +120,16 @@ public class CubeGen extends Thread{
 			}
 		}return false;
 	}public int farthestDepth(int i, int maxDepth) {
-//		int left, right;
-		if (currentChunk.get(i) == 0) {
+		int left, right;
+		int depth = 1;
+		if (currentChunk.size() > i+1 && i > 0 && currentChunk.get(i) != 0) {
+			left = currentChunk.get(i-1);
+			right = currentChunk.get(i+1);
+		}else {
 			return 0;
 		}
-		int depth = 1;
-//		if (currentChunk.size() > i+1 && i > 0) {
-//			left = currentChunk.get(i-1);
-//			right = currentChunk.get(i+1);
-//		}else {
-//			return 0;
-//		}
-//		while (depth < maxDepth && i > 0 && currentChunk.size() > i+16 && currentChunk.get(i+16) != 0 && currentChunk.get(i+1) == left && currentChunk.get(i-1) == right && !valueIn(removedBlocks,i+1) && (int) Math.floor(i/256.0) == (int) Math.floor((i+16)/256.0) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
-		while (depth < maxDepth && currentChunk.size() > i+16 && currentChunk.get(i+16) != 0 && !valueIn(removedBlocks,i+1) && (int) Math.floor(i/256.0) == (int) Math.floor((i+16)/256.0) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
+		while (depth < maxDepth && currentChunk.size() > i+17 && currentChunk.get(i+16) != 0 && currentChunk.get(i+15) == left && currentChunk.get(i+17) == right && !valueIn(removedBlocks,i+1) && (int) Math.floor(i/256.0) == (int) Math.floor((i+16)/256.0) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
+//		while (depth < maxDepth && currentChunk.size() > i+16 && currentChunk.get(i+16) != 0 && !valueIn(removedBlocks,i+1) && (int) Math.floor(i/256.0) == (int) Math.floor((i+16)/256.0) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
 			removedBlocks.add(i+16);
 			i+=16;
 			depth++;

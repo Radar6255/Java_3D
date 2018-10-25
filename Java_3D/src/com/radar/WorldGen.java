@@ -82,6 +82,7 @@ public class WorldGen{
 //								}
 //								ty = (int) Math.sqrt(Math.pow((tx)+(16*(chunkZ+iz)),2) + Math.pow((tz)+(16*(chunkX+ix)),2));
 								if (ty == h){
+//								if (h == 0) {
 									if (ty < 10) {
 										world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(2);
 									}else {

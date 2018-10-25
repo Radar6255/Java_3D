@@ -61,9 +61,9 @@ public class Cube extends CubeObject{
 		}
 		
 		chunk.addCube(this,x,y,z);
-		if (w == 1 && d == 1) {
+//		if (w == 1 && d == 1) {
 			renderUpdate();
-		}
+//		}
 //		else {
 //			combinedCubeUpdate();
 //		}

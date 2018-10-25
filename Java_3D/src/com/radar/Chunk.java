@@ -118,7 +118,12 @@ public class Chunk {
 					g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
 					if (debug){
 						g.setColor(Color.BLACK);
-						g.drawString(""+face.getDist(),face.getXCoords()[1],face.getYCoords()[1]);
+						g.fillOval(face.getXCoords()[0],face.getYCoords()[0], 4, 4);
+						g.fillOval(face.getXCoords()[1],face.getYCoords()[1], 4, 4);
+						g.fillOval(face.getXCoords()[2],face.getYCoords()[2], 4, 4);
+						g.fillOval(face.getXCoords()[3],face.getYCoords()[3], 4, 4);
+						
+//						g.drawString(""+face.getDist(),face.getXCoords()[1],face.getYCoords()[1]);
 	//					g.drawString(""+face.getX(),face.getXCoords()[0],face.getYCoords()[0]);
 					}
 				}
