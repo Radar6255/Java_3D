@@ -21,7 +21,7 @@ public class Player {
 	public PointerInfo mouseLoc;
 	public Point tempPoint;
 	
-	public double rate = 0.4;
+	public double rate = 0.6;
 	public int fov = 70;
 	
 	public Player(double x,double y,double z,double rotLat,double rotVert){
@@ -43,7 +43,7 @@ public class Player {
 		chunkY = (int) y;
 		chunkZ = (int) Math.floor(z/16);
 		if (!Main.pause){
-			//TODO Errored
+			//TODO Threw Error once
 			mouseLoc = MouseInfo.getPointerInfo();
 			
 			tempPoint = mouseLoc.getLocation();

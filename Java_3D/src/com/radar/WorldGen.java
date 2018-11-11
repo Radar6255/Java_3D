@@ -17,12 +17,12 @@ public class WorldGen{
 		world2.add(new ArrayList<ArrayList<Integer>>());
 		world2.get(0).add(new ArrayList<Integer>());
 		//TODO
-//		i = 0;
-//		while(i < 50){
-//			world.get(0).get(0).add(1);
+		i = 0;
+//		while(i < 256){
+//			world2.get(0).get(0).add(1);
 //			i++;
 //		}
-		i = 0;
+//		i = 0;
 	}
 	public void tick(){
 //		while (!debug){
@@ -73,7 +73,6 @@ public class WorldGen{
 //								Rotate ty = (int) Math.round(0.4*(Math.pow(((16-tx)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((tz)+(16*(chunkZ+iz)))*0.2, 2))); 90 degrees
 //								ty = (int) Math.round(0.4*(Math.pow(((tz)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((tx)+(16*(chunkZ+iz)))*0.2, 2)));
 //								ty = (int) Math.round(Math.pow((0.16-Math.pow((0.6-Math.pow((Math.pow(((tz)+(16*(chunkX+ix)))*0.04,2)+Math.pow(((tx)+(16*(chunkZ+iz)))*0.04,2)),0.5)),2)),0.5)*20);
-								//TODO
 //								ty = (int) ((Math.sin(((tz)+(16*(chunkX+ix)))*0.2)*Math.cos(((tx)+(16*(chunkZ+iz)))*0.2))*5.0)+10;
 								ty = (int) (18*(noise(((tx)+(16*(chunkZ+iz)))/80.0,(((tz)+(16*(chunkX+ix)))/80.0))+1));
 //								System.out.println((10*(Value2D(((tx)+(16*(chunkZ+iz))),((tz)+(16*(chunkX+ix))),8)+1)));
@@ -82,6 +81,7 @@ public class WorldGen{
 //								}
 //								ty = (int) Math.sqrt(Math.pow((tx)+(16*(chunkZ+iz)),2) + Math.pow((tz)+(16*(chunkX+ix)),2));
 								if (ty == h){
+//								if (h == 1) {
 									if (ty < 10) {
 										world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(2);
 									}else {

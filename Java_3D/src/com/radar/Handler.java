@@ -114,11 +114,11 @@ public class Handler {
 			
 		}
 		ix++;
-		if (ix == 3){
-			ix = -2;
+		if (ix == 5){
+			ix = -4;
 			iz++;
-		}if (iz == 3){
-			iz = -2;
+		}if (iz == 5){
+			iz = -4;
 		}
 		renderChunks.sort(new chunkCompare());
 

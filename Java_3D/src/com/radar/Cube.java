@@ -64,9 +64,9 @@ public class Cube extends CubeObject{
 		if (w == 1 && d == 1) {
 			renderUpdate();
 		}
-//		else {
-//			combinedCubeUpdate();
-//		}
+		else {
+			combinedCubeUpdate();
+		}
 		
 	}
 	public void render(Graphics g, double px, double py, double pz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
@@ -293,45 +293,47 @@ public class Cube extends CubeObject{
 		zOff= handler.getZOff();
 		chunkData = handler.getWorld().get(pcx+xOff).get(pcz+zOff);
 		chunkMax = chunkData.size();
+		//axis x == width
 		int xPos = 0;
-		int yPos = d;
+		int yPos = d-1;
 		for (int[] face : faces){
 			face[5] = 0;
 		}
 //		System.out.println("w: "+w+" d: "+d);
 		while (xPos <= w) {
-			while (yPos < 2) {
+			while (yPos <= 1) {
 				int count = 0;
 //				System.out.println("xPos:"+xPos+" yPos:"+yPos);
-				int testPos = cubeIndex - yPos - (16*xPos);
-//				System.out.println(cubeIndex);
+				int testPos = cubeIndex + yPos - (16*(xPos-2));
+//				System.out.println(testPos);
 				for (int[] face : faces){
 					visible = true;
 					//Blue Side
 					if (face[5] == 1) {continue;}
-					else if (count == 0 && testPos+1 < chunkMax && (testPos+1) % 16 != 0 && chunkData.get(testPos+1) == 1){
+					else if (count == 0 && testPos+1 < chunkMax && (testPos+1) % 16 != 0 && chunkData.get(testPos+1) != 0){
 						visible = false;
 					}
 					//Red Side
-					else if (count == 1 && testPos-1 >= 0 && testPos% 16 != 0 && chunkData.get(testPos-1) == 1){
+					else if (count == 1 && testPos-1 >= 0 && testPos% 16 != 0 && chunkData.get(testPos-1) != 0){
 						visible = false;
 					}
 					//Green Side
-					else if (count == 2 && testPos+16 < chunkMax && ((testPos+16) % 256 < 0 || (testPos+16) % 256 > 15) && chunkData.get(testPos+16) == 1){
+					else if (count == 2 && testPos+16 < chunkMax && ((testPos+16) % 256 < 0 || (testPos+16) % 256 > 15) && chunkData.get(testPos+16) != 0){
 						visible = false;
 					}
 					//Orange Side
-					else if (count == 3 && testPos-16 >= 0 && (testPos % 256 < 0 || testPos % 256 > 15) && chunkData.get(testPos-16) == 1){
+					else if (count == 3 && testPos-16 >= 0 && (testPos % 256 < 0 || testPos % 256 > 15) && chunkData.get(testPos-16) != 0){
 						visible = false;
 					}
 					//Yellow Side
-					else if (count == 4 && testPos-256 >= 0 && chunkData.get(testPos-256) == 1){
+					else if (count == 4 && testPos-256 >= 0 && chunkData.get(testPos-256) != 0){
 						visible = false;
 					}
 					//Light Blue Side
-					else if (count == 5 && testPos+256 < chunkMax && chunkData.get(testPos+256) == 1){
+					else if (count == 5 && testPos+256 < chunkMax && chunkData.get(testPos+256) != 0){
 						visible = false;
-					}else {
+					}
+					else {
 						visible = true;
 					}
 					//Adjacent Chunk Blue Side
@@ -349,8 +351,14 @@ public class Cube extends CubeObject{
 				}
 				yPos++;
 			}
+			yPos = d-1;
 			xPos++;
 		}
+//		for (int[] face : faces){
+//			if (face[5] == 0) {
+//				System.out.println("It worked");
+//			}
+//		}
 	}
 	public void renderUpdate(){
 		/**
@@ -371,29 +379,29 @@ public class Cube extends CubeObject{
 			
 			visible = true;
 			//Blue Side
-			if (count == 0 && cubeIndex+1 < chunkMax && (cubeIndex+1) % 16 != 0 && chunkData.get(cubeIndex+1) == 1 && d == 1){
+			if (count == 0 && cubeIndex+1 < chunkMax && (cubeIndex+1) % 16 != 0 && chunkData.get(cubeIndex+1) != 0 && d == 1){
 				visible = false;
 			}
 			//Red Side
-			else if (count == 1 && cubeIndex-1 >= 0 && cubeIndex% 16 != 0 && chunkData.get(cubeIndex-1) == 1 && d == 1){
+			else if (count == 1 && cubeIndex-1 >= 0 && cubeIndex% 16 != 0 && chunkData.get(cubeIndex-1) != 0 && d == 1){
 				visible = false;
 			}
 			
 			//Green Side
-			else if (count == 2 && cubeIndex+16 < chunkMax && ((cubeIndex+16) % 256 < 0 || (cubeIndex+16) % 256 > 15) && chunkData.get(cubeIndex+16) == 1 && w == 1){
+			else if (count == 2 && cubeIndex+16 < chunkMax && ((cubeIndex+16) % 256 < 0 || (cubeIndex+16) % 256 > 15) && chunkData.get(cubeIndex+16) != 0 && w == 1){
 				visible = false;
 			}
 			//Orange Side
-			else if (count == 3 && cubeIndex-16 >= 0 && (cubeIndex % 256 < 0 || cubeIndex % 256 > 15) && chunkData.get(cubeIndex-16) == 1){
+			else if (count == 3 && cubeIndex-16 >= 0 && (cubeIndex % 256 < 0 || cubeIndex % 256 > 15) && chunkData.get(cubeIndex-16) != 0){
 				visible = false;
 			}
 			
 			//Yellow Side
-			else if (count == 4 && cubeIndex-256 >= 0 && chunkData.get(cubeIndex-256) == 1){
+			else if (count == 4 && cubeIndex-256 >= 0 && chunkData.get(cubeIndex-256) != 0){
 				visible = false;
 			}
 			//Light Blue Side
-			else if (count == 5 && cubeIndex+256 < chunkMax && chunkData.get(cubeIndex+256) == 1){
+			else if (count == 5 && cubeIndex+256 < chunkMax && chunkData.get(cubeIndex+256) != 0){
 				visible = false;
 			}
 			//Adjacent Chunk Blue Side

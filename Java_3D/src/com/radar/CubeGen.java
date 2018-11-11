@@ -16,7 +16,7 @@ public class CubeGen extends Thread{
 	boolean go = true;
 	Player[] players;
 	private Handler handler;
-	Color[] faceColors = {Color.GREEN, Color.GREEN,Color.GREEN,Color.GREEN,Color.GREEN, new Color(0,132,0)};
+	Color[] faceColors = {new Color(0,162,0), new Color(0,162,0),new Color(0,162,0),new Color(0,162,0),Color.GREEN, new Color(0,132,0)};
 	Color[] faceColorsS = {Color.gray, Color.gray,Color.gray,Color.gray,Color.gray, Color.darkGray};
 	Color[] faceColorsS2 = {new Color(109, 100, 37), new Color(109, 100, 37),new Color(109, 100, 37),new Color(109, 100, 37),new Color(160, 147, 57), new Color(160, 147, 57)};
 	Color[] testColors = {Color.BLUE, Color.RED, Color.GREEN, Color.ORANGE, Color.YELLOW,Color.CYAN};
@@ -44,19 +44,24 @@ public class CubeGen extends Thread{
 					chunkX = chunkPos.get(0);
 					chunkZ = chunkPos.get(1);
 					chunkCreating = new Chunk(chunkX, chunkZ, players[0],handler, renderThread1);
-					//TODO rewrite to use for loop instead of get i which is very slow
 					if (combined){
 						while(i < currentChunk.size()){
 							if (currentChunk.get(i) != 0 && !valueIn(removedBlocks,i)) {
-								width = 1;
 								if (currentChunk.get(i) == 1) {
 									cubeColors = faceColors;
 								}else {
 									cubeColors = faceColorsS;
 								}
+//								cubeColors = faceColorsS;
+								width = 1;
 								depth = farthestDepth(i,16);
-								
-								while (depth > 1 && farthestDepth(i+1,depth) == depth && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
+								removedDepth(depth, i);
+//								if(depth > 1) {
+//									System.out.println(depth);
+//								}
+								// && (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0) == (int) Math.floor((((i+2)/256.0)-Math.floor((i+2)/256.0))*16.0)
+								while (depth > 1 && farthestDepth(i+1,depth) == depth) {
+									removedDepth(depth,i+1);
 									width++;
 									i++;
 //									cubeColors = faceColorsS2;
@@ -69,8 +74,12 @@ public class CubeGen extends Thread{
 								while (depth == 1 && currentChunk.size() > i+1 && currentChunk.get(i+1) != 0 && !valueIn(removedBlocks,i+1) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
 									width++;
 									i++;
+//									cubeColors = faceColors;
 //									cubeColors = faceColorsS2;
 								}
+//								if (valueIn(removedBlocks,i+1)) {
+//									System.out.println(depth+" "+width);
+//								}
 //								if (depth > 1) {
 //									cubeColors = faceColorsS2;
 //								}
@@ -118,24 +127,39 @@ public class CubeGen extends Thread{
 				return true;
 			}
 		}return false;
-	}public int farthestDepth(int i, int maxDepth) {
-//		int left, right;
-		if (currentChunk.get(i) == 0) {
-			return 0;
+	}
+	public void removedDepth(int depth, int i) {
+		while (depth > 0) {
+			removedBlocks.add(i);
+			i+=16;
+			depth--;
 		}
-		int depth = 1;
+	}
+	public int farthestDepth(int i, int maxDepth) {
+//		int left, right;
+//		if (currentChunk.get(i) == 0) {
+//			return 0;
+//		}
+		int orig = i;
+		int depth = 0;
 //		if (currentChunk.size() > i+1 && i > 0) {
 //			left = currentChunk.get(i-1);
 //			right = currentChunk.get(i+1);
 //		}else {
 //			return 0;
 //		}
-//		while (depth < maxDepth && i > 0 && currentChunk.size() > i+16 && currentChunk.get(i+16) != 0 && currentChunk.get(i+1) == left && currentChunk.get(i-1) == right && !valueIn(removedBlocks,i+1) && (int) Math.floor(i/256.0) == (int) Math.floor((i+16)/256.0) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
-		while (depth < maxDepth && currentChunk.size() > i+16 && currentChunk.get(i+16) != 0 && !valueIn(removedBlocks,i+1) && (int) Math.floor(i/256.0) == (int) Math.floor((i+16)/256.0) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+1)/256.0)-Math.floor((i+1)/256.0))*16.0)) {
-			removedBlocks.add(i+16);
+//		while (depth < maxDepth && i > 0 && currentChunk.size() > i+16 && currentChunk.get(i+16) != 0 && currentChunk.get(i+1) == left && currentChunk.get(i-1) == right && !valueIn(removedBlocks,i+1) && (int) Math.floor(i/256.0) == (int) Math.floor((i+16)/256.0) && (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) == (int) Math.floor((((i+16)/256.0)-Math.floor((i+16)/256.0))*16.0)) {
+//		while (depth <= maxDepth && currentChunk.size() > i+16 && currentChunk.get(i+16) != 0 && (int) (((i/16.0)-Math.floor(i/16.0))*16.0) == (int) ((((i+16)/16.0)-Math.floor((i+16)/16.0))*16.0) && (int) Math.floor(i/256.0) == (int) Math.floor((i+16)/256.0)) {
+		while (depth <= maxDepth && currentChunk.size() > i && currentChunk.get(i) != 0 && !valueIn(removedBlocks,i) && (int) (((i/16.0)-Math.floor(i/16.0))*16.0) == (int) ((((i-16)/16.0)-Math.floor((i-16)/16.0))*16.0) && ((int) Math.floor(i/256.0) == (int) Math.floor((i-16)/256.0) || i == orig)) {
+//			removedBlocks.add(i);
 			i+=16;
 			depth++;
-		}return depth;
+		}
+//		if (depth > 1) {
+//			System.out.println(depth);
+//		}
+		//TODO Print what is making it stopping the loop
+		return depth;
 	}
 }
 
