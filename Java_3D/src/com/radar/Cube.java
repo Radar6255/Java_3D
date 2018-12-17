@@ -1,21 +1,22 @@
 package com.radar;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.LinkedList;
 public class Cube extends CubeObject{
 	public int x, y, z, w, h, d, i, fov, far,pfov, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax, height, width;
 	public float tx, ty, tz;
-	public double f, f2, px, py, pz, rotLat, rotVert, dist, ldist, dist2,sl,cl,sv,cv, bound;
-	public boolean hasFar,debug = false;
+	
+	
+	//px, py, pz
+	public double f, f2, rotLat, rotVert, dist, ldist, dist2, bound;
+	public boolean hasFar,debug,place = false;
 	public Color[] faceColors = new Color[6];
 	public boolean visible, changed, looping, render,repeat,renderBlock,right,left,up,down,lside,rside,back,front;
 	ArrayList<Integer> chunkData = new ArrayList<Integer>();
-	LinkedList<Integer> chunkPosX = new LinkedList<Integer>();
-	LinkedList<Integer> chunkNegX = new LinkedList<Integer>();
-	LinkedList<Integer> chunkPosY = new LinkedList<Integer>();
-	LinkedList<Integer> chunkNegY = new LinkedList<Integer>();
+//	LinkedList<Integer> chunkPosX = new LinkedList<Integer>();
+//	LinkedList<Integer> chunkNegX = new LinkedList<Integer>();
+//	LinkedList<Integer> chunkPosY = new LinkedList<Integer>();
+//	LinkedList<Integer> chunkNegY = new LinkedList<Integer>();
 	private Handler handler;
 	Chunk chunk;
 	
@@ -69,7 +70,7 @@ public class Cube extends CubeObject{
 		}
 		
 	}
-	public void render(Graphics g, double px, double py, double pz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
+	public void render(double relx, double rely, double relz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
 		//Uncomment to run on main thread, else it runs on the cubeGen thread
 //		if (first){
 //			renderUpdate();
@@ -80,25 +81,26 @@ public class Cube extends CubeObject{
 		//Need to get viewing angle and use it to make V in which cubes should be rendered
 //		renderBlock = true;
 		renderBlock = false;
-//		System.out.println("Start");
 		//TODO Push the V backwards from players perspective, need to use sin + cos to find where the bottom of the v starts
 		lowerBound = (360 - rotLat) - 60;
 		upperBound = (360 - rotLat) + 60;
 		
-		if ((x-px) == 0){
-			bound = Math.toDegrees(Math.atan(z-pz));
+		if ((relx) == 0){
+			bound = Math.toDegrees(Math.atan(relz));
+			//System.out.println(z-pz);
 		}else{
-			bound = Math.toDegrees(Math.atan((z-pz)/(x-px)));
+			bound = Math.toDegrees(Math.atan((relz)/(relx)));
+			//System.out.println((z-pz)/(x-px));
 		}
 		
 		//2nd Quad
-		if((x-px) < 0 && (z-pz) > 0){
+		if((relx) < 0 && (relz) > 0){
 			bound = 180 + bound;
 		}//3rd Quad
-		else if((x-px) < 0 && (z-pz) < 0){
+		else if((relx) < 0 && (relz) < 0){
 			bound = 180 + bound;
 		}//4th  Quad
-		else if((x-px) > 0 && (z-pz) < 0){
+		else if((relx) > 0 && (relz) < 0){
 			bound = 360 + bound;
 		}
 		
@@ -107,13 +109,10 @@ public class Cube extends CubeObject{
 		if ((bound > lowerBound && bound < upperBound) || (bound > lowerBound+360 && bound < upperBound+360) || (bound > lowerBound-360 && bound < upperBound-360)){
 			renderBlock = true;
 		}
-//		if (renderBlock || w!=1 || d!=1){
 		if (renderBlock){
 			//Loop through all vertices to find which is farthest from player
 			//pointsRemoved = new int[8];
 			i = 0;
-			ldist = 0;
-			dist2 = 0;
 			far = 0;
 			
 			for (float[] point : verts) {
@@ -134,17 +133,13 @@ public class Cube extends CubeObject{
 					tz = point[2];
 				}
 				
-				tx = (float) (tx + (x - px));
-				ty = (float) (ty + (y - py));
-				tz = (float) (tz + (z - pz));
+				tx = (float) (tx + (relx));
+				ty = (float) (ty + (rely));
+				tz = (float) (tz + (relz));
 				
 				points3D[i][0] = tx;
 				points3D[i][1] = ty;
 				
-				
-				//Calculates distance from player to vertex
-				//TODO This may lower performance so find a way to remove nicely
-//				dist = Math.sqrt(Math.pow(tz, 2) + Math.pow(tx, 2) + Math.pow(ty, 2));
 				//Rotates points so that player appears to look around
 				point = rotate2D(tx, tz, sl,cl);
 				tx = point[0];
@@ -153,10 +148,21 @@ public class Cube extends CubeObject{
 				point = rotate2D(ty, tz, sv,cv);
 				ty = point[0];
 				tz = point[1];
+				dist = -tz;
+//				if (tx > 0) {
+//					dist = -tz+(tx*0.2);
+//					faceColors[5] = Color.RED;
+//				}else {
+//					dist = -tz;
+//					faceColors[5] = Color.BLUE;
+//				}
+				
 				points3D[i][2] = -tz;
 				//TODO Double check visual bugs
-				dist = -tz;
-				//Calculates field of view taking into account divide by zero errors
+				if (i == 0) {
+					ldist = dist;
+				}
+				//Calculates field of view
 				if (tz != 0) {
 					f = fov / tz;
 				} else {
@@ -177,12 +183,11 @@ public class Cube extends CubeObject{
 				
 				//Finds point farthest from the player
 				if (ldist < dist) {
-					dist2 = far;
 					ldist = dist;
 					far = i;
 				}
 				i++;
-			}//System.out.println(i);
+			}
 			if (renderBlock){
 //			renderFaces = new LinkedList<BlockFace>();
 			for (int[] face : faces) {
@@ -198,7 +203,7 @@ public class Cube extends CubeObject{
 						}
 						i++;
 					}//If face doesn't have the farthest point then try to render it
-//					if (!hasFar  || w!=1 || d!=1) {
+					//TODO add ||true to render all faces instead of just 3
 					if (!hasFar) {
 						//Add points to array to send with BlockFace for rendering
 						xCoords[0] = points[face[0]][0];
@@ -218,8 +223,7 @@ public class Cube extends CubeObject{
 							if (xc > 0 && xc < width) {
 								visible = true;
 							}
-						}
-						if (visible) {
+						}if (visible) {
 							visible = false;
 							for (int yc : yCoords) {
 								if (yc > 0 && yc < height) {
@@ -231,24 +235,51 @@ public class Cube extends CubeObject{
 						zCoords[1] = points[face[1]][2];
 						zCoords[2] = points[face[2]][2];
 						zCoords[3] = points[face[3]][2];
-//						if (visible || w!=1 || d!=1){
 						if (visible){
-						//Finds which face it is and what color it should be by index
-							//Distance calculated to closest point on face not center of the face
+							//Distance calculated when getting 2d points
 							
 							pointsZ[0] = points3D[face[0]][2];
 							pointsZ[1] = points3D[face[1]][2];
 							pointsZ[2] = points3D[face[2]][2];
 							pointsZ[3] = points3D[face[3]][2];
 							
-							//Sending blockface to be rendered at the chunk
-							//Making a block face for each cube doesn't seem to affect performance much
+							//Sending block face to be rendered at the chunk
+							//Making a block face objects for each cube doesn't seem to affect performance much
 							dist = 0;
 							for (float testz:pointsZ) {
 								dist+=testz;
 							}
-							tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, faceColors[face[4]],cubeIndex);
-							chunk.addFace(tempFace);	
+							if (containsPoint(width/2,height/2,xCoords,yCoords)) {
+								if (place) {
+									if (face[4] == 0) {
+										z+=1;
+										d-=1;
+									}else if (face[4]==1) {
+										d-=1;
+									}else if (face[4]==2) {
+										w+=1;
+									}else if (face[4]==3) {
+										w+=1;
+										x-=1;
+									}else if (face[4]==4) {
+										h+=1;
+										y-=1;
+									}else {
+										h+=1;
+									}
+									tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, Color.red,cubeIndex);
+//									chunk.addFace(tempFace);
+									handler.addFace(tempFace);
+								}else {
+									tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, Color.RED,cubeIndex);
+									handler.addFace(tempFace);
+//									chunk.addFace(tempFace);
+								}
+							}else if (!place) {
+								tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, faceColors[face[4]],cubeIndex);
+//								chunk.addFace(tempFace);
+								handler.addFace(tempFace);
+							}
 						}
 					}
 				}
@@ -256,6 +287,7 @@ public class Cube extends CubeObject{
 			
 			}
 		}
+		place = false;
 	}
 	public void updateFov() {
 		width = handler.getWidth();
@@ -266,12 +298,130 @@ public class Cube extends CubeObject{
 			fov = height;
 		}
 	}
-	public double getDist() {
-		tx = (float) (x - px);
-		ty = (float) (y - py);
-		tz = (float) (z - pz);
-		return (Math.sqrt(Math.pow(tx, 2) + Math.pow(ty, 2) + Math.pow(tz, 2)));
+	public boolean containsPoint(int x, int y, int[] xCoords, int[] yCoords) {
+		boolean leftS = false;
+		boolean rightS = false;
+		boolean cont = false;
+		int xSum = 0;
+		int ySum = 0;
+		for (int point : xCoords){
+			xSum += point;
+			if (point > x) {
+				leftS = true;
+			}else {
+				rightS = true;
+			}
+		}
+		if(leftS && rightS) {
+			
+			leftS = false;
+			rightS = false;
+			for (int point : yCoords){
+				ySum += point;
+				if (point > y) {
+					leftS = true;
+				}else {
+					rightS = true;
+				}
+			}if (leftS && rightS) {
+				cont = true;
+			}
+		}
+		
+		if (!cont) {
+			return false;
+		}
+		boolean prt1,prt2,prt3,prt4;
+		prt1 = prt2 = prt3 = prt4 = false;
+		if (xCoords[0]-xCoords[1] != 0 && ySum/4 >= (((yCoords[0]-yCoords[1])/(xCoords[0]-xCoords[1]))*((xSum/4)-xCoords[0])) + yCoords[0]) {
+			if (y > yCoords[0]+(((yCoords[0]-yCoords[1])/(xCoords[0]-xCoords[1]))*(x-xCoords[0]))) {
+				prt1 = true;
+			}
+		}else if (xCoords[0]-xCoords[1] == 0 && yCoords[0]-yCoords[1] != 0 && xSum/4 >= (((xCoords[0]-xCoords[1])/(yCoords[0]-yCoords[1]))*((ySum/4)-yCoords[0])) + xCoords[0]) {
+			if (x > xCoords[0]+(((xCoords[0]-xCoords[1])/(yCoords[0]-yCoords[1]))*(y-yCoords[0]))) {
+				prt1 = true;
+			}
+		}
+		if (xCoords[1]-xCoords[2] != 0 && ySum/4 >= (((yCoords[1]-yCoords[2])/(xCoords[1]-xCoords[2]))*((xSum/4)-xCoords[1])) + yCoords[1]) {
+			if (y > yCoords[1]+(((yCoords[1]-yCoords[2])/(xCoords[1]-xCoords[2]))*(x-xCoords[1]))) {
+				prt2 = true;
+			}
+		}else if (xCoords[1]-xCoords[2] == 0 && yCoords[1]-yCoords[2] != 0 && xSum/4 >= (((xCoords[1]-xCoords[2])/(yCoords[1]-yCoords[2]))*((ySum/4)-yCoords[1])) + xCoords[1]) {
+			if (x > xCoords[1]+(((xCoords[1]-xCoords[2])/(yCoords[1]-yCoords[2]))*(y-yCoords[1]))) {
+				prt2 = true;
+			}
+		}
+		if (xCoords[2]-xCoords[3] != 0 && ySum/4 >= (((yCoords[2]-yCoords[3])/(xCoords[2]-xCoords[3]))*((xSum/4)-xCoords[2])) + yCoords[2]) {
+			if (y > yCoords[2]+(((yCoords[2]-yCoords[3])/(xCoords[2]-xCoords[3]))*(x-xCoords[2]))) {
+				prt3 = true;
+			}
+		}else if (xCoords[2]-xCoords[3] == 0 && yCoords[2]-yCoords[3] != 0 && xSum/4 >= (((xCoords[2]-xCoords[3])/(yCoords[2]-yCoords[3]))*((ySum/4)-yCoords[2])) + xCoords[2]) {
+			if (x > xCoords[2]+(((xCoords[2]-xCoords[3])/(yCoords[2]-yCoords[3]))*(y-yCoords[2]))) {
+				prt3 = true;
+			}
+		}
+		if (xCoords[0]-xCoords[3] != 0 && ySum/4 >= (((yCoords[0]-yCoords[3])/(xCoords[0]-xCoords[3]))*((xSum/4)-xCoords[0])) + yCoords[0]) {
+			if (y > yCoords[0]+(((yCoords[0]-yCoords[3])/(xCoords[0]-xCoords[3]))*(x-xCoords[0]))) {
+				prt4 = true;
+			}
+		}else if (xCoords[0]-xCoords[3] == 0 && yCoords[0]-yCoords[3] != 0 && xSum/4 >= (((xCoords[0]-xCoords[3])/(yCoords[0]-yCoords[3]))*((ySum/4)-yCoords[0])) + xCoords[0]) {
+			if (x > xCoords[0]+(((xCoords[0]-xCoords[3])/(yCoords[0]-yCoords[3]))*(y-yCoords[0]))) {
+				prt4 = true;
+			}
+		}
+		
+		if (prt1 && prt2 && prt3 && prt4) {
+			return true;
+		}
+		
+		if (xCoords[0]-xCoords[1] != 0 && ySum/4 < (((yCoords[0]-yCoords[1])/(xCoords[0]-xCoords[1]))*((xSum/4)-xCoords[0])) + yCoords[0]) {
+			if (y < yCoords[0]+(((yCoords[0]-yCoords[1])/(xCoords[0]-xCoords[1]))*(x-xCoords[0]))) {
+				prt1 = true;
+			}
+		}else if (xCoords[0]-xCoords[1]==0 && yCoords[0]-yCoords[1] != 0 && xSum/4 < (((xCoords[0]-xCoords[1])/(yCoords[0]-yCoords[1]))*((ySum/4)-yCoords[0])) + xCoords[0]) {
+			if (x < xCoords[0]+(((xCoords[0]-xCoords[1])/(yCoords[0]-yCoords[1]))*(y-yCoords[0]))) {
+				prt1 = true;
+			}
+		}
+		if (xCoords[1]-xCoords[2] != 0 && ySum/4 < (((yCoords[1]-yCoords[2])/(xCoords[1]-xCoords[2]))*((xSum/4)-xCoords[1])) + yCoords[1]) {
+			if (y < yCoords[1]+(((yCoords[1]-yCoords[2])/(xCoords[1]-xCoords[2]))*(x-xCoords[1]))) {
+				prt2 = true;
+			}
+		}else if (xCoords[1]-xCoords[2]==0 && yCoords[1]-yCoords[2] != 0 && xSum/4 < (((xCoords[1]-xCoords[2])/(yCoords[1]-yCoords[2]))*((ySum/4)-yCoords[1])) + xCoords[1]) {
+			if (x < xCoords[1]+(((xCoords[1]-xCoords[2])/(yCoords[1]-yCoords[2]))*(y-yCoords[1]))) {
+				prt2 = true;
+			}
+		}
+		if (xCoords[2]-xCoords[3] != 0 && ySum/4 < (((yCoords[2]-yCoords[3])/(xCoords[2]-xCoords[3]))*((xSum/4)-xCoords[2])) + yCoords[2]) {
+			if (y < yCoords[2]+(((yCoords[2]-yCoords[3])/(xCoords[2]-xCoords[3]))*(x-xCoords[2]))) {
+				prt3 = true;
+			}
+		}else if (xCoords[2]-xCoords[3]==0 && yCoords[2]-yCoords[3] != 0 && xSum/4 < (((xCoords[2]-xCoords[3])/(yCoords[2]-yCoords[3]))*((ySum/4)-yCoords[2])) + xCoords[2]) {
+			if (x < xCoords[2]+(((xCoords[2]-xCoords[3])/(yCoords[2]-yCoords[3]))*(y-yCoords[2]))) {
+				prt3 = true;
+			}
+		}
+		if (xCoords[0]-xCoords[3] != 0 && ySum/4 < (((yCoords[0]-yCoords[3])/(xCoords[0]-xCoords[3]))*((xSum/4)-xCoords[0])) + yCoords[0]) {
+			if (y < yCoords[0]+(((yCoords[0]-yCoords[3])/(xCoords[0]-xCoords[3]))*(x-xCoords[0]))) {
+				prt4 = true;
+			}
+		}else if (xCoords[0]-xCoords[3]==0 && yCoords[0]-yCoords[3] != 0 && xSum/4 < (((xCoords[0]-xCoords[3])/(yCoords[0]-yCoords[3]))*((ySum/4)-yCoords[0])) + xCoords[0]) {
+			if (x < xCoords[0]+(((xCoords[0]-xCoords[3])/(yCoords[0]-yCoords[3]))*(y-yCoords[0]))) {
+				prt4 = true;
+			}
+		}
+		
+		if (prt1 && prt2 && prt3 && prt4) {
+			return true;
+		}
+		return false;
 	}
+//	public double getDist() {
+//		tx = (float) (relx);
+//		ty = (float) (rely);
+//		tz = (float) (relz);
+//		return (Math.sqrt(Math.pow(tx, 2) + Math.pow(ty, 2) + Math.pow(tz, 2)));
+//	}
 
 	public int getIndex() {
 		return cubeIndex;
@@ -280,6 +430,7 @@ public class Cube extends CubeObject{
 	}
 
 	public void tick() {}
+	
 	public boolean isVisible(){
 		for (int[] face:faces){
 			if (face[5] == 1){
@@ -304,7 +455,7 @@ public class Cube extends CubeObject{
 			while (yPos <= 1) {
 				int count = 0;
 //				System.out.println("xPos:"+xPos+" yPos:"+yPos);
-				int testPos = cubeIndex + yPos - (16*(xPos-2));
+				int testPos = cubeIndex - yPos + (16*(xPos+2));
 //				System.out.println(testPos);
 				for (int[] face : faces){
 					visible = true;
@@ -354,11 +505,6 @@ public class Cube extends CubeObject{
 			yPos = d-1;
 			xPos++;
 		}
-//		for (int[] face : faces){
-//			if (face[5] == 0) {
-//				System.out.println("It worked");
-//			}
-//		}
 	}
 	public void renderUpdate(){
 		/**
@@ -417,6 +563,15 @@ public class Cube extends CubeObject{
 			}
 			count++;
 		}
+	}public void placeBlock() {
+		place = true;
+		Player player = handler.getPlayer();
+		
+		double sl = player.getSineLat();
+		double cl = player.getCosineLat();
+		double sv = player.getSineVert();
+		double cv = player.getCosineVert();
+		render(player.getX(),player.getY(),player.getZ(),player.getRotLat(),player.getRotVert(),sl,cl,sv,cv);
 	}
 	//Code used from DLC Energy now changed a bit
 	private float[] rotate2D(float x, float y, double s,double c) {

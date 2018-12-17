@@ -13,12 +13,11 @@ import java.util.LinkedList;
 //These chunks are sorted in the handler using the getDist class
 
 public class Chunk {
-	public static float[] verts = { 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f , -0.5f, -0.5f, 0.5f , -0.5f, 0.5f, 0.5f , 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f , -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f };
 	int size;
 	LinkedList<Integer> blockPos = new LinkedList<Integer>();
 	LinkedList<CubeObject> blocks = new LinkedList<CubeObject>();
 	LinkedList<CubeObject> visibleBlocks = new LinkedList<CubeObject>();
-	LinkedList<Cube> combinedBlocks = new LinkedList<Cube>();
+	//LinkedList<Cube> combinedBlocks = new LinkedList<Cube>();
 	volatile LinkedList<BlockFace> facesToRender = new LinkedList<BlockFace>();
 	volatile LinkedList<BlockFace> facesToRender2 = new LinkedList<BlockFace>();
 	RenderThread renderThread1;
@@ -27,9 +26,14 @@ public class Chunk {
 	public volatile boolean threadReady = false;
 	public boolean doubleRender = false;
 	public double dist;
+	//TODO Temporary variable
+//	boolean start = true;
+
+	GpuHandler gpuHandler;
 	Handler handler;
 	Player player;
-	public Chunk(int chunkX, int chunkZ, Player player, Handler handler,RenderThread renderThread1){
+	public Chunk(int chunkX, int chunkZ, Player player, Handler handler,RenderThread renderThread1, GpuHandler gpuHandler){
+		this.gpuHandler = gpuHandler;
 		this.chunkX = chunkX;
 		this.chunkZ = chunkZ;
 		this.player = player;
@@ -44,7 +48,7 @@ public class Chunk {
 	}
 	double[] out = new double[24];
 	public double[] allVerts;
-	double px, py, pz, rotLat, rotVert, lowerBound,upperBound, bound = 0;
+	double rotLat, rotVert, lowerBound,upperBound, bound = 0;
 	public double sl,cl,sv,cv;
 	boolean renderChunk = false;
 	boolean first = true;
@@ -52,27 +56,27 @@ public class Chunk {
 	public void moveOn () {
 		threadReady = true;
 	}
-	
+	float [] relativePos;
 	public void render(Graphics g){
 		
 //		renderChunk = false;
 //		lowerBound = (360 - rotLat) - 30;
 //		upperBound = (360 - rotLat) + 30;
 //		
-//		if ((chunkX-(px/16)) == 0){
-//			bound = Math.toDegrees(Math.atan(chunkZ-(pz/16)));
+//		if ((chunkX-(playerCoords[0]/16)) == 0){
+//			bound = Math.toDegrees(Math.atan(chunkZ-(playerCoords[2] = playerCoords[2]/16)));
 //		}else{
-//			bound = Math.toDegrees(Math.atan((chunkZ-(pz/16))/(chunkX-(px/16))));
+//			bound = Math.toDegrees(Math.atan((chunkZ-(playerCoords[2] = playerCoords[2]/16))/(chunkX-(playerCoords[0]/16))));
 //		}
 //		
 //		//2nd Quad
-//		if((chunkX-(px/16)) < 0 && (chunkZ-(pz/16)) > 0){
+//		if((chunkX-(playerCoords[0]/16)) < 0 && (chunkZ-(playerCoords[2] = playerCoords[2]/16)) > 0){
 //			bound = 180 + bound;
 //		}//3rd Quad
-//		else if((chunkX-(px/16)) < 0 && (chunkZ-(pz/16)) < 0){
+//		else if((chunkX-(playerCoords[0]/16)) < 0 && (chunkZ-(playerCoords[2] = playerCoords[2]/16)) < 0){
 //			bound = 180 + bound;
 //		}//4th  Quad
-//		else if((chunkX-(px/16)) > 0 && (chunkZ-(pz/16)) < 0){
+//		else if((chunkX-(playerCoords[0]/16)) > 0 && (chunkZ-(playerCoords[2] = playerCoords[2]/16)) < 0){
 //			bound = 360 + bound;
 //		}
 //		
@@ -82,7 +86,6 @@ public class Chunk {
 //			renderChunk = true;
 //		}
 		if (!renderChunk){
-//			blocks.sort(new blockSort());
 			
 			playerCoords[0] = (float) player.getX();
 			playerCoords[1] = (float) player.getY();
@@ -94,17 +97,41 @@ public class Chunk {
 			cl = player.getCosineLat();
 			sv = player.getSineVert();
 			cv = player.getCosineVert();
-
+			
+//			long start = System.currentTimeMillis();
+//			relativePos = calcBlockPos(playerCoords);
+			float[] srcArrayB = new float[blockPos.size()];
+			int i = 0;
+			for (Integer coord: blockPos) {
+				if (i % 3 == 0) {
+					srcArrayB[i] = coord-playerCoords[0];
+				}else if (i % 3 == 1) {
+					srcArrayB[i] = coord-playerCoords[1];
+				}else {
+					srcArrayB[i] = coord-playerCoords[2];
+				}
+				i++;
+			}relativePos = srcArrayB;
+//			System.out.println(System.currentTimeMillis()-start);
+//			if (start) {
+//				start = false;
+//				for (float num : relativePos) {
+//					System.out.print(" "+num+" ");
+//				}
+//			}
+			
 //			for (CubeObject object:visibleBlocks){
 //				object.render(g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
 //			}
 			threadReady = false;
-			renderThread1.render(this,visibleBlocks,g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
+//			renderThread1.render(this,visibleBlocks,g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
+			renderThread1.render(this,visibleBlocks,g,relativePos,rotLat,rotVert,sl,cl,sv,cv);
 			
 			i  = 0;
 			size = (visibleBlocks.size()/2)-2;
+
 			for (CubeObject block: visibleBlocks) {
-				block.render(g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
+				block.render(relativePos[(i*3)],relativePos[(i*3)+1],relativePos[(i*3)+2],rotLat,rotVert,sl,cl,sv,cv);
 				if (i > size) {break;}
 				i++;
 			}
@@ -135,7 +162,6 @@ public class Chunk {
 			facesToRender2.clear();
 			facesToRender = new LinkedList<BlockFace>();
 			facesToRender2 = new LinkedList<BlockFace>();
-			
 			//TODO Double check if this could ever work
 	//		if (doubleRender){
 	//			for (CombinedCube object:combinedBlocks){
@@ -152,6 +178,18 @@ public class Chunk {
 			cube.updateFov();
 		}
 	}
+	
+	public float[] calcBlockPos(float[] srcArrayA) {
+		int s = blockPos.size();
+		float[] srcArrayB = new float[s];
+		int i = 0;
+		for (Integer coord: blockPos) {
+			srcArrayB[i] = coord;
+			i++;
+		}
+		return gpuHandler.findBlockPos(srcArrayA, srcArrayB, s);
+	}
+	
 	public void addFace(BlockFace face){
 		if (Thread.currentThread().getName() == "Render1") {
 			facesToRender.add(face);
@@ -164,10 +202,10 @@ public class Chunk {
 		blocks.add(cube);
 		if (cube.isVisible()){
 			visibleBlocks.add(cube);
+			blockPos.add(x);
+			blockPos.add(y);
+			blockPos.add(z);
 		}
-//		blockPos.add(x);
-//		blockPos.add(y);
-//		blockPos.add(z);
 	}
 	public double getDist(){
 		dist = Math.sqrt(Math.pow((16*chunkX)-player.getX()+8, 2)+Math.pow((16*chunkZ)-player.getZ()+8, 2));
@@ -176,9 +214,18 @@ public class Chunk {
 		this.debug = debug;
 		for (CubeObject cube:blocks){
 			cube.setDebug(debug);
-		}for (Cube cube:combinedBlocks){
-			cube.setDebug(debug);
 		}
+//		for (Cube cube:combinedBlocks){
+//			cube.setDebug(debug);
+//		}
+	}public void placeBlock() {
+		for (CubeObject cube:blocks) {
+			cube.placeBlock();
+		}
+	}public LinkedList<CubeObject> getVisibleBlocks() {
+		return visibleBlocks;
+	}public LinkedList<Integer> getBlockPos(){
+		return blockPos;
 	}
 }
 

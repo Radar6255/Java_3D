@@ -18,6 +18,9 @@ import java.awt.image.BufferedImage;
 public class Main extends Canvas implements Runnable{
 	public String version = "1.1.2";
 	public int frames,fps;
+	
+	public int totalFrames, seconds = 0;
+	
 	private static final long serialVersionUID = 1L;
 	private Thread thread;
 	private boolean running;
@@ -32,10 +35,11 @@ public class Main extends Canvas implements Runnable{
 	
 	public Main(){
 		handler = new Handler(this);
-		Player thePlayer = new Player(1,40,2,180,120);
+		Player thePlayer = new Player(1,40,2,180,120,handler,this);
 		handler.addPlayer(thePlayer);
 		WorldGen gen = new WorldGen(handler,thePlayer);
 		handler.addGeneration(gen);
+		this.addMouseListener(new MouseInput(thePlayer));
 		this.addKeyListener(new KeyInput(handler));
 		new Window(WIDTH,HEIGHT,"3D Stuff",this);
 	}
@@ -65,6 +69,8 @@ public class Main extends Canvas implements Runnable{
 				timer += 1000;
 				fps = frames;
 				frames = 0;
+				totalFrames += fps;
+				seconds+=1;
 			}
 		}
 		stop();
@@ -100,14 +106,15 @@ public class Main extends Canvas implements Runnable{
 			this.createBufferStrategy(2);
 			return;
 		}
-		//Help my sorting of cubes in handler
-		//System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
 		final Graphics g = bs.getDrawGraphics();
 		g.setColor(new Color(114, 154, 219));
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		handler.render(g);
 		g.setColor(Color.BLACK);
 		g.drawString("FPS:"+Integer.toString(fps), WIDTH-75, 20);
+		if (seconds > 0) {
+			g.drawString("Avg FPS:"+Integer.toString(totalFrames/seconds), WIDTH-85, 40);
+		}
 //		g.drawString(version, 10, HEIGHT-40);
 		g.dispose();
 		bs.show();

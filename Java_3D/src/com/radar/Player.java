@@ -14,6 +14,7 @@ public class Player {
 	int chunkX,chunkY,chunkZ;
 	double rotLat,rotVert,s,c,sv,cv;
 	public boolean up,down,left,right,space,shift,debug;
+	public volatile boolean place;
 	
 	int centerX = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2;
 	int centerY = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2;
@@ -21,17 +22,23 @@ public class Player {
 	public PointerInfo mouseLoc;
 	public Point tempPoint;
 	
-	public double rate = 0.6;
-	public int fov = 70;
+	public double rate = SettingVars.movementRate;
 	
-	public Player(double x,double y,double z,double rotLat,double rotVert){
+	Main main;
+	Handler handler;
+	public Player(double x,double y,double z,double rotLat,double rotVert,Handler handler, Main main){
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.rotLat = rotLat;
 		this.rotVert = rotVert;
+		this.handler = handler;
+		this.main = main;
 	}
 	public void render(Graphics g){
+		g.setColor(Color.black);
+		g.drawLine(main.getWidth()/2, (main.getHeight()/2)-10, main.getWidth()/2, (main.getHeight()/2)+10);
+		g.drawLine((main.getWidth()/2)-10, (main.getHeight()/2), (main.getWidth()/2)+10, (main.getHeight()/2));
 		if (debug){
 			g.setColor(Color.BLACK);
 			g.drawString(x+" "+y+" "+z, 20, 20);
@@ -45,7 +52,7 @@ public class Player {
 		if (!Main.pause){
 			//TODO Threw Error once
 			mouseLoc = MouseInfo.getPointerInfo();
-			
+			//TODO Line below also threw error when tabbed out three times now
 			tempPoint = mouseLoc.getLocation();
 
 			mx = tempPoint.getX();
@@ -73,6 +80,10 @@ public class Player {
 		c = Math.cos(Math.toRadians(rotLat));
 		sv = Math.sin(Math.toRadians(rotVert));
 		cv = Math.cos(Math.toRadians(rotVert));
+		if (place) {
+			handler.placeBlock();
+			place = false;
+		}
 		 if (space){y+=rate/2;}
 		 if (shift){y-=rate/2;}
 		 if (up){z-=c*rate; x-=s*rate;}
@@ -82,7 +93,13 @@ public class Player {
 		 if (left){z-=s*rate;x+=c*rate;}
 		 if (right){z+=s*rate;x-=c*rate;}
 
-	}public double getSineLat(){
+	}public void placeBlock() {
+		place = true;
+	}public void destroyBlock() {
+		place = true;
+	}
+	
+	public double getSineLat(){
 		return s;
 	}public double getCosineLat(){
 		return c;
@@ -90,10 +107,7 @@ public class Player {
 		return sv;
 	}public double getCosineVert(){
 		return cv;
-	}public int getFov(){
-		return fov;
-	}
-	public void setUp(boolean up){
+	}public void setUp(boolean up){
 		this.up = up;
 	}public void setDown(boolean down){
 		this.down = down;

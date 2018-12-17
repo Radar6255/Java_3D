@@ -1,5 +1,6 @@
 package com.radar;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -9,17 +10,23 @@ import java.util.LinkedList;
 //Gets info from world then creates chunks and cubes from them
 //Uses created chunks sorted to render all BlockFaces
 public class Handler {
-	
+	LinkedList<BlockFace> facesToRender = new LinkedList<BlockFace>();
 	LinkedList<Chunk> renderChunks = new LinkedList<Chunk>();
-	LinkedList<Chunk> renderQueue = new LinkedList<Chunk>();
+	volatile LinkedList<Chunk> renderQueue = new LinkedList<Chunk>();
 	LinkedList<Chunk> objectsSorted = new LinkedList<Chunk>();
 	ArrayList<Integer> currentChunk = new ArrayList<Integer>();
+	LinkedList<CubeObject[]> visibleBlocks = new LinkedList<CubeObject[]>();
+	volatile LinkedList<CubeObject[]> visibleBlocksTemp = new LinkedList<CubeObject[]>();
+	public LinkedList<Integer[]> blockPos = new LinkedList<Integer[]>();
+	volatile LinkedList<Integer[]> blockPosTemp = new LinkedList<Integer[]>();
 	public RenderThread renderThread1;
+	GpuHandler gpuHandler;
 	public CubeGen cubeGen;
 	public Main main;
 	public Handler(Main main){
+		gpuHandler = new GpuHandler();
 		renderThread1 = new RenderThread("1");
-		cubeGen = new CubeGen(players, this, renderThread1);
+		cubeGen = new CubeGen(players, this, renderThread1, gpuHandler);
 		cubeGen.start();
 		renderThread1.setName("Render1");
 		renderThread1.start();
@@ -28,7 +35,10 @@ public class Handler {
 	
 	//Holds indices of chunks loaded into render and where they start in the objects linkedList
 	LinkedList<Integer[]> renderedChunks = new LinkedList<Integer[]>();
-	int x,y,z, osize,xOff,zOff,chunkX,chunkZ,width,ix,iz,sCubeCount,chunkSize,cCubeCount,tx;
+	volatile LinkedList<Integer[]> removeData = new LinkedList<Integer[]>();
+	LinkedList<Integer> chunkSizes = new LinkedList<Integer>();
+	int x,y,z, osize,xOff,zOff,chunkX,chunkZ,width,ix,iz,sCubeCount,chunkSize,cCubeCount;
+	volatile int blockPosStart,visibleBlockStart = 0;
 	Player[] players = new Player[2];
 	WorldGen gen;
 	boolean looping,changed,out,loadChunk,debug;
@@ -73,6 +83,16 @@ public class Handler {
 		chunkI = 0;
 	}public void addChunk(Chunk chunk){
 		renderQueue.add(chunk);
+		blockPosTemp.add(chunk.getBlockPos().toArray(new Integer[chunk.getBlockPos().size()]));
+		visibleBlocksTemp.add(chunk.getVisibleBlocks().toArray(new CubeObject[chunk.getVisibleBlocks().size()]));
+		Integer[] temp = new Integer[6];
+		temp[0] = chunk.getChunkX();
+		temp[1] = chunk.getChunkZ();
+		removeData.add(temp);
+	}public void placeBlock() {
+		for (Chunk chunk:renderChunks) {
+			chunk.placeBlock();
+		}
 	}
 	public void render(Graphics g){
 		
@@ -103,7 +123,8 @@ public class Handler {
 			loadChunk = false;
 		}
 		//Loads chunks from world making them into cube objects to be rendered and ticked
-		if (loadChunk && currentChunk != null && !currentChunk.isEmpty()){
+		//&& currentChunk != null
+		if (loadChunk && !currentChunk.isEmpty()){
 			cubeGen.createChunk(currentChunk,chunkX+ix,chunkZ+iz);
 			synchronized(this) {
 				this.notify();
@@ -111,46 +132,47 @@ public class Handler {
 			Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,chunkSize};
 			renderedChunks.add(chunkI,tempArray);
 			chunkI++;
-			
 		}
 		ix++;
-		if (ix == 5){
-			ix = -4;
+		if (ix == SettingVars.viewDist+1){
+			ix = -SettingVars.viewDist;
 			iz++;
-		}if (iz == 5){
-			iz = -4;
+		}if (iz == SettingVars.viewDist+1){
+			iz = -SettingVars.viewDist;
 		}
-		renderChunks.sort(new chunkCompare());
+//		renderChunks.sort(new chunkCompare());
 
-		for (Chunk chunk:renderChunks){
-			chunk.render(g);
-		}
-
-		//TODO The has thrown an error once
-		for (Chunk toAdd:renderQueue){
-			renderChunks.add(toAdd);
-		}renderQueue.clear();
-		
 //		for (Chunk chunk:renderChunks){
 //			chunk.render(g);
 //		}
+		cubeRender(g);
+		
+		renderChunks.addAll(renderQueue);
+		renderQueue.clear();
+//		Threw Error twice
+		visibleBlocks.addAll(visibleBlocksTemp);
+		visibleBlocksTemp.clear();
+//		Threw Error twice
+		blockPos.addAll(blockPosTemp);
+		blockPosTemp.clear();
+
 		
 		i = 0;
 		while (i < renderChunks.size()){
-			//TODO Tie this with render distance setting
-			if (renderChunks.get(i).getDist() > 120){
+			if (renderChunks.get(i).getDist() > (16*SettingVars.viewDist)+32){
 				i2 = 0;
 				for (Integer[] data: renderedChunks){
 					if (data[0] == renderChunks.get(i).getChunkX() && data[1] == renderChunks.get(i).getChunkZ()){
 						chunkI--;
 						renderedChunks.remove(i2);
+						blockPos.remove(i2);
+						visibleBlocks.remove(i2);
 						break;
 					}
 					i2++;
 				}
 				renderChunks.remove(i);
-			}
-			i++;
+			}i++;
 		}
 		
 		players[0].render(g);
@@ -165,10 +187,91 @@ public class Handler {
 //		for (Chunk chunk:renderChunks){
 //			chunk.tick();
 //		}
-		
 		players[0].tick();
 	}
+	Player player;
+	float[] playerCoords = new float[3];
+	float[] relativePos;
+	double rotLat, rotVert,sl,cl,sv,cv;
 	
+	public void cubeRender(Graphics g) {
+		player = players[0];
+		playerCoords[0] = (float) player.getX();
+		playerCoords[1] = (float) player.getY();
+		playerCoords[2] = (float) player.getZ();
+		
+		rotLat = player.getRotLat();
+		rotVert = player.getRotVert();
+		sl = player.getSineLat();
+		cl = player.getCosineLat();
+		sv = player.getSineVert();
+		cv = player.getCosineVert();
+		
+		if (SettingVars.gpu) {
+			relativePos = calcBlockPos(playerCoords);
+		}else {
+			relativePos = new float[linkArraySize(blockPos)];
+			i = 0;
+			for (Integer[] chunkData:blockPos) {
+				for (Integer coord: chunkData) {
+					if (i % 3 == 0) {
+						relativePos[i] = coord-playerCoords[0];
+					}else if (i % 3 == 1) {
+						relativePos[i] = coord-playerCoords[1];
+					}else {
+						relativePos[i] = coord-playerCoords[2];
+					}
+					i++;
+				}
+			}
+		}
+		
+		i = 0;
+		for (CubeObject[] blocks:visibleBlocks) {
+			for (CubeObject block: blocks) {
+				block.render(relativePos[(i*3)],relativePos[(i*3)+1],relativePos[(i*3)+2],rotLat,rotVert,sl,cl,sv,cv);
+				i++;
+			}
+		}
+		facesToRender.sort(new sortFaces());
+		for (BlockFace face:facesToRender){
+			if (face != null){
+				g.setColor(face.getColor());
+				g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
+				if (debug){
+					g.setColor(Color.BLACK);
+					g.drawString(""+face.getCubeIndex(),face.getXCoords()[0],face.getYCoords()[0]);
+				}
+			}
+		}
+		facesToRender.clear();
+	}
+	
+	public void addFace(BlockFace tempFace) {
+		facesToRender.add(tempFace);
+	}
+	public int linkArraySize(LinkedList<Integer[]> data) {
+		i = 0;
+		for (Integer[] chunkData:blockPos) {
+			i+=chunkData.length;
+		}return i;
+	}
+	
+	public float[] calcBlockPos(float[] srcArrayA) {
+		int s = linkArraySize(blockPos);
+		if (s == 0) {
+			return null;
+		}
+		float[] srcArrayB = new float[s];
+		int i = 0;
+		for (Integer[] chunkData: blockPos) {
+			for (Integer coord: chunkData) {
+				srcArrayB[i] = coord;
+				i++;
+			}
+		}
+		return gpuHandler.findBlockPos(srcArrayA, srcArrayB, s);
+	}
 }
 
 //Used for Cube sorting

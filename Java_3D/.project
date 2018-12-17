@@ -3,6 +3,7 @@
 	<name>Java_3D</name>
 	<comment></comment>
 	<projects>
+		<project>JOCL</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

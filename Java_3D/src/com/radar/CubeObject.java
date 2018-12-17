@@ -1,11 +1,9 @@
 package com.radar;
 
-import java.awt.Graphics;
-
 public abstract class CubeObject {
 	public void tick(){
 		
-	}public void render(Graphics g, double px, double py, double pz, double rotLat, double rotVert, double sl, double cl, double sv, double cv){
+	}public void render(double px, double py, double pz, double rotLat, double rotVert, double sl, double cl, double sv, double cv){
 		
 	}public void setDebug(boolean t){
 		
@@ -14,6 +12,8 @@ public abstract class CubeObject {
 	}public boolean isVisible(){
 		return false;
 	}public void updateFov() {
+		
+	}public void placeBlock() {
 		
 	}
 }

@@ -6,6 +6,7 @@ import java.util.LinkedList;
 public class WorldGen{
 	int i,index,all,chunkX,chunkY,chunkZ,xOff,zOff,ix,iz,h,tx,ty,ty2,tz = 0;
 	boolean debug = false;
+	int genSize = SettingVars.genSize;
 	double x,y,z;
 	Handler handler;
 	Player thePlayer;
@@ -16,7 +17,6 @@ public class WorldGen{
 		this.thePlayer = thePlayer;
 		world2.add(new ArrayList<ArrayList<Integer>>());
 		world2.get(0).add(new ArrayList<Integer>());
-		//TODO
 		i = 0;
 //		while(i < 256){
 //			world2.get(0).get(0).add(1);
@@ -25,96 +25,94 @@ public class WorldGen{
 //		i = 0;
 	}
 	public void tick(){
-//		while (!debug){
-			x = thePlayer.getX();
-			y = thePlayer.getY();
-			z = thePlayer.getZ();
-			chunkX = thePlayer.getChunkX();
-			chunkY = thePlayer.getChunkY();
-			chunkZ = thePlayer.getChunkZ();
-			ix = -4;
-			iz = -4;
-			while(iz < 5){
-				try{
-					while((chunkX+xOff+ix) < 5){
-						
-						world2.add(0,new ArrayList<ArrayList<Integer>>());
-						while (world2.get(0).size() < zOff+ix) {
-							world2.get(0).add(new ArrayList<Integer>());
-						}
-						xOff++;
+		x = thePlayer.getX();
+		y = thePlayer.getY();
+		z = thePlayer.getZ();
+		chunkX = thePlayer.getChunkX();
+		chunkY = thePlayer.getChunkY();
+		chunkZ = thePlayer.getChunkZ();
+		ix = -genSize;
+		iz = -genSize;
+		while(iz < genSize+1){
+			try{
+				while((chunkX+xOff+ix) < genSize+1){
+					
+					world2.add(0,new ArrayList<ArrayList<Integer>>());
+					while (world2.get(0).size() < zOff+ix) {
+						world2.get(0).add(new ArrayList<Integer>());
 					}
-					while((chunkZ+zOff+iz) < 5){
-						for (ArrayList<ArrayList<Integer>> zChunks:world2){
-							zChunks.add(0, new ArrayList<Integer>());
-						}
-						zOff++;
+					xOff++;
+				}
+				while((chunkZ+zOff+iz) < genSize+1){
+					for (ArrayList<ArrayList<Integer>> zChunks:world2){
+						zChunks.add(0, new ArrayList<Integer>());
 					}
-					while (world2.size() <= chunkX+5+xOff+ix){
-						world2.add(new ArrayList<ArrayList<Integer>>());
-						while(world2.get(world2.size()-1).size() < zOff+iz){
-							world2.get(world2.size()-1).add(new ArrayList<Integer>());
-						}
+					zOff++;
+				}
+				while (world2.size() <= chunkX+genSize+1+xOff+ix){
+					world2.add(new ArrayList<ArrayList<Integer>>());
+					while(world2.get(world2.size()-1).size() < zOff+iz){
+						world2.get(world2.size()-1).add(new ArrayList<Integer>());
 					}
-					while (world2.get(chunkX+xOff+ix).size() <= chunkZ+zOff+5+iz){
-						world2.get(chunkX+xOff+ix).add(new ArrayList<Integer>());
-					}
-					if (world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).isEmpty()){
-						h = 0;
-						i = 0;
-						tx = 0;
-						tz = 0;
-						//Normally 60
-						while (h < 60){
-							while (i < 256){
+				}
+				while (world2.get(chunkX+xOff+ix).size() <= chunkZ+zOff+5+iz){
+					world2.get(chunkX+xOff+ix).add(new ArrayList<Integer>());
+				}
+				if (world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).isEmpty()){
+					h = 0;
+					i = 0;
+					tx = 0;
+					tz = 0;
+					//Normally 60
+					while (h < 60){
+						while (i < 256){
 //								ty  = (int) Math.round(Math.sqrt(5/(Math.pow(((16-tx)+(16*(chunkX+ix)))*0.1,2)*Math.pow(((16-tz)+(16*(chunkZ+iz)))*0.1, 2))));
-								ty = 0;
-								ty2 = 0;
+							ty = 0;
+							ty2 = 0;
 //								Rotate ty = (int) Math.round(0.4*(Math.pow(((16-tx)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((tz)+(16*(chunkZ+iz)))*0.2, 2))); 90 degrees
 //								ty = (int) Math.round(0.4*(Math.pow(((tz)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((tx)+(16*(chunkZ+iz)))*0.2, 2)));
 //								ty = (int) Math.round(Math.pow((0.16-Math.pow((0.6-Math.pow((Math.pow(((tz)+(16*(chunkX+ix)))*0.04,2)+Math.pow(((tx)+(16*(chunkZ+iz)))*0.04,2)),0.5)),2)),0.5)*20);
 //								ty = (int) ((Math.sin(((tz)+(16*(chunkX+ix)))*0.2)*Math.cos(((tx)+(16*(chunkZ+iz)))*0.2))*5.0)+10;
-								ty = (int) (18*(noise(((tx)+(16*(chunkZ+iz)))/80.0,(((tz)+(16*(chunkX+ix)))/80.0))+1));
+							ty = (int) (18*(noise(((tx)+(16*(chunkZ+iz)))/80.0,(((tz)+(16*(chunkX+ix)))/80.0))+1));
 //								System.out.println((10*(Value2D(((tx)+(16*(chunkZ+iz))),((tz)+(16*(chunkX+ix))),8)+1)));
 //								if ((((tz)+(16*(chunkX+ix))) + 3) != 0){
 //									ty = (int) ( (((tx)+(16*(chunkZ+iz))) + 2) / (((tz)+(16*(chunkX+ix))) + 3) );
 //								}
 //								ty = (int) Math.sqrt(Math.pow((tx)+(16*(chunkZ+iz)),2) + Math.pow((tz)+(16*(chunkX+ix)),2));
-								if (ty == h){
+							if (ty == h){
 //								if (h == 1) {
-									if (ty < 10) {
-										world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(2);
-									}else {
-										world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
-									}
-								}else{
-									world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
+								if (ty < 10) {
+									world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(2);
+								}else {
+									world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
 								}
-								i++;
-								tx++;
-								if (tx > 15){
-									tx = 0;
-									tz++;
-								}
+							}else{
+								world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
 							}
-							h++;
-							i = 0;
-							tz = 0;
-							tx = 0;
+							i++;
+							tx++;
+							if (tx > 15){
+								tx = 0;
+								tz++;
+							}
 						}
+						h++;
+						i = 0;
+						tz = 0;
+						tx = 0;
 					}
-				}catch(Exception e){
-					System.out.println("World gen error : ");
-					e.printStackTrace();
-					System.out.println(e.getCause());
 				}
-				ix++;
-				if (ix == 5){
-					iz++;
-					ix = -4;
-				}
+			}catch(Exception e){
+				System.out.println("World gen error : ");
+				e.printStackTrace();
+				System.out.println(e.getCause());
 			}
-//		}
+			ix++;
+			if (ix == genSize+1){
+				iz++;
+				ix = -genSize;
+			}
+		}
 	}public ArrayList<ArrayList<ArrayList<Integer>>> getWorld(){
 		return world2;
 	}public int getXOff(){
@@ -155,9 +153,7 @@ public class WorldGen{
 	  private static int perm[] = new int[512];
 	  static { for(int i=0; i<512; i++) perm[i]=p[i & 255]; }
 	  // 2D simplex noise
-	  public static double 
-	noise(double xin, double yin)
-	 {
+	  public static double noise (double xin, double yin){
 	    double n0, n1, n2; 
 	// Noise contributions from the three corners
 	    // Skew the input space to determine which simplex cell we're in
