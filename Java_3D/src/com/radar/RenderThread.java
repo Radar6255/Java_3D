@@ -14,7 +14,7 @@ public class RenderThread extends Thread{
 	float [] relativePos;
 	public boolean running = true;
 	volatile boolean ready = false;
-	public Chunk chunk;
+	public Handler handler;
 	RenderThread(String index){
 		this.index = index;
 	}
@@ -30,19 +30,18 @@ public class RenderThread extends Thread{
 						block.render(relativePos[((size/2)+i+1)*3], relativePos[(((size/2)+i+1)*3)+1], relativePos[(((size/2)+i+1)*3)+2], rotLat, rotVert, sl, cl, sv, cv);
 						i++;
 					}
-					visibleBlocks = new LinkedList<CubeObject>();
+//					visibleBlocks = new LinkedList<CubeObject>();
+					visibleBlocks.clear();
 					ready = false;
-					if (index == "1") {
-						chunk.moveOn();
-					}
+					handler.moveOn();
 				}
 			}catch(Exception e){
-				System.out.println(e);
+				System.out.println(e.getCause());
 			}
 		}
 	}
-	public void render(Chunk chunk,LinkedList<CubeObject> visibleBlocks, Graphics g, float [] relativePos, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
-		this.chunk = chunk;
+	public void render(Handler handler,LinkedList<CubeObject> visibleBlocks, Graphics g, float [] relativePos, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
+		this.handler = handler;
 		this.g = g;
 		this.rotLat = rotLat;
 		this.rotVert = rotVert;
@@ -54,18 +53,13 @@ public class RenderThread extends Thread{
 		int i = 0;
 		ready = false;
 		if (1 > visibleBlocks.size()/2) {
-			chunk.moveOn();
+			handler.moveOn();
 		}
 		size = visibleBlocks.size();
 		for (CubeObject visibleBlock : visibleBlocks) {
-//			if (index == "2") {
-//				this.visibleBlocks.add(visibleBlocks.get(i));
-//			}else {
 			if (i > visibleBlocks.size()/2) {
-//				this.visibleBlocks.add(visibleBlocks.get(size-i-1));
 				this.visibleBlocks.add(visibleBlock);
 			}
-//			}
 			i++;
 		}
 		ready = true;

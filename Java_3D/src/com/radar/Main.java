@@ -14,12 +14,15 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+
+import javax.swing.JFrame;
 //Main class initializes all classes and runs the game loop
 public class Main extends Canvas implements Runnable{
 	public String version = "1.1.2";
 	public int frames,fps;
 	
 	public int totalFrames, seconds = 0;
+	public static int mode = 0;
 	
 	private static final long serialVersionUID = 1L;
 	private Thread thread;
@@ -27,10 +30,12 @@ public class Main extends Canvas implements Runnable{
 	static boolean pause;
 	static boolean changeMouse = true;
 	private Handler handler;
+	private MenuRender menuRender;
 	int WIDTH = 1200;
 	int HEIGHT = 800;
 	int i = 0;
 	int iz = -50;
+	JFrame frame;
 //	ImageIcon img = new ImageIcon("./dirt.png");
 	
 	public Main(){
@@ -41,7 +46,8 @@ public class Main extends Canvas implements Runnable{
 		handler.addGeneration(gen);
 		this.addMouseListener(new MouseInput(thePlayer));
 		this.addKeyListener(new KeyInput(handler));
-		new Window(WIDTH,HEIGHT,"3D Stuff",this);
+		frame = new Window(WIDTH,HEIGHT,"3D Stuff",this).getFrame();
+		menuRender = new MenuRender(frame,this);
 	}
 	long startTime, endTime;
 	@Override
@@ -69,8 +75,10 @@ public class Main extends Canvas implements Runnable{
 				timer += 1000;
 				fps = frames;
 				frames = 0;
-				totalFrames += fps;
-				seconds+=1;
+				if (!pause) {
+					totalFrames += fps;
+					seconds+=1;
+				}
 			}
 		}
 		stop();
@@ -109,7 +117,12 @@ public class Main extends Canvas implements Runnable{
 		final Graphics g = bs.getDrawGraphics();
 		g.setColor(new Color(114, 154, 219));
 		g.fillRect(0, 0, WIDTH, HEIGHT);
-		handler.render(g);
+		if (mode == 0) {
+			handler.render(g);
+		}else {
+			//TODO Code to make escape menu
+			menuRender.render(g);
+		}
 		g.setColor(Color.BLACK);
 		g.drawString("FPS:"+Integer.toString(fps), WIDTH-75, 20);
 		if (seconds > 0) {

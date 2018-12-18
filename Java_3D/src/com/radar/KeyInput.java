@@ -49,9 +49,13 @@ public class KeyInput implements KeyListener {
 			handler.getPlayer().setShift(true);
 		}if (key == KeyEvent.VK_ESCAPE){
 			if (!Main.pause && !escape){
+				Main.mode = 1;
+				handler.main.setVisible(false);
 				Main.pause = true;
 				Main.changeMouse = true;
 			}else if(!escape){
+				Main.mode = 0;
+				handler.main.setVisible(true);
 				Main.pause = false;
 				Main.changeMouse = true;
 			}

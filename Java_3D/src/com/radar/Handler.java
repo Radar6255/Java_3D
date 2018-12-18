@@ -10,7 +10,8 @@ import java.util.LinkedList;
 //Gets info from world then creates chunks and cubes from them
 //Uses created chunks sorted to render all BlockFaces
 public class Handler {
-	LinkedList<BlockFace> facesToRender = new LinkedList<BlockFace>();
+	ArrayList<BlockFace> facesToRender = new ArrayList<BlockFace>();
+	ArrayList<BlockFace> facesToRender2 = new ArrayList<BlockFace>();
 	LinkedList<Chunk> renderChunks = new LinkedList<Chunk>();
 	volatile LinkedList<Chunk> renderQueue = new LinkedList<Chunk>();
 	LinkedList<Chunk> objectsSorted = new LinkedList<Chunk>();
@@ -19,17 +20,19 @@ public class Handler {
 	volatile LinkedList<CubeObject[]> visibleBlocksTemp = new LinkedList<CubeObject[]>();
 	public LinkedList<Integer[]> blockPos = new LinkedList<Integer[]>();
 	volatile LinkedList<Integer[]> blockPosTemp = new LinkedList<Integer[]>();
-	public RenderThread renderThread1;
+	public static RenderThread renderThread1;
 	GpuHandler gpuHandler;
 	public CubeGen cubeGen;
 	public Main main;
 	public Handler(Main main){
 		gpuHandler = new GpuHandler();
-		renderThread1 = new RenderThread("1");
-		cubeGen = new CubeGen(players, this, renderThread1, gpuHandler);
+		cubeGen = new CubeGen(players, this, gpuHandler);
 		cubeGen.start();
-		renderThread1.setName("Render1");
-		renderThread1.start();
+		if (SettingVars.multiThread) {
+			renderThread1 = new RenderThread("1");
+			renderThread1.setName("Render1");
+			renderThread1.start();
+		}
 		this.main = main;
 	}
 	
@@ -39,6 +42,7 @@ public class Handler {
 	LinkedList<Integer> chunkSizes = new LinkedList<Integer>();
 	int x,y,z, osize,xOff,zOff,chunkX,chunkZ,width,ix,iz,sCubeCount,chunkSize,cCubeCount;
 	volatile int blockPosStart,visibleBlockStart = 0;
+	volatile boolean renderWait = true;
 	Player[] players = new Player[2];
 	WorldGen gen;
 	boolean looping,changed,out,loadChunk,debug;
@@ -225,14 +229,37 @@ public class Handler {
 				}
 			}
 		}
-		
-		i = 0;
+		LinkedList<CubeObject> temp = new LinkedList<CubeObject>();
 		for (CubeObject[] blocks:visibleBlocks) {
 			for (CubeObject block: blocks) {
-				block.render(relativePos[(i*3)],relativePos[(i*3)+1],relativePos[(i*3)+2],rotLat,rotVert,sl,cl,sv,cv);
-				i++;
+				temp.add(block);
 			}
 		}
+		if (SettingVars.multiThread) {
+			renderWait = true;
+			renderThread1.render(this,temp,g,relativePos,rotLat,rotVert,sl,cl,sv,cv);
+		
+			i = 0;
+			for (CubeObject block: temp) {
+				block.render(relativePos[(i*3)],relativePos[(i*3)+1],relativePos[(i*3)+2],rotLat,rotVert,sl,cl,sv,cv);
+				i++;
+				if (i > temp.size()/2) {
+					break;
+				}
+			}
+			while (renderWait) {}
+			facesToRender.addAll(facesToRender2);
+		}else {
+			i = 0;
+			for (CubeObject[] blocks:visibleBlocks) {
+				for (CubeObject block: blocks) {
+					block.render(relativePos[(i*3)],relativePos[(i*3)+1],relativePos[(i*3)+2],rotLat,rotVert,sl,cl,sv,cv);
+					i++;
+				}
+			}
+		}
+		
+		
 		facesToRender.sort(new sortFaces());
 		for (BlockFace face:facesToRender){
 			if (face != null){
@@ -245,10 +272,15 @@ public class Handler {
 			}
 		}
 		facesToRender.clear();
+		facesToRender2.clear();
 	}
 	
 	public void addFace(BlockFace tempFace) {
-		facesToRender.add(tempFace);
+		if(Thread.currentThread().getName() == "Render1") {
+			facesToRender2.add(tempFace);
+		}else {
+			facesToRender.add(tempFace);
+		}
 	}
 	public int linkArraySize(LinkedList<Integer[]> data) {
 		i = 0;
@@ -271,6 +303,22 @@ public class Handler {
 			}
 		}
 		return gpuHandler.findBlockPos(srcArrayA, srcArrayB, s);
+	}
+	public void moveOn() {
+		renderWait = false;
+	}
+	public static void startMulti() {
+		renderThread1 = new RenderThread("1");
+		renderThread1.setName("Render1");
+		renderThread1.start();
+	}
+	public static void stopMulti() {
+		renderThread1.running = false;
+		try {
+			renderThread1.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }
 

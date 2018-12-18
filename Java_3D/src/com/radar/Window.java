@@ -10,9 +10,9 @@ import javax.swing.JFrame;
 //Sets basis for all characteristics of the game window
 public class Window extends Canvas{
 	private static final long serialVersionUID = 7288512704324421631L;
-	
+	JFrame frame;
 	public Window(int width,int height, String title, Main game){
-		JFrame frame = new JFrame(title);
+		frame = new JFrame(title);
 		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		//frame.setUndecorated(true);
 		frame.setPreferredSize(new Dimension(width,height));
@@ -31,6 +31,9 @@ public class Window extends Canvas{
 			}
 		});
 		game.start();
+	}
+	public JFrame getFrame() {
+		return frame;
 	}
 	
 }

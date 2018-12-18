@@ -1,6 +1,5 @@
 package com.radar;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -17,7 +16,6 @@ public class Chunk {
 	LinkedList<Integer> blockPos = new LinkedList<Integer>();
 	LinkedList<CubeObject> blocks = new LinkedList<CubeObject>();
 	LinkedList<CubeObject> visibleBlocks = new LinkedList<CubeObject>();
-	//LinkedList<Cube> combinedBlocks = new LinkedList<Cube>();
 	volatile LinkedList<BlockFace> facesToRender = new LinkedList<BlockFace>();
 	volatile LinkedList<BlockFace> facesToRender2 = new LinkedList<BlockFace>();
 	RenderThread renderThread1;
@@ -26,19 +24,16 @@ public class Chunk {
 	public volatile boolean threadReady = false;
 	public boolean doubleRender = false;
 	public double dist;
-	//TODO Temporary variable
-//	boolean start = true;
 
 	GpuHandler gpuHandler;
 	Handler handler;
 	Player player;
-	public Chunk(int chunkX, int chunkZ, Player player, Handler handler,RenderThread renderThread1, GpuHandler gpuHandler){
+	public Chunk(int chunkX, int chunkZ, Player player, Handler handler, GpuHandler gpuHandler){
 		this.gpuHandler = gpuHandler;
 		this.chunkX = chunkX;
 		this.chunkZ = chunkZ;
 		this.player = player;
 		this.handler = handler;
-		this.renderThread1 = renderThread1;
 	}
 	
 	public void tick(){
@@ -85,90 +80,6 @@ public class Chunk {
 //		if ((bound > lowerBound && bound < upperBound) || (bound > lowerBound+360 && bound < upperBound+360) || (bound > lowerBound-360 && bound < upperBound-360)){
 //			renderChunk = true;
 //		}
-		if (!renderChunk){
-			
-			playerCoords[0] = (float) player.getX();
-			playerCoords[1] = (float) player.getY();
-			playerCoords[2] = (float) player.getZ();
-			
-			rotLat = player.getRotLat();
-			rotVert = player.getRotVert();
-			sl = player.getSineLat();
-			cl = player.getCosineLat();
-			sv = player.getSineVert();
-			cv = player.getCosineVert();
-			
-//			long start = System.currentTimeMillis();
-//			relativePos = calcBlockPos(playerCoords);
-			float[] srcArrayB = new float[blockPos.size()];
-			int i = 0;
-			for (Integer coord: blockPos) {
-				if (i % 3 == 0) {
-					srcArrayB[i] = coord-playerCoords[0];
-				}else if (i % 3 == 1) {
-					srcArrayB[i] = coord-playerCoords[1];
-				}else {
-					srcArrayB[i] = coord-playerCoords[2];
-				}
-				i++;
-			}relativePos = srcArrayB;
-//			System.out.println(System.currentTimeMillis()-start);
-//			if (start) {
-//				start = false;
-//				for (float num : relativePos) {
-//					System.out.print(" "+num+" ");
-//				}
-//			}
-			
-//			for (CubeObject object:visibleBlocks){
-//				object.render(g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
-//			}
-			threadReady = false;
-//			renderThread1.render(this,visibleBlocks,g,playerCoords[0],playerCoords[1],playerCoords[2],rotLat,rotVert,sl,cl,sv,cv);
-			renderThread1.render(this,visibleBlocks,g,relativePos,rotLat,rotVert,sl,cl,sv,cv);
-			
-			i  = 0;
-			size = (visibleBlocks.size()/2)-2;
-
-			for (CubeObject block: visibleBlocks) {
-				block.render(relativePos[(i*3)],relativePos[(i*3)+1],relativePos[(i*3)+2],rotLat,rotVert,sl,cl,sv,cv);
-				if (i > size) {break;}
-				i++;
-			}
-			while (!threadReady) {}
-			facesToRender.addAll(facesToRender2);
-			
-			facesToRender.sort(new sortFaces());
-			for (BlockFace face:facesToRender){
-				if (face != null){
-					g.setColor(face.getColor());
-					g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
-					if (debug){
-						g.setColor(Color.BLACK);
-//						g.fillOval(face.getXCoords()[0]-2, face.getYCoords()[0]-2, 4, 4);
-//						g.fillOval(face.getXCoords()[1]-2, face.getYCoords()[1]-2, 4, 4);
-//						g.fillOval(face.getXCoords()[2]-2, face.getYCoords()[2]-2, 4, 4);
-//						g.fillOval(face.getXCoords()[3]-2, face.getYCoords()[3]-2, 4, 4);
-//						g.drawString(""+face.getDist(),face.getXCoords()[1],face.getYCoords()[1]);
-						g.drawString(""+face.getCubeIndex(),face.getXCoords()[0],face.getYCoords()[0]);
-					}
-				}
-			}
-			
-//			g.setColor(Color.BLACK);
-//			g.drawString("Faces Rendering:"+Integer.toString(i), 10, 60);
-			
-			facesToRender.clear();
-			facesToRender2.clear();
-			facesToRender = new LinkedList<BlockFace>();
-			facesToRender2 = new LinkedList<BlockFace>();
-			//TODO Double check if this could ever work
-	//		if (doubleRender){
-	//			for (CombinedCube object:combinedBlocks){
-	//				object.render(g);
-	//			}
-	//		}
-		}
 	}public int getChunkX(){
 		return chunkX;
 	}public int getChunkZ(){

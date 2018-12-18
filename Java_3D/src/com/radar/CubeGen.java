@@ -21,13 +21,11 @@ public class CubeGen extends Thread{
 	Color[] faceColorsS2 = {new Color(109, 100, 37), new Color(109, 100, 37),new Color(109, 100, 37),new Color(109, 100, 37),new Color(160, 147, 57), new Color(160, 147, 57)};
 	Color[] testColors = {Color.BLUE, Color.RED, Color.GREEN, Color.ORANGE, Color.YELLOW,Color.CYAN};
 	Color[] cubeColors = new Color[6];
-	RenderThread renderThread1;
 	GpuHandler gpuHandler;
-	public CubeGen(Player[] players, Handler handler, RenderThread renderThread1, GpuHandler gpuHandler){
+	public CubeGen(Player[] players, Handler handler, GpuHandler gpuHandler){
 		this.gpuHandler = gpuHandler;
 		this.players = players;
 		this.handler = handler;
-		this.renderThread1 = renderThread1;
 	}
 	//Way to change back to only single cubes
 	boolean combined = true;
@@ -45,7 +43,7 @@ public class CubeGen extends Thread{
 					i = 0;
 					chunkX = chunkPos.get(0);
 					chunkZ = chunkPos.get(1);
-					chunkCreating = new Chunk(chunkX, chunkZ, players[0],handler, renderThread1, gpuHandler);
+					chunkCreating = new Chunk(chunkX, chunkZ, players[0],handler, gpuHandler);
 					if (combined){
 						while(i < currentChunk.size()){
 							if (currentChunk.get(i) != 0 && !valueIn(removedBlocks,i)) {
