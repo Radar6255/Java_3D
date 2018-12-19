@@ -20,10 +20,12 @@ public class Handler {
 	volatile LinkedList<CubeObject[]> visibleBlocksTemp = new LinkedList<CubeObject[]>();
 	public LinkedList<Integer[]> blockPos = new LinkedList<Integer[]>();
 	volatile LinkedList<Integer[]> blockPosTemp = new LinkedList<Integer[]>();
+	
 	public static RenderThread renderThread1;
 	GpuHandler gpuHandler;
 	public CubeGen cubeGen;
 	public Main main;
+	
 	public Handler(Main main){
 		gpuHandler = new GpuHandler();
 		cubeGen = new CubeGen(players, this, gpuHandler);
@@ -38,8 +40,8 @@ public class Handler {
 	
 	//Holds indices of chunks loaded into render and where they start in the objects linkedList
 	LinkedList<Integer[]> renderedChunks = new LinkedList<Integer[]>();
-	volatile LinkedList<Integer[]> removeData = new LinkedList<Integer[]>();
 	LinkedList<Integer> chunkSizes = new LinkedList<Integer>();
+	
 	int x,y,z, osize,xOff,zOff,chunkX,chunkZ,width,ix,iz,sCubeCount,chunkSize,cCubeCount;
 	volatile int blockPosStart,visibleBlockStart = 0;
 	volatile boolean renderWait = true;
@@ -89,10 +91,6 @@ public class Handler {
 		renderQueue.add(chunk);
 		blockPosTemp.add(chunk.getBlockPos().toArray(new Integer[chunk.getBlockPos().size()]));
 		visibleBlocksTemp.add(chunk.getVisibleBlocks().toArray(new CubeObject[chunk.getVisibleBlocks().size()]));
-		Integer[] temp = new Integer[6];
-		temp[0] = chunk.getChunkX();
-		temp[1] = chunk.getChunkZ();
-		removeData.add(temp);
 	}public void placeBlock() {
 		for (Chunk chunk:renderChunks) {
 			chunk.placeBlock();
@@ -127,7 +125,6 @@ public class Handler {
 			loadChunk = false;
 		}
 		//Loads chunks from world making them into cube objects to be rendered and ticked
-		//&& currentChunk != null
 		if (loadChunk && !currentChunk.isEmpty()){
 			cubeGen.createChunk(currentChunk,chunkX+ix,chunkZ+iz);
 			synchronized(this) {
@@ -144,7 +141,6 @@ public class Handler {
 		}if (iz == SettingVars.viewDist+1){
 			iz = -SettingVars.viewDist;
 		}
-//		renderChunks.sort(new chunkCompare());
 
 //		for (Chunk chunk:renderChunks){
 //			chunk.render(g);
@@ -197,7 +193,7 @@ public class Handler {
 	float[] playerCoords = new float[3];
 	float[] relativePos;
 	double rotLat, rotVert,sl,cl,sv,cv;
-	
+	ArrayList<CubeObject> temp = new ArrayList<CubeObject>();
 	public void cubeRender(Graphics g) {
 		player = players[0];
 		playerCoords[0] = (float) player.getX();
@@ -211,8 +207,28 @@ public class Handler {
 		sv = player.getSineVert();
 		cv = player.getCosineVert();
 		
+		if (SettingVars.gpu || SettingVars.multiThread) {
+			temp.clear();
+			for (CubeObject[] blocks:visibleBlocks) {
+				for (CubeObject block: blocks) {
+					temp.add(block);
+				}
+			}
+		}
+		
+		
 		if (SettingVars.gpu) {
-			relativePos = calcBlockPos(playerCoords);
+			i = 0;
+			float [] temp2 = new float[temp.size()*3];
+			while (i+2 < temp2.length) {
+				temp2[i] = playerCoords[0];
+				temp2[i+1] = playerCoords[1];
+				temp2[i+2] = playerCoords[2];
+				i+=3;
+			}
+			
+//			relativePos = calcBlockPos(playerCoords);
+			relativePos = calcBlockPos(temp2);
 		}else {
 			relativePos = new float[linkArraySize(blockPos)];
 			i = 0;
@@ -229,12 +245,7 @@ public class Handler {
 				}
 			}
 		}
-		LinkedList<CubeObject> temp = new LinkedList<CubeObject>();
-		for (CubeObject[] blocks:visibleBlocks) {
-			for (CubeObject block: blocks) {
-				temp.add(block);
-			}
-		}
+		
 		if (SettingVars.multiThread) {
 			renderWait = true;
 			renderThread1.render(this,temp,g,relativePos,rotLat,rotVert,sl,cl,sv,cv);
@@ -284,7 +295,7 @@ public class Handler {
 	}
 	public int linkArraySize(LinkedList<Integer[]> data) {
 		i = 0;
-		for (Integer[] chunkData:blockPos) {
+		for (Integer[] chunkData:data) {
 			i+=chunkData.length;
 		}return i;
 	}

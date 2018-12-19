@@ -77,7 +77,7 @@ public class GpuHandler {
     		    "             __global float *c)"+
     		    "{"+
     		    "    int gid = get_global_id(0);"+
-    		    "    c[gid] = b[gid] - a[gid%3];"+
+    		    "    c[gid] = b[gid] - a[gid];"+
     		    "}";
         
         program = clCreateProgramWithSource(context,
@@ -100,6 +100,7 @@ public class GpuHandler {
         memObjects[0] = clCreateBuffer(context, 
             CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
             Sizeof.cl_float * size, srcA, null);
+//            Sizeof.cl_float * 3, srcA, null);
         memObjects[1] = clCreateBuffer(context, 
             CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
             Sizeof.cl_float * size, srcB, null);

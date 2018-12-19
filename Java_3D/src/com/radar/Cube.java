@@ -3,7 +3,7 @@ package com.radar;
 import java.awt.Color;
 import java.util.ArrayList;
 public class Cube extends CubeObject{
-	public int x, y, z, w, h, d, i, fov, far,pfov, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax, height, width;
+	public int x, y, z, w, h, d, i, fov, far, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax, height, width;
 	public float tx, ty, tz;
 	
 	
@@ -21,14 +21,14 @@ public class Cube extends CubeObject{
 	Chunk chunk;
 	
 	public static float[][] verts = { { 0.5f, 0.5f, 0.5f }, { 0.5f, -0.5f, 0.5f }, { -0.5f, -0.5f, 0.5f },{ -0.5f, 0.5f, 0.5f }, { 0.5f, 0.5f, -0.5f }, { 0.5f, -0.5f, -0.5f }, { -0.5f, -0.5f, -0.5f },{ -0.5f, 0.5f, -0.5f } };
-//	public static float[][] centerVerts = { { 0.0f, 0.0f, 0.5f }, { 0.0f, 0.0f, -0.5f }, { 0.5f, 0.0f, 0.0f },{ -0.5f, 0.0f, 0.0f }, { 0.0f, -0.5f, 0.0f }, { 0.0f, 0.5f, 0.0f } };
+
+	public float[][] vertsMod = { { 0.5f, 0.5f, 0.5f }, { 0.5f, -0.5f, 0.5f }, { -0.5f, -0.5f, 0.5f },{ -0.5f, 0.5f, 0.5f }, { 0.5f, 0.5f, -0.5f }, { 0.5f, -0.5f, -0.5f }, { -0.5f, -0.5f, -0.5f },{ -0.5f, 0.5f, -0.5f } };
+
 	private int[][] faces = { { 0, 1, 2, 3, 0, 1}, { 4, 5, 6, 7, 1, 1}, { 0, 4, 5, 1, 2, 1}, { 2, 6, 7, 3, 3, 1},{ 1, 5, 6, 2, 4, 1}, { 3, 7, 4, 0, 5, 1} };
 	public float[][] points3D = new float[9][3];
 	
-	public float[] pointsX = new float[4];
-	public float[] pointsY = new float[4];
 	public float[] pointsZ = new float[4];
-	boolean first = true;
+	
 	public int[][] points = new int[8][3];
 	public double[] distances = new double[8];
 	private int[] xCoords = new int[4];
@@ -68,18 +68,13 @@ public class Cube extends CubeObject{
 		else {
 			combinedCubeUpdate();
 		}
+//		updateModVerts();
 		
 	}
 	public void render(double relx, double rely, double relz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
-		//Uncomment to run on main thread, else it runs on the cubeGen thread
-//		if (first){
-//			renderUpdate();
-//			first = false;
-//		}
-		//Consider grabbing in the render from chunk
 		
 		//Need to get viewing angle and use it to make V in which cubes should be rendered
-//		renderBlock = true;
+		//Saves a few fps
 		renderBlock = false;
 		//TODO Push the V backwards from players perspective, need to use sin + cos to find where the bottom of the v starts
 		lowerBound = (360 - rotLat) - 60;
@@ -111,27 +106,13 @@ public class Cube extends CubeObject{
 		}
 		if (renderBlock){
 			//Loop through all vertices to find which is farthest from player
-			//pointsRemoved = new int[8];
 			i = 0;
 			far = 0;
 			
 			for (float[] point : verts) {
-				//Pulls x,y,z of points taking into account width, height, and depth
-				if (point[0] > 0.0){
-					tx = point[0]+(w-1);
-				}else{
-					tx = point[0];
-				}
-				if (point[1] > 0.0){
-					ty = point[1]+(h-1);
-				}else{
-					ty = point[1];
-				}
-				if (point[2] < 0.0){
-					tz = point[2]+(d-1);
-				}else{
-					tz = point[2];
-				}
+				tx = vertsMod[i][0];
+				ty = vertsMod[i][1];
+				tz = vertsMod[i][2];
 				
 				tx = (float) (tx + (relx));
 				ty = (float) (ty + (rely));
@@ -171,9 +152,6 @@ public class Cube extends CubeObject{
 				if (f > 0){
 					renderBlock = false;
 				}
-				
-				//Corner points render mostly for debugging
-				//g.fillOval((int) ((tx * f) + (Main.WIDTH / 2) - 2), (int) ((ty * f) + (Main.HEIGHT) - 2), 4, 4);
 				
 				//Puts 2D points into array for later when I need to render the polygons
 
@@ -267,6 +245,7 @@ public class Cube extends CubeObject{
 									}else {
 										h+=1;
 									}
+									updateModVerts();
 									tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, Color.red,cubeIndex);
 //									chunk.addFace(tempFace);
 									handler.addFace(tempFace);
@@ -298,6 +277,30 @@ public class Cube extends CubeObject{
 			fov = height;
 		}
 	}
+	
+	public void updateModVerts() {
+		i = 0;
+		while (i < vertsMod.length) {
+			//Pulls x,y,z of points taking into account width, height, and depth
+			if (vertsMod[i][0] > 0.0){
+				vertsMod[i][0] = verts[i][0] + (w-1);
+			}else {
+				vertsMod[i][0] = verts[i][0];
+			}
+			if (vertsMod[i][1] > 0.0){
+				vertsMod[i][1] = verts[i][1] + (h-1);
+			}else {
+				vertsMod[i][1] = verts[i][1];
+			}
+			if (vertsMod[i][2] < 0.0){
+				vertsMod[i][2] = verts[i][2] + (d-1);
+			}else {
+				vertsMod[i][2] = verts[i][2];
+			}
+			i++;
+		}
+	}
+	
 	public boolean containsPoint(int x, int y, int[] xCoords, int[] yCoords) {
 		boolean leftS = false;
 		boolean rightS = false;

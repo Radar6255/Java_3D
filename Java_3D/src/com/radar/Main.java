@@ -30,7 +30,7 @@ public class Main extends Canvas implements Runnable{
 	static boolean pause;
 	static boolean changeMouse = true;
 	private Handler handler;
-	private MenuRender menuRender;
+	MenuRender menuRender;
 	int WIDTH = 1200;
 	int HEIGHT = 800;
 	int i = 0;
@@ -40,7 +40,7 @@ public class Main extends Canvas implements Runnable{
 	
 	public Main(){
 		handler = new Handler(this);
-		Player thePlayer = new Player(1,40,2,180,120,handler,this);
+		Player thePlayer = new Player(1.1,40.1,2.1,180,120,handler,this);
 		handler.addPlayer(thePlayer);
 		WorldGen gen = new WorldGen(handler,thePlayer);
 		handler.addGeneration(gen);
@@ -119,9 +119,6 @@ public class Main extends Canvas implements Runnable{
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		if (mode == 0) {
 			handler.render(g);
-		}else {
-			//TODO Code to make escape menu
-			menuRender.render(g);
 		}
 		g.setColor(Color.BLACK);
 		g.drawString("FPS:"+Integer.toString(fps), WIDTH-75, 20);

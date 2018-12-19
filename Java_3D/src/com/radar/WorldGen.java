@@ -73,7 +73,7 @@ public class WorldGen{
 //								ty = (int) Math.round(0.4*(Math.pow(((tz)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((tx)+(16*(chunkZ+iz)))*0.2, 2)));
 //								ty = (int) Math.round(Math.pow((0.16-Math.pow((0.6-Math.pow((Math.pow(((tz)+(16*(chunkX+ix)))*0.04,2)+Math.pow(((tx)+(16*(chunkZ+iz)))*0.04,2)),0.5)),2)),0.5)*20);
 //								ty = (int) ((Math.sin(((tz)+(16*(chunkX+ix)))*0.2)*Math.cos(((tx)+(16*(chunkZ+iz)))*0.2))*5.0)+10;
-							ty = (int) (18*(noise(((tx)+(16*(chunkZ+iz)))/80.0,(((tz)+(16*(chunkX+ix)))/80.0))+1));
+							ty = (int) (20*(noise(((tx)+(16*(chunkZ+iz)))/100.0,(((tz)+(16*(chunkX+ix)))/100.0))+1));
 //								System.out.println((10*(Value2D(((tx)+(16*(chunkZ+iz))),((tz)+(16*(chunkX+ix))),8)+1)));
 //								if ((((tz)+(16*(chunkX+ix))) + 3) != 0){
 //									ty = (int) ( (((tx)+(16*(chunkZ+iz))) + 2) / (((tz)+(16*(chunkX+ix))) + 3) );

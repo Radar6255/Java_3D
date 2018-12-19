@@ -1,7 +1,6 @@
 package com.radar;
 
 import java.awt.Button;
-import java.awt.Graphics;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -68,9 +67,4 @@ public class MenuRender {
 			frame.add(button);
 		}
 	}
-	
-	public void render(Graphics g) {
-		
-	}
-	
 }
