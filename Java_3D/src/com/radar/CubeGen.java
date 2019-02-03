@@ -79,6 +79,7 @@ public class CubeGen extends Thread{
 								}
 //								System.out.println(i);
 //								cubeColors = testColors;
+//								System.out.println(Thread.currentThread()+"Start");
 								new Cube(cubeColors.clone(), (int) Math.floor(((i/256.0)-Math.floor(i/256.0))*16.0) + 16*(chunkX), (int) Math.floor(i/256.0), (int) (((i/16.0)-Math.floor(i/16.0))*16.0) + 16*(chunkZ),depth,1,-width+2,handler,i,chunkX,chunkZ,chunkCreating );
 							}
 							i++;

@@ -57,8 +57,12 @@ public class Player {
 
 			mx = tempPoint.getX();
 			my = tempPoint.getY();
-			rotLat = rotLat + ((mx-centerX)/6);
-			rotVert = rotVert + ((my-centerY)/6);
+			
+//			mx = mx*SettingVars.sensScale;
+//			my = my*SettingVars.sensScale;
+			
+			rotLat = rotLat + ((mx-centerX)*SettingVars.sensScale);
+			rotVert = rotVert + ((my-centerY)*SettingVars.sensScale);
 			if (rotVert > 90){
 				rotVert = 90;
 			}if (rotVert < -90){

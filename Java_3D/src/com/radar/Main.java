@@ -14,8 +14,8 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-
 import javax.swing.JFrame;
+
 //Main class initializes all classes and runs the game loop
 public class Main extends Canvas implements Runnable{
 	public String version = "1.1.2";
@@ -33,7 +33,6 @@ public class Main extends Canvas implements Runnable{
 	MenuRender menuRender;
 	int WIDTH = 1200;
 	int HEIGHT = 800;
-	int i = 0;
 	int iz = -50;
 	JFrame frame;
 //	ImageIcon img = new ImageIcon("./dirt.png");
@@ -125,7 +124,7 @@ public class Main extends Canvas implements Runnable{
 		if (seconds > 0) {
 			g.drawString("Avg FPS:"+Integer.toString(totalFrames/seconds), WIDTH-85, 40);
 		}
-//		g.drawString(version, 10, HEIGHT-40);
+		g.drawString(""+Cube.cubeCount, 10, HEIGHT-40);
 		g.dispose();
 		bs.show();
 	}

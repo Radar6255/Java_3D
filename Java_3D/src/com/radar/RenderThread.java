@@ -26,7 +26,8 @@ public class RenderThread extends Thread{
 					int i = 0;
 					for (CubeObject block: visibleBlocks) {
 //						block.render(px, py, pz, rotLat, rotVert, sl, cl, sv, cv);
-						block.render(relativePos[(size+i)*3], relativePos[((size+i)*3)+1], relativePos[((size+i)*3)+2], rotLat, rotVert, sl, cl, sv, cv);
+//						block.render(relativePos[(size+i)*3], relativePos[((size+i)*3)+1], relativePos[((size+i)*3)+2], rotLat, rotVert, sl, cl, sv, cv);
+						
 //						block.render(relativePos[((size/2)+i+1)*3], relativePos[(((size/2)+i+1)*3)+1], relativePos[(((size/2)+i+1)*3)+2], rotLat, rotVert, sl, cl, sv, cv);
 						i++;
 					}

@@ -1,6 +1,7 @@
 package com.radar;
 
 import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 
@@ -14,12 +15,14 @@ import java.util.LinkedList;
 public class Chunk {
 	int size;
 	LinkedList<Integer> blockPos = new LinkedList<Integer>();
+	ArrayList<Float> modifiedVerts = new ArrayList<Float>();
 	LinkedList<CubeObject> blocks = new LinkedList<CubeObject>();
 	LinkedList<CubeObject> visibleBlocks = new LinkedList<CubeObject>();
 	volatile LinkedList<BlockFace> facesToRender = new LinkedList<BlockFace>();
 	volatile LinkedList<BlockFace> facesToRender2 = new LinkedList<BlockFace>();
 	RenderThread renderThread1;
-	public int chunkX, chunkZ, xOff, zOff,off, i;
+	public int chunkX, chunkZ, xOff, zOff,off;
+	int i;
 	public boolean debug = false;
 	public volatile boolean threadReady = false;
 	public boolean doubleRender = false;
@@ -109,13 +112,18 @@ public class Chunk {
 		}else {
 			facesToRender2.add(face);
 		}
-	}public void addCube(CubeObject cube,int x, int y, int z){
+	}public void addCube(CubeObject cube,int x, int y, int z, float[][] vertsMod){
 		blocks.add(cube);
 		if (cube.isVisible()){
 			visibleBlocks.add(cube);
 			blockPos.add(x);
 			blockPos.add(y);
 			blockPos.add(z);
+			for (float[] verts:vertsMod) {
+				for (float coord:verts) {
+					modifiedVerts.add((float) coord);
+				}
+			}
 		}
 	}
 	public double getDist(){
@@ -137,6 +145,15 @@ public class Chunk {
 		return visibleBlocks;
 	}public LinkedList<Integer> getBlockPos(){
 		return blockPos;
+	}
+	public float[] getModVerts(){
+		float[] tempA = new float[modifiedVerts.size()];
+		i = 0;
+		while (i < modifiedVerts.size()) {
+			tempA[i] = modifiedVerts.get(i);
+			i++;
+		}
+		return tempA;
 	}
 }
 

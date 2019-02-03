@@ -3,9 +3,11 @@ package com.radar;
 import java.awt.Color;
 import java.util.ArrayList;
 public class Cube extends CubeObject{
-	public int x, y, z, w, h, d, i, fov, far, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax, height, width;
+	public int x, y, z, w, h, d, fov, far, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax, height, width;
+	private int i;
 	public float tx, ty, tz;
 	
+	public static int cubeCount = 0;
 	
 	//px, py, pz
 	public double f, f2, rotLat, rotVert, dist, ldist, dist2, bound;
@@ -20,11 +22,11 @@ public class Cube extends CubeObject{
 	private Handler handler;
 	Chunk chunk;
 	
-	public static float[][] verts = { { 0.5f, 0.5f, 0.5f }, { 0.5f, -0.5f, 0.5f }, { -0.5f, -0.5f, 0.5f },{ -0.5f, 0.5f, 0.5f }, { 0.5f, 0.5f, -0.5f }, { 0.5f, -0.5f, -0.5f }, { -0.5f, -0.5f, -0.5f },{ -0.5f, 0.5f, -0.5f } };
+	public static final float[][] verts = { { 0.5f, 0.5f, 0.5f }, { 0.5f, -0.5f, 0.5f }, { -0.5f, -0.5f, 0.5f },{ -0.5f, 0.5f, 0.5f }, { 0.5f, 0.5f, -0.5f }, { 0.5f, -0.5f, -0.5f }, { -0.5f, -0.5f, -0.5f },{ -0.5f, 0.5f, -0.5f } };
 
 	public float[][] vertsMod = { { 0.5f, 0.5f, 0.5f }, { 0.5f, -0.5f, 0.5f }, { -0.5f, -0.5f, 0.5f },{ -0.5f, 0.5f, 0.5f }, { 0.5f, 0.5f, -0.5f }, { 0.5f, -0.5f, -0.5f }, { -0.5f, -0.5f, -0.5f },{ -0.5f, 0.5f, -0.5f } };
 
-	private int[][] faces = { { 0, 1, 2, 3, 0, 1}, { 4, 5, 6, 7, 1, 1}, { 0, 4, 5, 1, 2, 1}, { 2, 6, 7, 3, 3, 1},{ 1, 5, 6, 2, 4, 1}, { 3, 7, 4, 0, 5, 1} };
+	private static final int[][] faces = { { 0, 1, 2, 3, 0, 1}, { 4, 5, 6, 7, 1, 1}, { 0, 4, 5, 1, 2, 1}, { 2, 6, 7, 3, 3, 1},{ 1, 5, 6, 2, 4, 1}, { 3, 7, 4, 0, 5, 1} };
 	public float[][] points3D = new float[9][3];
 	
 	public float[] pointsZ = new float[4];
@@ -38,6 +40,22 @@ public class Cube extends CubeObject{
 
 	public double upperBound, lowerBound = 0;
 	
+	float[][] sentVerts;
+	
+	/**
+	 * @param faceColors Array of Color objects corresponding to a color for each side
+	 * @param x X position of the cube
+	 * @param y Y position of the cube
+	 * @param z Z position of the cube
+	 * @param w Width of the cube
+	 * @param h Height of the cube
+	 * @param d Depth of the cube
+	 * @param handler Handler instance
+	 * @param cubeIndex Index of cube in chunk
+	 * @param chunkX Chunk x position
+	 * @param chunkZ Chunk y position
+	 * @param chunk Instance of chunk cube is in
+	 */
 	public Cube(Color[] faceColors,int x, int y, int z, int w, int h, int d,Handler handler, int cubeIndex,int chunkX,int chunkZ, Chunk chunk) {
 		this.faceColors = faceColors;
 		this.x = x;
@@ -61,67 +79,48 @@ public class Cube extends CubeObject{
 			fov = height;
 		}
 		
-		chunk.addCube(this,x,y,z);
+		
 		if (w == 1 && d == 1) {
 			renderUpdate();
 		}
 		else {
 			combinedCubeUpdate();
 		}
-//		updateModVerts();
+//		System.out.println("End "+Thread.currentThread());
 		
+		sentVerts = updateModVerts(vertsMod);
+		chunk.addCube(this,x,y,z, sentVerts);
+		cubeCount++;
 	}
-	public void render(double relx, double rely, double relz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
-		
-		//Need to get viewing angle and use it to make V in which cubes should be rendered
-		//Saves a few fps
-		renderBlock = false;
-		//TODO Push the V backwards from players perspective, need to use sin + cos to find where the bottom of the v starts
-		lowerBound = (360 - rotLat) - 60;
-		upperBound = (360 - rotLat) + 60;
-		
-		if ((relx) == 0){
-			bound = Math.toDegrees(Math.atan(relz));
-			//System.out.println(z-pz);
-		}else{
-			bound = Math.toDegrees(Math.atan((relz)/(relx)));
-			//System.out.println((z-pz)/(x-px));
-		}
-		
-		//2nd Quad
-		if((relx) < 0 && (relz) > 0){
-			bound = 180 + bound;
-		}//3rd Quad
-		else if((relx) < 0 && (relz) < 0){
-			bound = 180 + bound;
-		}//4th  Quad
-		else if((relx) > 0 && (relz) < 0){
-			bound = 360 + bound;
-		}
-		
-		bound += 90.5;
-		
-		if ((bound > lowerBound && bound < upperBound) || (bound > lowerBound+360 && bound < upperBound+360) || (bound > lowerBound-360 && bound < upperBound-360)){
-			renderBlock = true;
-		}
-		if (renderBlock){
+//	public void render(double relx, double rely, double relz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
+	public void render(double relx, double rely, double relz, double rotLat, double rotVert, float[] tempX, float[] tempY, float[] tempZ) {
+		if (frustrumCull(relx,rely,relz,rotLat)){
 			//Loop through all vertices to find which is farthest from player
-			i = 0;
+			int test = 0;
 			far = 0;
-			
 			for (float[] point : verts) {
-				tx = vertsMod[i][0];
-				ty = vertsMod[i][1];
-				tz = vertsMod[i][2];
+				tx = vertsMod[test][0];
+				ty = vertsMod[test][1];
+				tz = vertsMod[test][2];
+//				if (tx != relx) {
+//					System.out.println(tempX[test] +" "+tx+" "+test);
+//				}
 				
-				tx = (float) (tx + (relx));
-				ty = (float) (ty + (rely));
-				tz = (float) (tz + (relz));
+//				tx = (float) (tx + (relx));
+//				ty = (float) (ty + (rely));
+//				tz = (float) (tz + (relz));
 				
-				points3D[i][0] = tx;
-				points3D[i][1] = ty;
+				tx = (float) (-x + relx);
+				ty = (float) (y - rely);
+				tz = (float) (z - relz);
 				
-				//Rotates points so that player appears to look around
+				double sl = handler.getPlayer().getSineLat();
+				double cl = handler.getPlayer().getCosineLat();
+				double sv = handler.getPlayer().getSineVert();
+				double cv = handler.getPlayer().getCosineVert();
+				if (tempX[0] == tx) {
+					System.out.println("X is right");
+				}
 				point = rotate2D(tx, tz, sl,cl);
 				tx = point[0];
 				tz = point[1];
@@ -129,6 +128,19 @@ public class Cube extends CubeObject{
 				point = rotate2D(ty, tz, sv,cv);
 				ty = point[0];
 				tz = point[1];
+				
+//				points3D[test][0] = tx;
+//				points3D[test][1] = ty;
+				
+//				if (tempX[test] != tx) {
+//					System.out.println("X is wrong");
+//				}
+				
+				//Rotates points so that player appears to look around
+				
+//				tx = tempX[test];
+//				ty = tempY[test];
+//				tz = tempZ[test];
 				dist = -tz;
 //				if (tx > 0) {
 //					dist = -tz+(tx*0.2);
@@ -138,9 +150,9 @@ public class Cube extends CubeObject{
 //					faceColors[5] = Color.BLUE;
 //				}
 				
-				points3D[i][2] = -tz;
+				points3D[test][2] = -tz;
 				//TODO Double check visual bugs
-				if (i == 0) {
+				if (test == 0) {
 					ldist = dist;
 				}
 				//Calculates field of view
@@ -155,16 +167,16 @@ public class Cube extends CubeObject{
 				
 				//Puts 2D points into array for later when I need to render the polygons
 
-				points[i][0] = (int) ((tx * f) + (width / 2));
-				points[i][1] = (int) ((ty * f) + (height));
-				points[i][2] = (int) (tz);
+				points[test][0] = (int) ((tx * f) + (width / 2));
+				points[test][1] = (int) ((ty * f) + (height));
+				points[test][2] = (int) (tz);
 				
 				//Finds point farthest from the player
 				if (ldist < dist) {
 					ldist = dist;
-					far = i;
+					far = test;
 				}
-				i++;
+				test++;
 			}
 			if (renderBlock){
 //			renderFaces = new LinkedList<BlockFace>();
@@ -245,7 +257,7 @@ public class Cube extends CubeObject{
 									}else {
 										h+=1;
 									}
-									updateModVerts();
+									updateModVerts(vertsMod);
 									tempFace = new BlockFace(xCoords, yCoords, zCoords, face, dist, Color.red,cubeIndex);
 //									chunk.addFace(tempFace);
 									handler.addFace(tempFace);
@@ -268,6 +280,9 @@ public class Cube extends CubeObject{
 		}
 		place = false;
 	}
+	/* (non-Javadoc)
+	 * @see com.radar.CubeObject#updateFov()
+	 */
 	public void updateFov() {
 		width = handler.getWidth();
 		height = handler.getHeight();
@@ -278,27 +293,29 @@ public class Cube extends CubeObject{
 		}
 	}
 	
-	public void updateModVerts() {
+	public float[][] updateModVerts(float[][] vertMod) {
 		i = 0;
-		while (i < vertsMod.length) {
+		while (i < vertMod.length) {
 			//Pulls x,y,z of points taking into account width, height, and depth
-			if (vertsMod[i][0] > 0.0){
-				vertsMod[i][0] = verts[i][0] + (w-1);
+			if (vertMod[i][0] > 0.0){
+				vertMod[i][0] = verts[i][0] + (w-1);
 			}else {
-				vertsMod[i][0] = verts[i][0];
+				vertMod[i][0] = verts[i][0];
 			}
-			if (vertsMod[i][1] > 0.0){
-				vertsMod[i][1] = verts[i][1] + (h-1);
+			if (vertMod[i][1] > 0.0){
+				vertMod[i][1] = verts[i][1] + (h-1);
 			}else {
-				vertsMod[i][1] = verts[i][1];
+				vertMod[i][1] = verts[i][1];
 			}
-			if (vertsMod[i][2] < 0.0){
-				vertsMod[i][2] = verts[i][2] + (d-1);
+			if (vertMod[i][2] < 0.0){
+				vertMod[i][2] = verts[i][2] + (d-1);
 			}else {
-				vertsMod[i][2] = verts[i][2];
+				vertMod[i][2] = verts[i][2];
 			}
 			i++;
 		}
+		vertsMod = vertMod;
+		return vertMod;
 	}
 	
 	public boolean containsPoint(int x, int y, int[] xCoords, int[] yCoords) {
@@ -426,12 +443,16 @@ public class Cube extends CubeObject{
 //		return (Math.sqrt(Math.pow(tx, 2) + Math.pow(ty, 2) + Math.pow(tz, 2)));
 //	}
 
+	/**
+	 * @return Index of the cube in the chunk
+	 */
 	public int getIndex() {
 		return cubeIndex;
-	}public void setDebug(boolean debug){
+	}
+	public void setDebug(boolean debug){
 		this.debug = debug;
 	}
-
+	
 	public void tick() {}
 	
 	public boolean isVisible(){
@@ -441,7 +462,8 @@ public class Cube extends CubeObject{
 			}
 		}
 		return false;
-	}public void combinedCubeUpdate() {
+	}
+	public void combinedCubeUpdate() {
 		
 		xOff= handler.getXOff();
 		zOff= handler.getZOff();
@@ -568,13 +590,56 @@ public class Cube extends CubeObject{
 		}
 	}public void placeBlock() {
 		place = true;
-		Player player = handler.getPlayer();
+//		Player player = handler.getPlayer();
+//		
+//		double sl = player.getSineLat();
+//		double cl = player.getCosineLat();
+//		double sv = player.getSineVert();
+//		double cv = player.getCosineVert();
+//		render(player.getX(),player.getY(),player.getZ(),player.getRotLat(),player.getRotVert(),sl,cl,sv,cv);
+	}
+	
+	/**
+	 * @param relx Cube x position relative to player
+	 * @param rely Cube y position relative to player
+	 * @param relz Cube z position relative to player
+	 * @param rotLat Rotation of player in degrees
+	 * @return True if in front of player, false if not
+	 */
+	public boolean frustrumCull(double relx, double rely, double relz, double rotLat) {
+		//Need to get viewing angle and use it to make V in which cubes should be rendered
+		//Saves a few fps
 		
-		double sl = player.getSineLat();
-		double cl = player.getCosineLat();
-		double sv = player.getSineVert();
-		double cv = player.getCosineVert();
-		render(player.getX(),player.getY(),player.getZ(),player.getRotLat(),player.getRotVert(),sl,cl,sv,cv);
+		renderBlock = false;
+		//TODO Push the V backwards from players perspective, need to use sin + cos to find where the bottom of the v starts
+		lowerBound = (360 - rotLat) - 60;
+		upperBound = (360 - rotLat) + 60;
+		
+		if ((relx) == 0){
+			bound = Math.toDegrees(Math.atan(relz));
+			//System.out.println(z-pz);
+		}else{
+			bound = Math.toDegrees(Math.atan((relz)/(relx)));
+			//System.out.println((z-pz)/(x-px));
+		}
+		
+		//2nd Quad
+		if((relx) < 0 && (relz) > 0){
+			bound = 180 + bound;
+		}//3rd Quad
+		else if((relx) < 0 && (relz) < 0){
+			bound = 180 + bound;
+		}//4th  Quad
+		else if((relx) > 0 && (relz) < 0){
+			bound = 360 + bound;
+		}
+		
+		bound += 90.5;
+		
+		if ((bound > lowerBound && bound < upperBound) || (bound > lowerBound+360 && bound < upperBound+360) || (bound > lowerBound-360 && bound < upperBound-360)){
+			renderBlock = true;
+		}
+		return renderBlock;
 	}
 	//Code used from DLC Energy now changed a bit
 	private float[] rotate2D(float x, float y, double s,double c) {

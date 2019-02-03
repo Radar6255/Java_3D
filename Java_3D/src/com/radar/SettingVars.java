@@ -7,4 +7,5 @@ public class SettingVars {
 	public static double movementRate = 0.6;
 	public static boolean gpu = false;
 	public static boolean multiThread = false;
+	public static double sensScale = 0.1;
 }
