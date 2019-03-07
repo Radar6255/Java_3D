@@ -103,7 +103,6 @@ public class CubeGen extends Thread{
 				}
 			}
 			try {
-//				System.out.println("Paused");
 				synchronized(handler) {
 					handler.wait();
 				}

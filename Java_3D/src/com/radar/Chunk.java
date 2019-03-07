@@ -1,7 +1,6 @@
 package com.radar;
 
 import java.awt.Graphics;
-import java.util.Comparator;
 import java.util.LinkedList;
 
 //This class is created when a chunk is loaded
@@ -20,7 +19,6 @@ public class Chunk {
 	volatile LinkedList<BlockFace> facesToRender2 = new LinkedList<BlockFace>();
 	RenderThread renderThread1;
 	public int chunkX, chunkZ, xOff, zOff,off, i;
-	public boolean debug = false;
 	public volatile boolean threadReady = false;
 	public boolean doubleRender = false;
 	public double dist;
@@ -121,15 +119,8 @@ public class Chunk {
 	public double getDist(){
 		dist = Math.sqrt(Math.pow((16*chunkX)-player.getX()+8, 2)+Math.pow((16*chunkZ)-player.getZ()+8, 2));
 		return dist;
-	}public void setDebug(boolean debug){
-		this.debug = debug;
-		for (CubeObject cube:blocks){
-			cube.setDebug(debug);
-		}
-//		for (Cube cube:combinedBlocks){
-//			cube.setDebug(debug);
-//		}
-	}public void placeBlock() {
+	}
+	public void placeBlock() {
 		for (CubeObject cube:blocks) {
 			cube.placeBlock();
 		}
@@ -140,25 +131,3 @@ public class Chunk {
 	}
 }
 
-class blockSort implements Comparator<CubeObject>{
-
-	public int compare(CubeObject o1, CubeObject o2) {
-		if (o1.getDist() < o2.getDist()){
-			return 1;
-		}else if (o1.getDist() > o2.getDist()){
-			return -1;
-		}else{return 0;}
-	}
-	
-}
-class sortFaces implements Comparator<BlockFace>{
-
-	public int compare(BlockFace o1, BlockFace o2) {
-		if (o1.getDist() < o2.getDist()){
-			return 1;
-		}else if (o1.getDist() > o2.getDist()){
-			return -1;
-		}else{return 0;}
-	}
-
-}

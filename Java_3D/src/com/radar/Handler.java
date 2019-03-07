@@ -3,6 +3,7 @@ package com.radar;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 
@@ -30,12 +31,14 @@ public class Handler {
 		gpuHandler = new GpuHandler();
 		cubeGen = new CubeGen(players, this, gpuHandler);
 		cubeGen.start();
+		
+		renderThread1 = new RenderThread("1",this);
 		if (SettingVars.multiThread) {
-			renderThread1 = new RenderThread("1");
 			renderThread1.setName("Render1");
 			renderThread1.start();
 		}
 		this.main = main;
+
 	}
 	
 	//Holds indices of chunks loaded into render and where they start in the objects linkedList
@@ -44,7 +47,7 @@ public class Handler {
 	
 	int x,y,z, osize,xOff,zOff,chunkX,chunkZ,width,ix,iz,sCubeCount,chunkSize,cCubeCount;
 	volatile int blockPosStart,visibleBlockStart = 0;
-	volatile boolean renderWait = true;
+	volatile boolean renderWait, skip = true;
 	Player[] players = new Player[2];
 	WorldGen gen;
 	boolean looping,changed,out,loadChunk,debug;
@@ -74,9 +77,7 @@ public class Handler {
 	}
 	public void debugMode(boolean debug){
 		gen.setDebug(debug);
-		for (Chunk chunk:renderChunks){
-			chunk.setDebug(debug);
-		}players[0].setDebug(debug);
+		players[0].setDebug(debug);
 		this.debug = debug;
 	}public Player getPlayer(){
 		return players[0];
@@ -88,10 +89,13 @@ public class Handler {
 		renderedChunks = new LinkedList<Integer[]>();
 		chunkI = 0;
 	}public void addChunk(Chunk chunk){
+		skip = true;
 		renderQueue.add(chunk);
 		blockPosTemp.add(chunk.getBlockPos().toArray(new Integer[chunk.getBlockPos().size()]));
 		visibleBlocksTemp.add(chunk.getVisibleBlocks().toArray(new CubeObject[chunk.getVisibleBlocks().size()]));
-	}public void placeBlock() {
+		skip = false;
+	}
+	public void placeBlock() {
 		for (Chunk chunk:renderChunks) {
 			chunk.placeBlock();
 		}
@@ -128,7 +132,8 @@ public class Handler {
 		if (loadChunk && !currentChunk.isEmpty()){
 			cubeGen.createChunk(currentChunk,chunkX+ix,chunkZ+iz);
 			synchronized(this) {
-				this.notify();
+//				this.notify();
+				notifyAll();
 			}
 			Integer[] tempArray = {chunkX+ix,chunkZ+iz,osize,chunkSize};
 			renderedChunks.add(chunkI,tempArray);
@@ -146,15 +151,22 @@ public class Handler {
 //			chunk.render(g);
 //		}
 		cubeRender(g);
+//		Threw Error once
+		if (!skip) {
+			renderChunks.addAll(renderQueue);
+			renderQueue.clear();
+		}
 		
-		renderChunks.addAll(renderQueue);
-		renderQueue.clear();
 //		Threw Error twice
-		visibleBlocks.addAll(visibleBlocksTemp);
-		visibleBlocksTemp.clear();
+		if (!skip) {
+			visibleBlocks.addAll(visibleBlocksTemp);
+			visibleBlocksTemp.clear();
+		}
 //		Threw Error twice
-		blockPos.addAll(blockPosTemp);
-		blockPosTemp.clear();
+		if (!skip) {
+			blockPos.addAll(blockPosTemp);
+			blockPosTemp.clear();
+		}
 
 		
 		i = 0;
@@ -165,8 +177,8 @@ public class Handler {
 					if (data[0] == renderChunks.get(i).getChunkX() && data[1] == renderChunks.get(i).getChunkZ()){
 						chunkI--;
 						renderedChunks.remove(i2);
-						blockPos.remove(i2);
 						visibleBlocks.remove(i2);
+						blockPos.remove(i2);
 						break;
 					}
 					i2++;
@@ -181,13 +193,24 @@ public class Handler {
 			g.drawString("Combined Cubes:"+cCubeCount,10,80);
 		}
 	}
-	
+	boolean first = true;
 	public void tick(){
-		gen.tick();
+		if (!SettingVars.graphFunc) {
+			gen.tick();
+		}
 //		for (Chunk chunk:renderChunks){
 //			chunk.tick();
 //		}
 		players[0].tick();
+		if (first && SettingVars.graphFunc) {
+			Color[] faceColors = {new Color(0,162,0), new Color(0,162,0),new Color(0,162,0),new Color(0,162,0),Color.GREEN, new Color(0,132,0)};
+			Chunk test = new Chunk(0,0,players[0],this,gpuHandler);
+			for (int i = 0; i < 50; i++) {
+				test.addCube(new Cube(faceColors,(int) (10*Math.sin(0.15*i)),i,(int) (10*Math.cos(0.15*i)),1,1,1,this,0,0,0,test), chunkX, y, chunkSize);
+			}
+			addChunk(test);
+			first = false;
+		}
 	}
 	Player player;
 	float[] playerCoords = new float[3];
@@ -249,6 +272,9 @@ public class Handler {
 		if (SettingVars.multiThread) {
 			renderWait = true;
 			renderThread1.render(this,temp,g,relativePos,rotLat,rotVert,sl,cl,sv,cv);
+			synchronized(this) {
+				notifyAll();
+			}
 		
 			i = 0;
 			for (CubeObject block: temp) {
@@ -258,20 +284,30 @@ public class Handler {
 					break;
 				}
 			}
-			while (renderWait) {}
+			if (renderWait) {
+				synchronized (renderThread1) {
+					try {
+						renderThread1.wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
 			facesToRender.addAll(facesToRender2);
 		}else {
 			i = 0;
 			for (CubeObject[] blocks:visibleBlocks) {
-				for (CubeObject block: blocks) {
-					block.render(relativePos[(i*3)],relativePos[(i*3)+1],relativePos[(i*3)+2],rotLat,rotVert,sl,cl,sv,cv);
-					i++;
+				if (blocks!=null) {
+					for (CubeObject block: blocks) {
+						block.render(relativePos[(i*3)],relativePos[(i*3)+1],relativePos[(i*3)+2],rotLat,rotVert,sl,cl,sv,cv);
+						i++;
+					}
 				}
 			}
 		}
 		
-		
-		facesToRender.sort(new sortFaces());
+		Collections.sort(facesToRender);
 		for (BlockFace face:facesToRender){
 			if (face != null){
 				g.setColor(face.getColor());
@@ -296,7 +332,9 @@ public class Handler {
 	public int linkArraySize(LinkedList<Integer[]> data) {
 		i = 0;
 		for (Integer[] chunkData:data) {
-			i+=chunkData.length;
+			if (chunkData!=null) {
+				i+=chunkData.length;
+			}
 		}return i;
 	}
 	
@@ -319,7 +357,7 @@ public class Handler {
 		renderWait = false;
 	}
 	public static void startMulti() {
-		renderThread1 = new RenderThread("1");
+//		renderThread1 = new RenderThread("1",this);
 		renderThread1.setName("Render1");
 		renderThread1.start();
 	}

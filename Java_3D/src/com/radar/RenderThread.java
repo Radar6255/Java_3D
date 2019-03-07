@@ -15,8 +15,9 @@ public class RenderThread extends Thread{
 	public boolean running = true;
 	volatile boolean ready = false;
 	public Handler handler;
-	RenderThread(String index){
+	RenderThread(String index, Handler handler){
 		this.index = index;
+		this.handler = handler;
 	}
 	public void run() {
 
@@ -35,10 +36,23 @@ public class RenderThread extends Thread{
 					ready = false;
 					handler.moveOn();
 				}
+				synchronized (this) {
+					notifyAll();
+				}
 			}catch(Exception e){
 				System.out.println(e.getCause());
 			}
+			if (!ready) {
+				synchronized(handler) {
+					try {
+						handler.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
+		
 	}
 	public void render(Handler handler,ArrayList<CubeObject> visibleBlocks, Graphics g, float [] relativePos, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
 		this.handler = handler;

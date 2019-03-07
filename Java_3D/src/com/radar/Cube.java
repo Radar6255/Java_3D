@@ -6,10 +6,9 @@ public class Cube extends CubeObject{
 	public int x, y, z, w, h, d, i, fov, far, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax, height, width;
 	public float tx, ty, tz;
 	
-	
 	//px, py, pz
 	public double f, f2, rotLat, rotVert, dist, ldist, dist2, bound;
-	public boolean hasFar,debug,place = false;
+	public boolean hasFar,place = false;
 	public Color[] faceColors = new Color[6];
 	public boolean visible, changed, looping, render,repeat,renderBlock,right,left,up,down,lside,rside,back,front;
 	ArrayList<Integer> chunkData = new ArrayList<Integer>();
@@ -17,7 +16,6 @@ public class Cube extends CubeObject{
 //	LinkedList<Integer> chunkNegX = new LinkedList<Integer>();
 //	LinkedList<Integer> chunkPosY = new LinkedList<Integer>();
 //	LinkedList<Integer> chunkNegY = new LinkedList<Integer>();
-	private Handler handler;
 	Chunk chunk;
 	
 	public static float[][] verts = { { 0.5f, 0.5f, 0.5f }, { 0.5f, -0.5f, 0.5f }, { -0.5f, -0.5f, 0.5f },{ -0.5f, 0.5f, 0.5f }, { 0.5f, 0.5f, -0.5f }, { 0.5f, -0.5f, -0.5f }, { -0.5f, -0.5f, -0.5f },{ -0.5f, 0.5f, -0.5f } };
@@ -39,6 +37,7 @@ public class Cube extends CubeObject{
 	public double upperBound, lowerBound = 0;
 	
 	public Cube(Color[] faceColors,int x, int y, int z, int w, int h, int d,Handler handler, int cubeIndex,int chunkX,int chunkZ, Chunk chunk) {
+		super(handler);
 		this.faceColors = faceColors;
 		this.x = x;
 		this.y = y;
@@ -46,7 +45,7 @@ public class Cube extends CubeObject{
 		this.w = w;
 		this.h = h;
 		this.d = d;
-		this.handler = handler;
+//		this.handler = handler;
 		this.chunk = chunk;
 		pcx = chunkX;
 		pcz = chunkZ;
@@ -66,9 +65,9 @@ public class Cube extends CubeObject{
 			renderUpdate();
 		}
 		else {
-			combinedCubeUpdate();
+//			combinedCubeUpdate();
 		}
-//		updateModVerts();
+		updateModVerts();
 		
 	}
 	public void render(double relx, double rely, double relz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
@@ -268,15 +267,15 @@ public class Cube extends CubeObject{
 		}
 		place = false;
 	}
-	public void updateFov() {
-		width = handler.getWidth();
-		height = handler.getHeight();
-		if (width < height) {
-			fov = width;
-		} else {
-			fov = height;
-		}
-	}
+//	public void updateFov() {
+//		width = handler.getWidth();
+//		height = handler.getHeight();
+//		if (width < height) {
+//			fov = width;
+//		} else {
+//			fov = height;
+//		}
+//	}
 	
 	public void updateModVerts() {
 		i = 0;
@@ -419,17 +418,9 @@ public class Cube extends CubeObject{
 		}
 		return false;
 	}
-//	public double getDist() {
-//		tx = (float) (relx);
-//		ty = (float) (rely);
-//		tz = (float) (relz);
-//		return (Math.sqrt(Math.pow(tx, 2) + Math.pow(ty, 2) + Math.pow(tz, 2)));
-//	}
 
 	public int getIndex() {
 		return cubeIndex;
-	}public void setDebug(boolean debug){
-		this.debug = debug;
 	}
 
 	public void tick() {}

@@ -4,7 +4,7 @@ import java.awt.Color;
 
 //BlockFace class is object to hold data about the BlockFace to be rendered
 
-public class BlockFace {
+public class BlockFace implements Comparable<BlockFace>{
 	private int[] xCoords;
 	private int[] yCoords;
 	private int[] zCoords;
@@ -48,5 +48,13 @@ public class BlockFace {
 		return dist;
 	}public void setDist(double dist){
 		this.dist = dist;
+	}
+	@Override
+	public int compareTo(BlockFace o) {
+		if (o.getDist() > this.getDist()) {
+			return 1;
+		}else if (o.getDist() < this.getDist()) {
+			return -1;
+		}return 0;
 	}
 }

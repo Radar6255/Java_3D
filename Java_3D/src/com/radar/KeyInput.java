@@ -20,16 +20,13 @@ public class KeyInput implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
-//		if (key == KeyEvent.VK_P){
-//			System.out.println("Placed block");
-//			handler.getPlayer().placeBlock();
-//		}
 		if (key == KeyEvent.VK_F3){
 			if (!debug){
 				debug = true;
 			}else{
 				debug = false;
 			}handler.debugMode(debug);
+			CubeObject.setDebug(debug);
 		}
 		if (key == KeyEvent.VK_R){
 			handler.reloadChunks();

@@ -7,7 +7,7 @@ public class WorldGen{
 	int i,index,all,chunkX,chunkY,chunkZ,xOff,zOff,ix,iz,h,tx,ty,ty2,tz = 0;
 	boolean debug = false;
 	int genSize = SettingVars.genSize;
-	double x,y,z;
+	double x,y,z, yRange, yRange2;
 	Handler handler;
 	Player thePlayer;
 	public ArrayList<ArrayList<ArrayList<Integer>>> world2 = new ArrayList<ArrayList<ArrayList<Integer>>>();
@@ -18,6 +18,7 @@ public class WorldGen{
 		world2.add(new ArrayList<ArrayList<Integer>>());
 		world2.get(0).add(new ArrayList<Integer>());
 		i = 0;
+//		Debug flat world
 //		while(i < 256){
 //			world2.get(0).get(0).add(1);
 //			i++;
@@ -73,21 +74,40 @@ public class WorldGen{
 //								ty = (int) Math.round(0.4*(Math.pow(((tz)+(16*(chunkX+ix)))*0.2, 2)+Math.pow(((tx)+(16*(chunkZ+iz)))*0.2, 2)));
 //								ty = (int) Math.round(Math.pow((0.16-Math.pow((0.6-Math.pow((Math.pow(((tz)+(16*(chunkX+ix)))*0.04,2)+Math.pow(((tx)+(16*(chunkZ+iz)))*0.04,2)),0.5)),2)),0.5)*20);
 //								ty = (int) ((Math.sin(((tz)+(16*(chunkX+ix)))*0.2)*Math.cos(((tx)+(16*(chunkZ+iz)))*0.2))*5.0)+10;
-							ty = (int) (20*(noise(((tx)+(16*(chunkZ+iz)))/100.0,(((tz)+(16*(chunkX+ix)))/100.0))+1));
+							if (SettingVars.noise) {
+								ty = (int) (20*(noise(((tx)+(16*(chunkZ+iz)))/100.0,(((tz)+(16*(chunkX+ix)))/100.0))+1));
+							}else {
+								yRange = 0.4*(Math.pow(((tz)+(16*(chunkX+ix)))*0.3, 2)+Math.pow(((tx)+(16*(chunkZ+iz)))*0.3, 2));
+								z = ((tx)+(16*(chunkZ+iz)));
+								x = ((tz)+(16*(chunkX+ix)));
+//								yRange = 0.6*Math.sqrt((1+Math.pow((z*0.8),2)) + (Math.pow((x*0.8), 2)))+7;
+//								yRange2 = 0.6*-Math.sqrt((1+Math.pow((z*0.8),2)) + (Math.pow((x*0.8), 2)))+7;
+							}
 //								System.out.println((10*(Value2D(((tx)+(16*(chunkZ+iz))),((tz)+(16*(chunkX+ix))),8)+1)));
 //								if ((((tz)+(16*(chunkX+ix))) + 3) != 0){
 //									ty = (int) ( (((tx)+(16*(chunkZ+iz))) + 2) / (((tz)+(16*(chunkX+ix))) + 3) );
 //								}
 //								ty = (int) Math.sqrt(Math.pow((tx)+(16*(chunkZ+iz)),2) + Math.pow((tz)+(16*(chunkX+ix)),2));
-							if (ty == h){
-//								if (h == 1) {
-								if (ty < 10) {
-									world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(2);
-								}else {
-									world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
+							if (SettingVars.noise) {
+								if (ty == h){
+									if (ty < 10) {
+										world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(2);
+									}else {
+										world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
+									}
+								}else{
+									world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
 								}
-							}else{
-								world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
+							}else {
+								if ((yRange < h+0.5 && yRange > h-0.5) || (yRange2 < h+0.5 && yRange2 > h-0.5)){
+									if (ty < 10) {
+										world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(2);
+									}else {
+										world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(1);
+									}
+								}else{
+									world2.get(chunkX+xOff+ix).get(chunkZ+zOff+iz).add(0);
+								}
 							}
 							i++;
 							tx++;
