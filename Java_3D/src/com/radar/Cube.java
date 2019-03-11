@@ -6,6 +6,8 @@ public class Cube extends CubeObject{
 	public int x, y, z, w, h, d, i, fov, far, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax, height, width;
 	public float tx, ty, tz;
 	
+	public static volatile long msLag;
+	
 	//px, py, pz
 	public double f, f2, rotLat, rotVert, dist, ldist, dist2, bound;
 	public boolean hasFar,place = false;
@@ -71,7 +73,7 @@ public class Cube extends CubeObject{
 		
 	}
 	public void render(double relx, double rely, double relz, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
-		
+		long startRender = System.currentTimeMillis();
 		//Need to get viewing angle and use it to make V in which cubes should be rendered
 		//Saves a few fps
 		renderBlock = false;
@@ -266,16 +268,8 @@ public class Cube extends CubeObject{
 			}
 		}
 		place = false;
+		msLag += System.currentTimeMillis() - startRender;
 	}
-//	public void updateFov() {
-//		width = handler.getWidth();
-//		height = handler.getHeight();
-//		if (width < height) {
-//			fov = width;
-//		} else {
-//			fov = height;
-//		}
-//	}
 	
 	public void updateModVerts() {
 		i = 0;

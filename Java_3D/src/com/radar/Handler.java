@@ -11,16 +11,25 @@ import java.util.LinkedList;
 //Gets info from world then creates chunks and cubes from them
 //Uses created chunks sorted to render all BlockFaces
 public class Handler {
-	ArrayList<BlockFace> facesToRender = new ArrayList<BlockFace>();
-	ArrayList<BlockFace> facesToRender2 = new ArrayList<BlockFace>();
-	LinkedList<Chunk> renderChunks = new LinkedList<Chunk>();
+	private ArrayList<BlockFace> facesToRender = new ArrayList<BlockFace>();
+	private LinkedList<Chunk> renderChunks = new LinkedList<Chunk>();
+	private ArrayList<Integer> currentChunk = new ArrayList<Integer>();
+	
+	private LinkedList<CubeObject[]> visibleBlocks = new LinkedList<CubeObject[]>();
+	private LinkedList<Integer[]> blockPos = new LinkedList<Integer[]>();
+	
 	volatile LinkedList<Chunk> renderQueue = new LinkedList<Chunk>();
-	LinkedList<Chunk> objectsSorted = new LinkedList<Chunk>();
-	ArrayList<Integer> currentChunk = new ArrayList<Integer>();
-	LinkedList<CubeObject[]> visibleBlocks = new LinkedList<CubeObject[]>();
 	volatile LinkedList<CubeObject[]> visibleBlocksTemp = new LinkedList<CubeObject[]>();
-	public LinkedList<Integer[]> blockPos = new LinkedList<Integer[]>();
 	volatile LinkedList<Integer[]> blockPosTemp = new LinkedList<Integer[]>();
+
+//	LinkedList<Chunk> renderQueue = new LinkedList<Chunk>();
+//	LinkedList<CubeObject[]> visibleBlocksTemp = new LinkedList<CubeObject[]>();
+//	LinkedList<Integer[]> blockPosTemp = new LinkedList<Integer[]>();
+	
+//	public static long cubeRenderMs = 0;
+//	public static long testMs = 0;
+	public long cubeRenderMs = 0;
+	public long testMs = 0;
 	
 	public static RenderThread renderThread1;
 	GpuHandler gpuHandler;
@@ -88,9 +97,10 @@ public class Handler {
 		renderedChunks = null;
 		renderedChunks = new LinkedList<Integer[]>();
 		chunkI = 0;
-	}public void addChunk(Chunk chunk){
+	}public synchronized void addChunk(Chunk chunk){
 		skip = true;
 		renderQueue.add(chunk);
+//		renderChunks.add(chunk);
 		blockPosTemp.add(chunk.getBlockPos().toArray(new Integer[chunk.getBlockPos().size()]));
 		visibleBlocksTemp.add(chunk.getVisibleBlocks().toArray(new CubeObject[chunk.getVisibleBlocks().size()]));
 		skip = false;
@@ -150,7 +160,9 @@ public class Handler {
 //		for (Chunk chunk:renderChunks){
 //			chunk.render(g);
 //		}
+		long start = System.currentTimeMillis();
 		cubeRender(g);
+		cubeRenderMs = System.currentTimeMillis() - start;
 //		Threw Error once
 		if (!skip) {
 			renderChunks.addAll(renderQueue);
@@ -217,6 +229,7 @@ public class Handler {
 	float[] relativePos;
 	double rotLat, rotVert,sl,cl,sv,cv;
 	ArrayList<CubeObject> temp = new ArrayList<CubeObject>();
+	//TODO Speed up
 	public void cubeRender(Graphics g) {
 		player = players[0];
 		playerCoords[0] = (float) player.getX();
@@ -294,7 +307,6 @@ public class Handler {
 					}
 				}
 			}
-			facesToRender.addAll(facesToRender2);
 		}else {
 			i = 0;
 			for (CubeObject[] blocks:visibleBlocks) {
@@ -306,7 +318,8 @@ public class Handler {
 				}
 			}
 		}
-		
+		long start = System.currentTimeMillis();
+//		g.setColor(Color.GRAY);
 		Collections.sort(facesToRender);
 		for (BlockFace face:facesToRender){
 			if (face != null){
@@ -319,15 +332,11 @@ public class Handler {
 			}
 		}
 		facesToRender.clear();
-		facesToRender2.clear();
+		testMs = System.currentTimeMillis() - start;
 	}
 	
-	public void addFace(BlockFace tempFace) {
-		if(Thread.currentThread().getName() == "Render1") {
-			facesToRender2.add(tempFace);
-		}else {
-			facesToRender.add(tempFace);
-		}
+	public synchronized void addFace(BlockFace tempFace) {
+		facesToRender.add(tempFace);
 	}
 	public int linkArraySize(LinkedList<Integer[]> data) {
 		i = 0;
