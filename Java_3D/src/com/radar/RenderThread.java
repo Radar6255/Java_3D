@@ -3,6 +3,8 @@ package com.radar;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import com.radar.cube.CubeObject;
+
 public class RenderThread extends Thread{
 	
 	ArrayList<CubeObject> visibleBlocks = new ArrayList<CubeObject>();

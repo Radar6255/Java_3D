@@ -1,4 +1,4 @@
-package com.radar;
+package com.radar.windows;
 
 import java.awt.Button;
 import java.awt.PopupMenu;
@@ -6,6 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
+
+import com.radar.Handler;
+import com.radar.Main;
+import com.radar.SettingVars;
 
 public class MenuRender {
 	Main main;

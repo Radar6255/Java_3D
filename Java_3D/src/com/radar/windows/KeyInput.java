@@ -1,7 +1,11 @@
-package com.radar;
+package com.radar.windows;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
+import com.radar.Handler;
+import com.radar.Main;
+import com.radar.cube.CubeObject;
 
 //Handles all key input from the user
 //Sends the data through setter methods

@@ -1,4 +1,4 @@
-package com.radar;
+package com.radar.windows;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
@@ -6,6 +6,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import javax.swing.JFrame;
+
+import com.radar.Main;
 
 //Sets basis for all characteristics of the game window
 public class Window extends Canvas{

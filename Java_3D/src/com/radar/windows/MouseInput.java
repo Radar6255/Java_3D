@@ -1,7 +1,9 @@
-package com.radar;
+package com.radar.windows;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
+import com.radar.Player;
 
 public class MouseInput implements MouseListener{
 	Player player;

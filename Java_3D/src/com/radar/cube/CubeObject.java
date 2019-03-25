@@ -1,4 +1,6 @@
-package com.radar;
+package com.radar.cube;
+
+import com.radar.Handler;
 
 public abstract class CubeObject {
 	public static boolean debug = false;

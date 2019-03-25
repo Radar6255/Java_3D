@@ -1,7 +1,11 @@
-package com.radar;
+package com.radar.cube;
 
 import java.awt.Color;
 import java.util.ArrayList;
+
+import com.radar.Handler;
+import com.radar.Player;
+import com.radar.world.Chunk;
 public class Cube extends CubeObject{
 	public int x, y, z, w, h, d, i, fov, far, cubeIndex,pcx,pcy,pcz,xOff,zOff, chunkMax, height, width;
 	public float tx, ty, tz;

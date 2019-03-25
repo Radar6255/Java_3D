@@ -1,7 +1,11 @@
-package com.radar;
+package com.radar.world;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+
+import com.radar.Handler;
+import com.radar.Player;
+import com.radar.SettingVars;
 
 public class WorldGen{
 	int i,index,all,chunkX,chunkY,chunkZ,xOff,zOff,ix,iz,h,tx,ty,ty2,tz = 0;

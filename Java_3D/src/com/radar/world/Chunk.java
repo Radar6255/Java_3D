@@ -1,7 +1,14 @@
-package com.radar;
+package com.radar.world;
 
 import java.awt.Graphics;
 import java.util.LinkedList;
+
+import com.radar.GpuHandler;
+import com.radar.Handler;
+import com.radar.Player;
+import com.radar.RenderThread;
+import com.radar.cube.BlockFace;
+import com.radar.cube.CubeObject;
 
 //This class is created when a chunk is loaded
 //It is given to each cube created in the chunk

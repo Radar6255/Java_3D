@@ -16,6 +16,13 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
+
+import com.radar.cube.Cube;
+import com.radar.windows.KeyInput;
+import com.radar.windows.MenuRender;
+import com.radar.windows.MouseInput;
+import com.radar.windows.Window;
+import com.radar.world.WorldGen;
 //Main class initializes all classes and runs the game loop
 public class Main extends Canvas implements Runnable{
 	public String version = "1.1.2";
@@ -30,8 +37,8 @@ public class Main extends Canvas implements Runnable{
 	private static final long serialVersionUID = 1L;
 	private Thread thread;
 	private boolean running;
-	static boolean pause;
-	static boolean changeMouse = true;
+	public static boolean pause;
+	public static boolean changeMouse = true;
 	private Handler handler;
 	MenuRender menuRender;
 	int WIDTH = 1200;
@@ -49,7 +56,7 @@ public class Main extends Canvas implements Runnable{
 		handler.addGeneration(gen);
 		this.addMouseListener(new MouseInput(thePlayer));
 		this.addKeyListener(new KeyInput(handler));
-		frame = new Window(WIDTH,HEIGHT,"3D Stuff",this).getFrame();
+		frame = new Window(WIDTH, HEIGHT, "3D Stuff", this).getFrame();
 		menuRender = new MenuRender(frame,this);
 	}
 	long startTime, endTime;

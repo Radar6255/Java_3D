@@ -1,8 +1,13 @@
-package com.radar;
+package com.radar.world;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedList;
+
+import com.radar.GpuHandler;
+import com.radar.Handler;
+import com.radar.Player;
+import com.radar.cube.Cube;
 
 public class CubeGen extends Thread{
 	ArrayList<ArrayList<Integer>> chunkQueue = new ArrayList<ArrayList<Integer>>();

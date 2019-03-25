@@ -1,4 +1,4 @@
-package com.radar;
+package com.radar.cube;
 
 import java.awt.Color;
 
