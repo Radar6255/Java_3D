@@ -9,6 +9,8 @@ import java.awt.PointerInfo;
 import java.awt.Robot;
 import java.awt.Toolkit;
 
+import com.jogamp.opengl.GL2;
+import static com.jogamp.opengl.GL2.*;
 public class Player {
 	double x,y,z,mx,my;
 	int chunkX,chunkY,chunkZ;
@@ -35,15 +37,21 @@ public class Player {
 		this.handler = handler;
 		this.main = main;
 	}
-	public void render(Graphics g){
-		g.setColor(Color.black);
-		g.drawLine(main.getWidth()/2, (main.getHeight()/2)-10, main.getWidth()/2, (main.getHeight()/2)+10);
-		g.drawLine((main.getWidth()/2)-10, (main.getHeight()/2), (main.getWidth()/2)+10, (main.getHeight()/2));
-		if (debug){
-			g.setColor(Color.BLACK);
-			g.drawString(x+" "+y+" "+z, 20, 20);
-			g.drawString(chunkX+" "+chunkY+" "+chunkZ, 20, 40);
-		}
+	public void render(GL2 gl){
+//		g.setColor(Color.black);
+//		g.drawLine(main.getWidth()/2, (main.getHeight()/2)-10, main.getWidth()/2, (main.getHeight()/2)+10);
+//		g.drawLine((main.getWidth()/2)-10, (main.getHeight()/2), (main.getWidth()/2)+10, (main.getHeight()/2));
+		gl.glBegin(GL_LINES);
+		gl.glVertex2f(0f, -0.03f);
+		gl.glVertex2f(0f, 0.03f);
+		gl.glVertex2f(-0.03f, 0f);
+		gl.glVertex2f(0.03f, 0f);
+		gl.glEnd();
+//		if (debug){
+//			g.setColor(Color.BLACK);
+//			g.drawString(x+" "+y+" "+z, 20, 20);
+//			g.drawString(chunkX+" "+chunkY+" "+chunkZ, 20, 40);
+//		}
 	}
 	public void tick(){
 		chunkX = (int) Math.floor(x/16);

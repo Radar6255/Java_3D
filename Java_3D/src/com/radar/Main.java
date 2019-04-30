@@ -6,17 +6,22 @@
 
 package com.radar;
 
-import java.awt.Canvas;
+import static com.jogamp.opengl.GL2ES3.*;
+
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JFrame;
-
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.util.FPSAnimator;
 import com.radar.cube.Cube;
 import com.radar.windows.KeyInput;
 import com.radar.windows.MenuRender;
@@ -24,10 +29,9 @@ import com.radar.windows.MouseInput;
 import com.radar.windows.Window;
 import com.radar.world.WorldGen;
 //Main class initializes all classes and runs the game loop
-public class Main extends Canvas implements Runnable{
-	public String version = "1.1.2";
+public class Main extends GLCanvas implements Runnable, GLEventListener{
+	public String version = "1.1.3";
 	public int frames,fps;
-	
 	long renderTime;
 	
 	public int totalFrames, seconds = 0;
@@ -45,9 +49,9 @@ public class Main extends Canvas implements Runnable{
 	int HEIGHT = 800;
 	int i = 0;
 	int iz = -50;
-	JFrame frame;
-//	ImageIcon img = new ImageIcon("./dirt.png");
-	
+	Frame frame;
+	FPSAnimator animator;
+	long last, start;
 	public Main(){
 		handler = new Handler(this);
 		Player thePlayer = new Player(1.1,40.1,2.1,180,120,handler,this);
@@ -58,6 +62,12 @@ public class Main extends Canvas implements Runnable{
 		this.addKeyListener(new KeyInput(handler));
 		frame = new Window(WIDTH, HEIGHT, "3D Stuff", this).getFrame();
 		menuRender = new MenuRender(frame,this);
+		animator = new FPSAnimator(this, 200);
+		this.addGLEventListener(this);
+		animator.start();
+		this.start();
+		last = System.currentTimeMillis();
+//		start = animator.getFPSStartTime();
 	}
 	long startTime, endTime;
 	
@@ -70,6 +80,7 @@ public class Main extends Canvas implements Runnable{
 		double delta = 0;
 		long timer = System.currentTimeMillis();
 		frames = 0;
+//		running = false;
 		while (running){
 			long now = System.nanoTime();
 			delta += (now- lastTime) / ns;
@@ -81,8 +92,7 @@ public class Main extends Canvas implements Runnable{
 			if (running){
 				Cube.msLag = 0;
 				renderTime = System.currentTimeMillis();
-				render();
-				
+//				render();
 			}
 			frames++;
 			if (System.currentTimeMillis() - timer > 1000){
@@ -96,6 +106,43 @@ public class Main extends Canvas implements Runnable{
 			}
 		}
 		stop();
+	}
+	@Override
+	public void display(GLAutoDrawable drawable) {
+//		render();
+//		animator.resetFPSCounter();
+//		if (System.currentTimeMillis()-last > 1000) {
+//			last = System.currentTimeMillis();
+//			animator.resetFPSCounter();
+//			System.out.println(animator.getLastFPSUpdateTime());
+//		}
+		GL2 gl = drawable.getGL().getGL2();
+		gl.glBegin(GL_QUADS);
+		gl.glColor3f(1,1,1);
+		gl.glVertex2f(-1, -1);
+		gl.glVertex2f(1, -1);
+		gl.glVertex2f(1, 1);
+		gl.glVertex2f(-1, 1);
+		gl.glEnd();
+		gl.glBegin(GL_LINES);
+		gl.glColor3f(0, 0, 0);
+//		System.out.println(System.currentTimeMillis()/100);
+//		if (animator.getLastFPSUpdateTime()-start != 0) {
+//			System.out.println((animator.getTotalFPSFrames()*1000)/(animator.getLastFPSUpdateTime()-start));
+//		}
+		if (last - System.currentTimeMillis() != 0) {
+			System.out.println((1000*animator.getTotalFPSFrames())/(System.currentTimeMillis()-last));
+		}
+		
+		
+//		System.out.println(animator.getTotalFPSFrames());
+//		if (animator.getLastFPS() > 150) {
+//			gl.glVertex2f(-0.03f, -0.03f);
+//			gl.glVertex2f(-0.03f, 0.03f);
+//		}
+		gl.glEnd();
+		handler.render(gl);
+//		gl.glEnd();
 	}
 
 	public synchronized void start(){
@@ -123,6 +170,7 @@ public class Main extends Canvas implements Runnable{
 		handler.tick();
 	}
 	public void render(){
+//		System.out.println("Rendering right");
 		BufferStrategy bs = this.getBufferStrategy();
 		if (bs == null){
 			this.createBufferStrategy(2);
@@ -136,7 +184,7 @@ public class Main extends Canvas implements Runnable{
 		g.setColor(new Color(114, 154, 219));
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		if (mode == 0) {
-			handler.render(g);
+//			handler.render(g);
 		}
 		renderTime = System.currentTimeMillis() - renderTime;
 		g.setColor(Color.BLACK);
@@ -167,6 +215,8 @@ public class Main extends Canvas implements Runnable{
 //		gGraph.drawImage(vImg, 0, 0, this);
 		bs.show();
 	}
+	
+	
 	public int getHeight(){
 		return HEIGHT;
 	}public int getWidth(){
@@ -180,5 +230,20 @@ public class Main extends Canvas implements Runnable{
 	
 	public static void main(String[] args){
 		new Main();
+	}
+	@Override
+	public void dispose(GLAutoDrawable arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void init(GLAutoDrawable arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
+		// TODO Auto-generated method stub
+		
 	}
 }

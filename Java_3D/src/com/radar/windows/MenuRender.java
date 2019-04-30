@@ -1,11 +1,10 @@
 package com.radar.windows;
 
 import java.awt.Button;
+import java.awt.Frame;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.JFrame;
 
 import com.radar.Handler;
 import com.radar.Main;
@@ -13,7 +12,7 @@ import com.radar.SettingVars;
 
 public class MenuRender {
 	Main main;
-	JFrame frame;
+	Frame frame;
 	PopupMenu test;
 	Button a = new Button("Resume");
 	Button b = new Button("Toggle GPU");
@@ -57,8 +56,8 @@ public class MenuRender {
 		}
 		
 	};
-	public MenuRender(JFrame frame, Main main) {
-		this.frame = frame;
+	public MenuRender(Frame frame2, Main main) {
+		this.frame = frame2;
 		this.main = main;
 		int w = 160;
 		int h = 20;
@@ -68,7 +67,7 @@ public class MenuRender {
 			button.setBounds(x,y,w,h);
 			y += h;
 			button.addActionListener(listener);
-			frame.add(button);
+			frame2.add(button);
 		}
 	}
 }

@@ -9,7 +9,6 @@ public class RenderThread extends Thread{
 	
 	ArrayList<CubeObject> visibleBlocks = new ArrayList<CubeObject>();
 	String index;
-	Graphics g;
 	double px, py, pz, rotLat, rotVert = 0;
 	public double sl,cl,sv,cv;
 	public int size;
@@ -56,9 +55,8 @@ public class RenderThread extends Thread{
 		}
 		
 	}
-	public void render(Handler handler,ArrayList<CubeObject> visibleBlocks, Graphics g, float [] relativePos, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
+	public void render(Handler handler,ArrayList<CubeObject> visibleBlocks, float [] relativePos, double rotLat, double rotVert, double sl, double cl, double sv, double cv) {
 		this.handler = handler;
-		this.g = g;
 		this.rotLat = rotLat;
 		this.rotVert = rotVert;
 		this.relativePos = relativePos;

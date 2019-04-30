@@ -7,13 +7,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
 import com.radar.cube.BlockFace;
 import com.radar.cube.Cube;
 import com.radar.cube.CubeObject;
 import com.radar.world.Chunk;
 import com.radar.world.CubeGen;
 import com.radar.world.WorldGen;
-
+import static com.jogamp.opengl.GL2ES3.GL_QUADS;
 //Handler class makes worldGen into a reality
 //Gets info from world then creates chunks and cubes from them
 //Uses created chunks sorted to render all BlockFaces
@@ -117,8 +119,7 @@ public class Handler {
 			chunk.placeBlock();
 		}
 	}
-	public void render(Graphics g){
-		
+	public void render(GL2 gl){
 		chunks = gen.getWorld();
 		xOff = gen.getXOff();
 		zOff = gen.getZOff();
@@ -168,7 +169,7 @@ public class Handler {
 //			chunk.render(g);
 //		}
 		long start = System.currentTimeMillis();
-		cubeRender(g);
+		cubeRender(gl);
 		cubeRenderMs = System.currentTimeMillis() - start;
 //		Threw Error once
 		if (!skip) {
@@ -206,11 +207,11 @@ public class Handler {
 			}i++;
 		}
 		
-		players[0].render(g);
-		if (debug){
-			g.drawString("Single Cubes:"+sCubeCount,10,70);
-			g.drawString("Combined Cubes:"+cCubeCount,10,80);
-		}
+		players[0].render(gl);
+//		if (debug){
+//			g.drawString("Single Cubes:"+sCubeCount,10,70);
+//			g.drawString("Combined Cubes:"+cCubeCount,10,80);
+//		}
 	}
 	boolean first = true;
 	public void tick(){
@@ -237,7 +238,7 @@ public class Handler {
 	double rotLat, rotVert,sl,cl,sv,cv;
 	ArrayList<CubeObject> temp = new ArrayList<CubeObject>();
 	//TODO Speed up
-	public void cubeRender(Graphics g) {
+	public void cubeRender(GL2 gl) {
 		player = players[0];
 		playerCoords[0] = (float) player.getX();
 		playerCoords[1] = (float) player.getY();
@@ -291,7 +292,7 @@ public class Handler {
 		
 		if (SettingVars.multiThread) {
 			renderWait = true;
-			renderThread1.render(this,temp,g,relativePos,rotLat,rotVert,sl,cl,sv,cv);
+			renderThread1.render(this,temp,relativePos,rotLat,rotVert,sl,cl,sv,cv);
 			synchronized(this) {
 				notifyAll();
 			}
@@ -328,16 +329,28 @@ public class Handler {
 		long start = System.currentTimeMillis();
 //		g.setColor(Color.GRAY);
 		Collections.sort(facesToRender);
+		//TODO Change to OpenGL
+		gl.glBegin(GL_QUADS);
 		for (BlockFace face:facesToRender){
 			if (face != null){
-				g.setColor(face.getColor());
-				g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
-				if (debug){
-					g.setColor(Color.BLACK);
-					g.drawString(""+face.getCubeIndex(),face.getXCoords()[0],face.getYCoords()[0]);
+//				gl.set
+//				g.setColor(face.getColor());
+				
+//				g.fillPolygon(face.getXCoords(), face.getYCoords(), 4);
+				gl.glColor3f(face.getColor().getRed()/255.0f, face.getColor().getGreen()/255f, face.getColor().getBlue()/255f);
+				
+				for(int i = 0; i < 4; i++) {
+					float[] point = getCoords(face.getXCoords()[i], face.getYCoords()[i]);
+					gl.glVertex2f(point[0], point[1]);
 				}
+				
+//				if (debug){
+//					g.setColor(Color.BLACK);
+//					g.drawString(""+face.getCubeIndex(),face.getXCoords()[0],face.getYCoords()[0]);
+//				}
 			}
 		}
+		gl.glEnd();
 		facesToRender.clear();
 		testMs = System.currentTimeMillis() - start;
 	}
@@ -345,6 +358,10 @@ public class Handler {
 	public synchronized void addFace(BlockFace tempFace) {
 		facesToRender.add(tempFace);
 	}
+	public float[] getCoords(int x, int y) {
+		return new float[] {((2.0f*x)/main.WIDTH)-1.0f, -(((2.0f*y)/main.HEIGHT)-1.0f)};
+	}
+	
 	public int linkArraySize(LinkedList<Integer[]> data) {
 		i = 0;
 		for (Integer[] chunkData:data) {
